@@ -2,8 +2,12 @@ using UnityEngine;
 
 public class BaseManager : MonoBehaviour
 {
-    private GameManager gameManager;
-    private bool isFreeze;
+    protected GameManager gameManager;
+    protected bool isFreeze;
+    void Awake()
+    {
+        gameManager.OnInit+=Init;
+    }
     void Start()
     {
         
