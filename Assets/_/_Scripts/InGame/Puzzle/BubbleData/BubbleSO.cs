@@ -3,6 +3,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName ="EmptyBubbleData",menuName ="ScriptableObject/BubbleData")]
 public class BubbleSO : ScriptableObject
 {
+  [Header("Name")]
+  public String SOName;
   [Header("Module Sector")]
   [SerializeReference]
   public GameAction action;

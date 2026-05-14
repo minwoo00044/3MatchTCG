@@ -4,7 +4,7 @@ public class BaseManager : MonoBehaviour
 {
     protected GameManager gameManager;
     protected bool isFreeze;
-    void Awake()
+    protected virtual void Awake()
     {
         gameManager.OnInit+=Init;
     }
