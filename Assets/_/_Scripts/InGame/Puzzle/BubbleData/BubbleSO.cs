@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-[CreateAssetMenu(fileName ="EmptyBubbleData",menuName ="ScriptableObject/BubbleData")]
+[CreateAssetMenu(fileName = "EmptyBubbleData", menuName = "ScriptableObject/BubbleData")]
 public class BubbleSO : ScriptableObject
 {
   [Header("Name")]
@@ -18,7 +18,7 @@ public class BubbleSO : ScriptableObject
   //그외에 넣어야할 수치 고민중
 
   public void Excute()
-    {
-        action.OnExcute(target.FindTarget());
-    }
-} 
+  {
+    action.OnExcute(target.FindTarget());
+  }
+}

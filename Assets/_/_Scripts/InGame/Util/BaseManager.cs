@@ -2,22 +2,24 @@ using UnityEngine;
 
 public class BaseManager : MonoBehaviour
 {
+    [SerializeField]
     protected GameManager gameManager;
     protected bool isFreeze;
     protected virtual void Awake()
     {
         gameManager.OnInit+=Init;
+        gameManager.OnUpdate+=OnUpdate;
     }
     void Start()
     {
         
     }
     // Update is called once per frame
-    public virtual void Init()
+    protected virtual void Init()
     {
-        
+        Debug.Log($"{this} init");
     }
-    public virtual void OnUpdate()
+    protected virtual void OnUpdate()
     {
         
     }

@@ -1,4 +1,6 @@
-public class PuzzleMatrixView
+using UnityEngine;
+
+public class PuzzleMatrixView : MonoBehaviour
 {
-    
+
 }

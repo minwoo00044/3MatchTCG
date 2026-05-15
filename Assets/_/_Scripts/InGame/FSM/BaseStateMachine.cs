@@ -40,6 +40,7 @@ public class BaseStateMachine<T,O> where T: struct,Enum where O:class
             current = stateDict[stateName];
             current.OnEnter();
             OnStateEnter?.Invoke(stateName);
+            Debug.Log($"State change to {stateName}");
         }
         finally 
         {

@@ -11,11 +11,9 @@ public class GameInitState : BaseState<EGameState, GameManager>
 
     public override void OnExit()
     {
-        throw new System.NotImplementedException();
     }
 
     public override void OnUpdate()
     {
-        throw new System.NotImplementedException();
     }
 }
