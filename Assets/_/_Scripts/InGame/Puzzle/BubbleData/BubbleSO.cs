@@ -11,6 +11,7 @@ public class BubbleSO : ScriptableObject
   [SerializeReference]
   public ActionTarget target;
   public Sprite bubbleImage;
+  public Color bubbleColor;
   //연출효과 등등
   [Header("DataParse Sector")]
   public float value;

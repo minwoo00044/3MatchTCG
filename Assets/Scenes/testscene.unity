@@ -255,6 +255,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1339909933
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1339909935}
+  - component: {fileID: 1339909934}
+  m_Layer: 0
+  m_Name: PuzzleMatrixView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1339909934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339909933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d07b01126db99fb48abdbe9c7257c32d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1339909935
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339909933}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2011066235
 GameObject:
   m_ObjectHideFlags: 0
@@ -297,7 +341,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ea53f99d38c65b4d9ec770783a79fa0, type: 2}
   - {fileID: 11400000, guid: febefedad1a89734888960b83130ae46, type: 2}
   size: 8
-  puzzleMatrixView: {fileID: 0}
+  viewPrefab: {fileID: 0}
+  puzzleMatrixView: {fileID: 1339909934}
 --- !u!4 &2011066237
 Transform:
   m_ObjectHideFlags: 0
@@ -320,3 +365,4 @@ SceneRoots:
   - {fileID: 873936087}
   - {fileID: 803944019}
   - {fileID: 2011066237}
+  - {fileID: 1339909935}

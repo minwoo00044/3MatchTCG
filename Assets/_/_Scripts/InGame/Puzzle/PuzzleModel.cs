@@ -17,14 +17,25 @@ public class PuzzleModel
         this.puzzleManager = puzzleManager;
         this.Size = size;
     }
-    public void SetBubbles()
+    private void SetBubbleAt(int x, int y, Bubble bubble)
+    {
+        bubbles[x][y] = bubble;
+        if (bubble != null)
+        {
+            bubble.Pos = new Vector2Int(x, y);
+        }
+    }
+    public void SetBubbles(Action callback)
     {
         bubbles = new Bubble[Size][];
         for (int i = 0; i < Size; i++)
         {
             bubbles[i] = new Bubble[Size];
         }
+
         InitializeBoard();
+        callback?.Invoke();
+        // 디버깅 로그 출력
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < Size; i++)
         {
@@ -116,29 +127,34 @@ public class PuzzleModel
     }
     private void SwapData(Vector2Int a, Vector2Int b)
     {
-        Bubble temp = bubbles[a.x][a.y];
-        bubbles[a.x][a.y] = bubbles[b.x][b.y];
-        bubbles[b.x][b.y] = temp;
+        Bubble tempA = bubbles[a.x][a.y];
+        Bubble tempB = bubbles[b.x][b.y];
+
+        SetBubbleAt(a.x, a.y, tempB);
+        SetBubbleAt(b.x, b.y, tempA);
     }
     private void ProcessChainReaction(MoveReceipt receipt)
     {
         bool hasMoreMatches = true;
         while (hasMoreMatches)
         {
-            // 1. 매치된 버블 데이터 삭제 (null 처리)
             foreach (var pos in receipt.MatchPositions)
             {
                 var target = bubbles[pos.x][pos.y];
-                target.ReturnToPool(); // 스스로 풀로 귀환
-                bubbles[pos.x][pos.y] = null;
+                if (target != null)
+                {
+                    target.ReturnToPool();
+                    SetBubbleAt(pos.x, pos.y, null); // null 대입 시에도 메서드 사용
+                }
             }
+
             ApplyGravity(receipt);
             FillEmptySlots(receipt);
-            List<Vector2Int> newMatches = GetAllMatches();
 
+            List<Vector2Int> newMatches = GetAllMatches();
             if (newMatches.Count > 0)
             {
-                receipt.MatchPositions = newMatches; // 다음 루프에서 터뜨릴 위치 갱신
+                receipt.MatchPositions = newMatches;
                 hasMoreMatches = true;
             }
             else
@@ -175,8 +191,6 @@ public class PuzzleModel
     }
     private void ApplyGravity(MoveReceipt receipt)
     {
-        // 2. 중력 작용 (아래로 떨어뜨리기)
-        // bubbles[x][y] 구조이므로 x(열) 단위로 처리하면 매우 쉽습니다.
         for (int x = 0; x < Size; x++)
         {
             int emptyRow = -1;
@@ -184,52 +198,37 @@ public class PuzzleModel
             {
                 if (bubbles[x][y] == null)
                 {
-                    if (emptyRow == -1) emptyRow = y; // 가장 낮은 빈칸 위치 저장
+                    if (emptyRow == -1) emptyRow = y;
                 }
                 else if (emptyRow != -1)
                 {
-                    // 빈칸 위로 데이터가 발견되면 아래로 이동
                     Bubble data = bubbles[x][y];
-                    bubbles[x][emptyRow] = data;
-                    bubbles[x][y] = null;
+
+                    SetBubbleAt(x, emptyRow, data); // 이동 및 위치 기록
+                    SetBubbleAt(x, y, null);        // 이전 자리 비움
 
                     receipt.GravityMoves.Add(new MoveStep(data, new Vector2Int(x, y), new Vector2Int(x, emptyRow)));
-
-                    // 다시 가장 낮은 빈칸 찾기 (현재 y가 null이 되었으므로 순차적으로 올라감)
                     emptyRow++;
                 }
             }
         }
     }
-
     private void FillEmptySlots(MoveReceipt receipt)
     {
         for (int x = 0; x < Size; x++)
         {
-            // 각 열의 위쪽부터 빈칸이 몇 개인지 카운트 (연출용 가상 y좌표 설정에 활용)
             int fillCount = 0;
-
-            // 위에서부터 아래로 내려오며 빈칸 채우기 (y의 큰 값부터 0까지)
             for (int y = Size - 1; y >= 0; y--)
             {
                 if (bubbles[x][y] == null)
                 {
-                    // 1. 팩토리로부터 가중치가 반영된 새 데이터 수신
-                    // (매니저를 통해 팩토리에 접근하는 구조)
                     Bubble newData = puzzleManager.RequestNewBubbleData();
 
-                    // 2. 모델 배열에 할당 (논리적 실체화)
-                    bubbles[x][y] = newData;
+                    SetBubbleAt(x, y, newData); // 생성 및 위치 기록
 
-                    // 3. 리필 연출을 위한 좌표 설정
-                    // 시작점: 보드 바로 위 가상 좌표 (Size + fillCount)
-                    // 도착점: 현재 빈칸 좌표 (x, y)
                     Vector2Int spawnPos = new Vector2Int(x, Size + fillCount);
                     Vector2Int targetPos = new Vector2Int(x, y);
-
-                    // 4. 명세서에 기록
                     receipt.RefillMoves.Add(new MoveStep(newData, spawnPos, targetPos));
-
                     fillCount++;
                 }
             }
@@ -238,10 +237,8 @@ public class PuzzleModel
     public void InitializeBoard()
     {
         bool isBoardPlayable = false;
-
         while (!isBoardPlayable)
         {
-            // 1. 일단 보드를 터지는 곳 없게 채움
             for (int x = 0; x < Size; x++)
             {
                 for (int y = 0; y < Size; y++)
@@ -250,20 +247,14 @@ public class PuzzleModel
                     do
                     {
                         newData = puzzleManager.RequestNewBubbleData();
-                        bubbles[x][y] = newData;
+                        SetBubbleAt(x, y, newData); // 초기 배치 시 기록
                     } while (CheckInitialMatch(x, y));
                 }
             }
 
-            // 2. [중요] 이 판이 유저가 풀 수 있는 판인지 검사
-            if (CanAnyMatchExist())
-            {
-                isBoardPlayable = true;
-            }
-            // 만약 데드락이라면? while 루프에 의해 처음부터 다시 생성 (또는 셔플 호출)
+            if (CanAnyMatchExist()) isBoardPlayable = true;
         }
     }
-
     // 초기 배치용 간이 매치 체크 (왼쪽 2칸, 아래쪽 2칸만 확인)
     private bool CheckInitialMatch(int x, int y)
     {
@@ -286,7 +277,6 @@ public class PuzzleModel
         MoveReceipt ret = new MoveReceipt();
         List<Bubble> allExistingBubbles = new List<Bubble>();
 
-        // 1. 현재 보드의 모든 데이터를 리스트에 수집
         for (int x = 0; x < Size; x++)
         {
             for (int y = 0; y < Size; y++)
@@ -295,42 +285,31 @@ public class PuzzleModel
             }
         }
 
-        // 2. 유효한 보드가 만들어질 때까지 셔플 반복
         bool isValid = false;
         while (!isValid)
         {
-            // 리스트 셔플 (Fisher-Yates 알고리즘 등 사용)
             allExistingBubbles = allExistingBubbles.OrderBy(a => Guid.NewGuid()).ToList();
 
-            // 보드에 재배치
             int index = 0;
             for (int x = 0; x < Size; x++)
             {
                 for (int y = 0; y < Size; y++)
                 {
-                    // 셔플 결과 기록을 위해 이전 좌표 저장 가능 (연출용)
-                    // Vector2Int oldPos = bubbles[x][y].CurrentPos; 
-                    bubbles[x][y] = allExistingBubbles[index++];
+                    SetBubbleAt(x, y, allExistingBubbles[index++]); // 셔플 재배치 시 기록
                 }
             }
 
-            // 3. 셔플 후 즉시 터지는 게 없고, 매칭 가능한 수(Deadlock 아님)가 있는지 확인
-            if (GetAllMatches().Count == 0 && CanAnyMatchExist())
-            {
-                isValid = true;
-            }
+            if (GetAllMatches().Count == 0 && CanAnyMatchExist()) isValid = true;
         }
 
-        // 4. 셔플 명세서 작성 (모든 버블의 ToPos를 갱신)
-        // BoardView에서 전체가 섞이는 연출을 하도록 정보를 담아 보냅니다.
         for (int x = 0; x < Size; x++)
         {
             for (int y = 0; y < Size; y++)
             {
+                // 셔플은 시작 위치를 알 수 없으므로 -1, -1 처리 (또는 현재 뷰 위치 활용)
                 ret.GravityMoves.Add(new MoveStep(bubbles[x][y], new Vector2Int(-1, -1), new Vector2Int(x, y)));
             }
         }
-
         return ret;
     }
     public bool CanAnyMatchExist()

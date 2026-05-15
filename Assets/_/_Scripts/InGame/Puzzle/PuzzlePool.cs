@@ -10,9 +10,10 @@ public class PuzzlePool
     private PuzzleView viewPrefab; 
     private Transform poolParent;
 
-    public PuzzlePool(PuzzleManager puzzleManager)
+    public PuzzlePool(PuzzleManager puzzleManager, PuzzleView viewPrefab)
     {
         this.puzzleManager = puzzleManager;
+        this.viewPrefab = viewPrefab;
         dataPool = new Queue<Bubble>();
         viewPool = new Queue<PuzzleView>();
     }
@@ -39,7 +40,7 @@ public class PuzzlePool
         else
         {
             // 풀에 없으면 매니저에게 요청하거나 직접 Instantiate
-            view = GameObject.Instantiate(viewPrefab);
+            view = GameObject.Instantiate(viewPrefab,poolParent);
         }
 
         view.gameObject.SetActive(true);

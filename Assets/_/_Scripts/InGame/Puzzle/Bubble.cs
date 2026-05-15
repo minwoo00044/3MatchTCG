@@ -4,7 +4,7 @@ using UnityEngine;
 public class Bubble : IPoolable<Bubble>
 {
     public BubbleSO Spec { get; private set; }
-    public Vector2Int Pos { get; set; }
+    public Vector2Int Pos { get;  set; }
     private Action<Bubble> _returnAction;
     public void Initialize(Action<Bubble> returnAction)
     {
