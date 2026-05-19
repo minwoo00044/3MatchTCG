@@ -14,19 +14,22 @@ public class PuzzleManager : BaseManager
     private PuzzleModel puzzleModel;
     private PuzzleFactory puzzleFactory;
     private PuzzlePool puzzlePool;
+    private PuzzleStateMachine puzzleStateMachine;
     protected override void Awake()
     {
         base.Awake();
-        puzzleModel = new PuzzleModel(this,size);
+        puzzleModel = new PuzzleModel(this, size);
         puzzleFactory = new PuzzleFactory();
-        puzzlePool = new PuzzlePool(this,viewPrefab);
+        puzzlePool = new PuzzlePool(this, viewPrefab);
+        puzzleStateMachine = new PuzzleStateMachine(this);
+        puzzleStateMachine.InsertState(EPuzzleState.Init, new PuzzleInitState(puzzleStateMachine));
     }
     //게임매니저의 OnInit 이벤트에 맞춰서 호출됨
     protected override void Init()
     {
         base.Init();
-        puzzleFactory.InJectBubbleSpecs(testTable);
-        puzzleModel.SetBubbles(()=>puzzleMatrixView.DrawingAllMatrix());
+        Debug.Log("불렸니?");
+        puzzleStateMachine.ChangeState(EPuzzleState.Init);
     }
     protected override void OnUpdate()
     {
@@ -36,8 +39,19 @@ public class PuzzleManager : BaseManager
         Bubble data = puzzleFactory.PackBubble(puzzlePool.RequestData());
         PuzzleView puzzleView = puzzlePool.RequestView();
         puzzleView.Injection(data.Spec.bubbleColor, data.Spec.bubbleImage);
-
-
         return data;
+    }
+    public void PuzzleInitialize()
+    {
+        puzzleFactory.InJectBubbleSpecs(testTable);
+        puzzleModel.SetBubbles(() =>
+        {
+            puzzleMatrixView.DrawingAllMatrix();
+            ReportStateTaskComplete();
+        });
+    }
+    private void ReportStateTaskComplete()
+    {
+        gameManager.ReceiveCompleteSignal();
     }
 }

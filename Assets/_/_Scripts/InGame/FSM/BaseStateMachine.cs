@@ -4,11 +4,14 @@ using UnityEngine;
 public class BaseStateMachine<T,O> where T: struct,Enum where O:class
 {
     protected Dictionary<T,IState> stateDict;
-    protected IState current;
+    private IState current;
     protected bool isDirty;
-    protected O owner;
+    private O owner;
 
-    public Action<T>OnStateEnter;
+
+    public O Owner { get => owner; set => owner = value; }
+    public IState Current { get => current; private set => current = value; }
+
     public BaseStateMachine(O owner)
     {
         isDirty = false;
@@ -39,7 +42,6 @@ public class BaseStateMachine<T,O> where T: struct,Enum where O:class
             
             current = stateDict[stateName];
             current.OnEnter();
-            OnStateEnter?.Invoke(stateName);
             Debug.Log($"State change to {stateName}");
         }
         finally 
