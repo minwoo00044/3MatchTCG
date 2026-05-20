@@ -7,7 +7,7 @@ public class BaseManager : MonoBehaviour
     protected bool isFreeze;
     protected virtual void Awake()
     {
-        gameManager.OnInit+=Init;
+        gameManager.OnInit+=OnInit;
         gameManager.OnUpdate+=OnUpdate;
     }
     void Start()
@@ -15,7 +15,7 @@ public class BaseManager : MonoBehaviour
         
     }
     // Update is called once per frame
-    protected virtual void Init()
+    protected virtual void OnInit()
     {
         Debug.Log($"{this} init");
     }

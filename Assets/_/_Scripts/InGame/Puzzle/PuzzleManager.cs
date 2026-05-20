@@ -22,13 +22,11 @@ public class PuzzleManager : BaseManager
         puzzleFactory = new PuzzleFactory();
         puzzlePool = new PuzzlePool(this, viewPrefab);
         puzzleStateMachine = new PuzzleStateMachine(this);
-        puzzleStateMachine.InsertState(EPuzzleState.Init, new PuzzleInitState(puzzleStateMachine));
     }
     //게임매니저의 OnInit 이벤트에 맞춰서 호출됨
-    protected override void Init()
+    protected override void OnInit()
     {
-        base.Init();
-        Debug.Log("불렸니?");
+        base.OnInit();
         puzzleStateMachine.ChangeState(EPuzzleState.Init);
     }
     protected override void OnUpdate()
@@ -37,8 +35,8 @@ public class PuzzleManager : BaseManager
     public Bubble RequestNewBubbleData()
     {
         Bubble data = puzzleFactory.PackBubble(puzzlePool.RequestData());
-        PuzzleView puzzleView = puzzlePool.RequestView();
-        puzzleView.Injection(data.Spec.bubbleColor, data.Spec.bubbleImage);
+        //PuzzleView puzzleView = puzzlePool.RequestView();
+        //puzzleView.Injection(data.Spec.bubbleColor, data.Spec.bubbleImage);
         return data;
     }
     public void PuzzleInitialize()

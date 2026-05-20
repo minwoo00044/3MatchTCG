@@ -23,12 +23,11 @@ public class GameManager : MonoBehaviour
     private void GMInit()
     {
         machine = new GameStateMachine(this);
-        machine.InsertState(EGameState.Init, new GameInitState(machine));
     }
     public void ReceiveCompleteSignal()
     {
         // 1. 현재 머신의 활성화된 스테이트가 보고를 수집하는 인터페이스를 구현했는지 검사
-        if (machine.Current is IReportableState reportableState)
+        if (machine.CurrentState is IReportableState reportableState)
         {
             // 2. 자격이 있다면 해당 스테이트 객체에게 신호를 그대로 토스!
             reportableState.ReceiveCompleteSignal();
