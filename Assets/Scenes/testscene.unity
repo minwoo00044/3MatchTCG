@@ -341,7 +341,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ea53f99d38c65b4d9ec770783a79fa0, type: 2}
   - {fileID: 11400000, guid: febefedad1a89734888960b83130ae46, type: 2}
   size: 8
-  viewPrefab: {fileID: 0}
+  viewPrefab: {fileID: -1897470619763223486, guid: 3e98186be4e77414789331cd349738db, type: 3}
   puzzleMatrixView: {fileID: 1339909934}
 --- !u!4 &2011066237
 Transform:

@@ -10,14 +10,18 @@ public class PuzzleView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
     private SpriteRenderer inBubble;
 
     private Action<PuzzleView> _returnAction;
+    [SerializeField]
+    private Bubble _data;
 
     void Awake()
     {
     }
-    public void Injection(Color color, Sprite sprite)
+    public void Injection(Bubble data)
     {
-        bubbleShell.color = color;
-        inBubble.sprite = sprite;
+        _data = data;
+
+        bubbleShell.color = _data.Spec.bubbleColor;
+        inBubble.sprite = _data.Spec.bubbleImage;
     }
     
     public void OnPointerDown(PointerEventData eventData)
@@ -29,14 +33,13 @@ public class PuzzleView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
     {
         throw new System.NotImplementedException();
     }
+    public void ReturnToPool()
+    {
+        _returnAction?.Invoke(this); // 풀의 반납 로직 실행
+    }
 
     public void Initialize(Action<PuzzleView> returnAction)
     {
         _returnAction = returnAction;
-    }
-
-    public void ReturnToPool()
-    {
-        _returnAction?.Invoke(this); // 풀의 반납 로직 실행
     }
 }

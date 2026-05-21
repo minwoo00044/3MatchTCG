@@ -239,15 +239,23 @@ public class PuzzleModel
         bool isBoardPlayable = false;
         while (!isBoardPlayable)
         {
+            // [수정] 다시 루프를 돌 때 기존에 배치했던 버블들을 싹 다 풀로 안전하게 반환
+            ClearBoardAndPool();
+
             for (int x = 0; x < Size; x++)
             {
                 for (int y = 0; y < Size; y++)
                 {
                     Bubble newData;
+                    // 초기 배치 시 3매치가 나지 않도록 계속 리롤치는 구간
+                    // (이 구간에서 폐기되는 버블들도 풀에 돌려주어야 합니다)
                     do
                     {
+                        // 만약 이전에 실패한 버블이 이 자리에 있다면 풀로 반환
+                        if (bubbles[x][y] != null) bubbles[x][y].ReturnToPool();
+
                         newData = puzzleManager.RequestNewBubbleData();
-                        SetBubbleAt(x, y, newData); // 초기 배치 시 기록
+                        SetBubbleAt(x, y, newData);
                     } while (CheckInitialMatch(x, y));
                 }
             }
@@ -286,30 +294,42 @@ public class PuzzleModel
         }
 
         bool isValid = false;
+        // [개선] 검증 단계에서는 실물 보드(bubbles)를 건드리지 않고 리스트 셔플만 돌립니다.
         while (!isValid)
         {
             allExistingBubbles = allExistingBubbles.OrderBy(a => Guid.NewGuid()).ToList();
 
+            // 임시로 실물 보드에 배치해보고 검증
             int index = 0;
             for (int x = 0; x < Size; x++)
             {
                 for (int y = 0; y < Size; y++)
                 {
-                    SetBubbleAt(x, y, allExistingBubbles[index++]); // 셔플 재배치 시 기록
+                    // 실제 주소값만 잠시 링크를 바꿔서 테스트
+                    bubbles[x][y] = allExistingBubbles[index++];
                 }
             }
 
-            if (GetAllMatches().Count == 0 && CanAnyMatchExist()) isValid = true;
+            // 검증 통과하면 탈출, 실패하면 실물 버블 파괴 없이 리스트 순서만 다시 섞음
+            if (GetAllMatches().Count == 0 && CanAnyMatchExist())
+            {
+                isValid = true;
+            }
         }
 
+        // [추가] 최종 확정된 배치 상태를 기반으로 포지션 값 동기화
         for (int x = 0; x < Size; x++)
         {
             for (int y = 0; y < Size; y++)
             {
-                // 셔플은 시작 위치를 알 수 없으므로 -1, -1 처리 (또는 현재 뷰 위치 활용)
-                ret.GravityMoves.Add(new MoveStep(bubbles[x][y], new Vector2Int(-1, -1), new Vector2Int(x, y)));
+                if (bubbles[x][y] != null)
+                {
+                    bubbles[x][y].Pos = new Vector2Int(x, y);
+                    ret.GravityMoves.Add(new MoveStep(bubbles[x][y], new Vector2Int(-1, -1), new Vector2Int(x, y)));
+                }
             }
         }
+
         return ret;
     }
     public bool CanAnyMatchExist()
@@ -337,5 +357,21 @@ public class PuzzleModel
             }
         }
         return false;
+    }
+    private void ClearBoardAndPool()
+    {
+        if (bubbles == null) return;
+
+        for (int x = 0; x < Size; x++)
+        {
+            for (int y = 0; y < Size; y++)
+            {
+                if (bubbles[x][y] != null)
+                {
+                    bubbles[x][y].ReturnToPool();
+                    SetBubbleAt(x, y, null);
+                }
+            }
+        }
     }
 }

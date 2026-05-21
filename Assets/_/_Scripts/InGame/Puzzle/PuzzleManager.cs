@@ -35,8 +35,9 @@ public class PuzzleManager : BaseManager
     public Bubble RequestNewBubbleData()
     {
         Bubble data = puzzleFactory.PackBubble(puzzlePool.RequestData());
-        //PuzzleView puzzleView = puzzlePool.RequestView();
-        //puzzleView.Injection(data.Spec.bubbleColor, data.Spec.bubbleImage);
+        PuzzleView puzzleView = puzzlePool.RequestView();
+        puzzleView.Injection(data);
+        puzzleMatrixView.RegistBubble(data,puzzleView);
         return data;
     }
     public void PuzzleInitialize()
@@ -51,5 +52,9 @@ public class PuzzleManager : BaseManager
     private void ReportStateTaskComplete()
     {
         gameManager.ReceiveCompleteSignal();
+    }
+    public void RemoveAtMatrix(Bubble data)
+    {
+        puzzleMatrixView.RemoveView(data);
     }
 }

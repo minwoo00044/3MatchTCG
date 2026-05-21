@@ -21,7 +21,21 @@ public class PuzzlePool
     // --- 데이터 풀 로직 ---
     public Bubble RequestData()
     {
-        return dataPool.Count > 0 ? dataPool.Dequeue() : new Bubble();
+        Bubble ret = null;
+        if(dataPool.Count > 0)
+        {
+            ret = dataPool.Dequeue();
+        }
+        else
+        {
+            ret = new Bubble();
+            ret.Initialize((T) =>
+            {
+                ReturnData(T);
+                puzzleManager.RemoveAtMatrix(T);
+            });
+        }
+        return ret;
     }
 
     public void ReturnData(Bubble data)
@@ -43,7 +57,8 @@ public class PuzzlePool
             view = GameObject.Instantiate(viewPrefab,poolParent);
         }
 
-        view.gameObject.SetActive(true);
+        view.gameObject.SetActive(false);
+        view.Initialize(ReturnView);
         return view;
     }
 
