@@ -110,7 +110,7 @@ public class BaseStateMachine<T, O>
         CurrentState = nextState;
         CurrentState?.OnEnter();
     }
-    protected void OnUpdate()
+    public void OnUpdate()
     {
         CurrentState?.OnUpdate();
     }

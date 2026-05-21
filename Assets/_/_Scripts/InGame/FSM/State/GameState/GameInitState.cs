@@ -25,7 +25,7 @@ public class GameInitState : BaseState<EGameState, GameManager>, IReportableStat
         if (readyCount >= totalTargetCount) OnAllTasksComplete();
     }
 
-    private void OnAllTasksComplete() => machine.ChangeState(EGameState.Wait);
+    public void OnAllTasksComplete() => machine.ChangeState(EGameState.Wait);
     public override void OnUpdate() { }
     public override void OnExit() { }
 

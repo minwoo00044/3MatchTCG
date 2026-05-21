@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-public class PuzzleManager : BaseManager
+public class PuzzleManager : BaseManager,IReceiverableMachineManager
 {
     [Header("TEST")]
     [SerializeField]
@@ -15,6 +15,7 @@ public class PuzzleManager : BaseManager
     private PuzzleFactory puzzleFactory;
     private PuzzlePool puzzlePool;
     private PuzzleStateMachine puzzleStateMachine;
+    private StateReportHub<EPuzzleState,PuzzleManager> stateReportHub;
     protected override void Awake()
     {
         base.Awake();
@@ -22,6 +23,8 @@ public class PuzzleManager : BaseManager
         puzzleFactory = new PuzzleFactory();
         puzzlePool = new PuzzlePool(this, viewPrefab);
         puzzleStateMachine = new PuzzleStateMachine(this);
+        puzzleMatrixView.Init(this);
+        stateReportHub = new StateReportHub<EPuzzleState, PuzzleManager>(puzzleStateMachine);
     }
     //게임매니저의 OnInit 이벤트에 맞춰서 호출됨
     protected override void OnInit()
@@ -31,6 +34,8 @@ public class PuzzleManager : BaseManager
     }
     protected override void OnUpdate()
     {
+        base.OnUpdate();
+        puzzleStateMachine.OnUpdate();
     }
     public Bubble RequestNewBubbleData()
     {
@@ -46,15 +51,19 @@ public class PuzzleManager : BaseManager
         puzzleModel.SetBubbles(() =>
         {
             puzzleMatrixView.DrawingAllMatrix();
-            ReportStateTaskComplete();
         });
     }
-    private void ReportStateTaskComplete()
+    public void ReportStateTaskComplete()
     {
         gameManager.ReceiveCompleteSignal();
     }
     public void RemoveAtMatrix(Bubble data)
     {
         puzzleMatrixView.RemoveView(data);
+    }
+
+    public void ReceiveCompleteSignal()
+    {
+        stateReportHub.ReceiveCompleteSignal();
     }
 }

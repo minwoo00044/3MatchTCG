@@ -21,6 +21,6 @@ public class BaseManager : MonoBehaviour
     }
     protected virtual void OnUpdate()
     {
-        
+        if(!isFreeze) return;
     }
 }

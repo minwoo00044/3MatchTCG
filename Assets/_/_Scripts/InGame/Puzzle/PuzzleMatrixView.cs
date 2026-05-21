@@ -4,6 +4,7 @@ using UnityEngine;
 public class PuzzleMatrixView : MonoBehaviour
 {
     private Dictionary<Bubble,PuzzleView> dataViewDict = new Dictionary<Bubble, PuzzleView>();
+    private PuzzleManager puzzleManager;
     public void DrawingAllMatrix()
     {
         Debug.Log("drawStart");
@@ -15,6 +16,11 @@ public class PuzzleMatrixView : MonoBehaviour
             pair.Value.transform.SetPositionAndRotation(new Vector2(x,y),transform.rotation);
             pair.Value.gameObject.SetActive(true);
         }
+        puzzleManager.ReceiveCompleteSignal();
+    }
+    public void Init(PuzzleManager puzzleManager)
+    {
+        this.puzzleManager = puzzleManager;
     }
     public void RegistBubble(Bubble data, PuzzleView view)
     {
