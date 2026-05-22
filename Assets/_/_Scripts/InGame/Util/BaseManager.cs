@@ -4,7 +4,10 @@ public class BaseManager : MonoBehaviour
 {
     [SerializeField]
     protected GameManager gameManager;
-    protected bool isFreeze;
+    private bool isFreeze;
+
+    public bool IsFreeze { get => isFreeze; set => isFreeze = value; }
+
     protected virtual void Awake()
     {
         gameManager.OnInit+=OnInit;

@@ -41,7 +41,7 @@ public class PuzzleManager : BaseManager,IReceiverableMachineManager
     {
         Bubble data = puzzleFactory.PackBubble(puzzlePool.RequestData());
         PuzzleView puzzleView = puzzlePool.RequestView();
-        puzzleView.Injection(data);
+        //puzzleView.Injection(data);
         puzzleMatrixView.RegistBubble(data,puzzleView);
         return data;
     }
@@ -66,4 +66,6 @@ public class PuzzleManager : BaseManager,IReceiverableMachineManager
     {
         stateReportHub.ReceiveCompleteSignal();
     }
+
+    
 }

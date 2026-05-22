@@ -21,12 +21,20 @@ public class PuzzleInitState : BaseState<EPuzzleState, PuzzleManager>, IReportab
 
     public override void OnEnter()
     {
-        var owner = machine.Owner as PuzzleManager;
-        owner.PuzzleInitialize();
+        // 1. 카운터 세팅 및 규칙 장전 (준비 완료)
         readyCount = 0;
-        totalTargetCount = 2; //우선 퍼즐 매니저가 보고받을 대상은 모델과 뷰 단 둘로 본다.
+        totalTargetCount = 2;
+
+        // 2. 일꾼들 출발 및 방송 개시
+        var owner = machine.Owner as PuzzleManager;
+        if (owner != null)
+        {
+            owner.PuzzleInitialize();
+        }
+
         _cachedBroadCastAction?.Invoke();
-        //if (totalTargetCount == 0) OnAllTasksComplete();
+
+        if (totalTargetCount == 0) OnAllTasksComplete();
     }
 
     public override void OnExit()
