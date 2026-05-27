@@ -13,12 +13,15 @@ public class PuzzleView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
     [SerializeField]
     private Bubble _data;
 
-    private Action<PuzzleView> onPointerDownNotify;
-    private Action<PuzzleView> onPointerUpNotify;
+    private Action<Bubble> onPointerDownNotify;
+    private Action<Bubble> onPointerUpNotify;
+
+    public Bubble Data { get => _data; set => _data = value; }
+
     void Awake()
     {
     }
-    public void Injection(Bubble data, Action<PuzzleView> down, Action<PuzzleView> up)
+    public void Injection(Bubble data, Action<Bubble> down, Action<Bubble> up)
     {
         _data = data;
 
@@ -31,12 +34,12 @@ public class PuzzleView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
     
     public void OnPointerDown(PointerEventData eventData)
     {
-        onPointerDownNotify?.Invoke(this);
+        onPointerDownNotify?.Invoke(this._data);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        onPointerUpNotify?.Invoke(this);
+        onPointerUpNotify?.Invoke(this._data);
     }
     public void ReturnToPool()
     {

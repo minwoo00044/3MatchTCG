@@ -43,7 +43,6 @@ public class PuzzleInitState : BaseState<EPuzzleState, PuzzleManager>, IReportab
 
     public override void OnUpdate()
     {
-        throw new System.NotImplementedException();
     }
 
     public void ReceiveCompleteSignal()
