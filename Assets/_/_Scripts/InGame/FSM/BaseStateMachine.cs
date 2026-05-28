@@ -109,6 +109,7 @@ public class BaseStateMachine<T, O>
 
         CurrentState = nextState;
         CurrentState?.OnEnter();
+        Debug.Log($"{this},{CurrentState} init");
     }
     public void OnUpdate()
     {

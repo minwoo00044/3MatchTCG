@@ -22,6 +22,7 @@ public class GameInitState : BaseState<EGameState, GameManager>, IReportableStat
     public void ReceiveCompleteSignal()
     {
         readyCount++;
+        Debug.Log($"{readyCount}:{totalTargetCount}");
         if (readyCount >= totalTargetCount) OnAllTasksComplete();
     }
 

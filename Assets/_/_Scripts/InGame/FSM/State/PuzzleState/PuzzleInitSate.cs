@@ -1,5 +1,5 @@
 using System;
-
+using UnityEngine;
 public class PuzzleInitState : BaseState<EPuzzleState, PuzzleManager>, IReportableState, IBroadcastableState
 {
     private Action _cachedBroadCastAction;
@@ -48,6 +48,7 @@ public class PuzzleInitState : BaseState<EPuzzleState, PuzzleManager>, IReportab
     public void ReceiveCompleteSignal()
     {
         readyCount++;
+        Debug.Log($"{readyCount}:{totalTargetCount}");
         if (readyCount >= totalTargetCount) OnAllTasksComplete();
     }
 }

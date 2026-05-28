@@ -29,6 +29,7 @@ GameStateMachine machine;
     public void ReceiveCompleteSignal()=> stateReportHub.ReceiveCompleteSignal();
     public int GetMinorManager()
     {
+        Debug.Log(OnInit?.GetInvocationList().Length);
         return OnInit?.GetInvocationList().Length ?? 0;
     }
 }

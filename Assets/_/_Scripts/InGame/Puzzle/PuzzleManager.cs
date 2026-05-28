@@ -52,6 +52,7 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
         puzzleModel.SetBubbles(() =>
         {
             puzzleMatrixView.DrawingAllMatrix();
+            
         });
     }
     public void ReportStateTaskComplete()
@@ -97,7 +98,7 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
                 Bubble targetData = targetView.Data; // PuzzleView에 public Bubble Data => _data; 프로퍼티 필요
 
                 // 4. 누른 데이터와 뗀 데이터가 다르고, 서로 인접해 있다면 스왑 실행!
-                if (selected != targetData && IsAdjacent(selected.Pos, targetData.Pos))
+                if (selected != targetData && puzzleModel.IsAdjacent(selected.Pos, targetData.Pos))
                 {
                     // 변경사항 > 스테이트를 퍼즐액션 상태로 변경
                     //게임 매니저 상태를 퍼즐액션 상태로 변경(추가 클릭 및 게임 진행 정지)
@@ -111,9 +112,5 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
         // 한 사이클이 끝났으므로 선택 데이터 초기화
         selected = null;
     }
-    //변경사항 모델로 이관
-    private bool IsAdjacent(Vector2Int posA, Vector2Int posB)
-    {
-        return (posA - posB).sqrMagnitude == 1;
-    }
+
 }

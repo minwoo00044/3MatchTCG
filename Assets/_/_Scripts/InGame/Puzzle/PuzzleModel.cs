@@ -46,6 +46,7 @@ public class PuzzleModel
             sb.Append("\n");
         }
         Debug.Log(sb.ToString());
+        puzzleManager.ReceiveCompleteSignal();
     }
     private HashSet<Vector2Int> GetConnectedBubbles(Vector2Int start, string soName)
     {
@@ -373,5 +374,10 @@ public class PuzzleModel
                 }
             }
         }
+    }
+        //변경사항 모델로 이관
+    public bool IsAdjacent(Vector2Int posA, Vector2Int posB)
+    {
+        return (posA - posB).sqrMagnitude == 1;
     }
 }
