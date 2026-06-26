@@ -71,6 +71,7 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
 
     private void OnPuzzleViewClickDown(Bubble data)
     {
+        if(IsFreeze) return;
         if (selected is null) 
         {
             selected = data;
@@ -102,6 +103,7 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
                 {
                     // 변경사항 > 스테이트를 퍼즐액션 상태로 변경
                     //게임 매니저 상태를 퍼즐액션 상태로 변경(추가 클릭 및 게임 진행 정지)
+                    gameManager.ReceiveCompleteSignal();
                     // 게임매니저의 이벤트에 따라 모델에 스왑명령
                     // 이후 퍼즐 머신을 연출/연쇄 상태(Animate)로 전환하여 뷰에게 그리라고 지시
                     // puzzleMachine.ChangeState(EPuzzleState.Animate, receipt);
