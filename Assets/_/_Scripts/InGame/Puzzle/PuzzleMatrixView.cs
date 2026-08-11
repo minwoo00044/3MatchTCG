@@ -8,13 +8,15 @@ public class PuzzleMatrixView : MonoBehaviour
     private Dictionary<Bubble, PuzzleView> dataViewDict = new Dictionary<Bubble, PuzzleView>();
     private PuzzleManager puzzleManager;
 
-    // ===================== 낙하 연출 타이밍 =====================
-    // 중력/리필은 이동 거리가 제각각이므로 고정 시간이 아니라 "칸당 시간"으로 계산합니다.
-    [Header("FALL TIMING")]
-    [Tooltip("낙하 1칸당 소요 시간(초)")]
+    // ===================== 연출 타이밍 =====================
+    [Header("TIMING")]
+    [SerializeField] private float swapDuration = 0.15f;
+    [SerializeField] private float matchDuration = 0.15f;
+    [Tooltip("낙하 1칸당 소요 시간(초). 중력/리필은 이동 거리가 제각각이라 고정 시간을 쓰면 속도가 달라 보입니다.")]
     [SerializeField] private float fallSecondsPerCell = 0.07f;
     [Tooltip("아주 짧은 낙하도 이 시간 이상은 보장")]
     [SerializeField] private float fallMinDuration = 0.12f;
+    [SerializeField] private float shuffleDuration = 0.45f;
 
     // 이동 거리에 비례한 낙하 시간. 1칸이든 6칸이든 체감 속도가 같아집니다.
     private float GetFallDuration(Vector2Int from, Vector2Int to)
@@ -23,22 +25,6 @@ public class PuzzleMatrixView : MonoBehaviour
         return Mathf.Max(fallMinDuration, distance * fallSecondsPerCell);
     }
 
-    // ===================== 디버그 로그 =====================
-    [Header("DEBUG")]
-    [SerializeField] private bool enableAnimLog = true;
-
-    private void PLog(string msg)
-    {
-        if (!enableAnimLog) return;
-        Debug.Log($"[PZ|f{Time.frameCount}|t{Time.time:F3}] {msg}");
-    }
-    private void PWarn(string msg)
-    {
-        if (!enableAnimLog) return;
-        Debug.LogWarning($"[PZ|f{Time.frameCount}|t{Time.time:F3}] {msg}");
-    }
-    // =====================================================
-
     public Vector2 GetWorldPos(Vector2Int gridPos)
     {
         return new Vector2(gridPos.x * 1f, gridPos.y * 1f);
@@ -46,7 +32,6 @@ public class PuzzleMatrixView : MonoBehaviour
 
     public void DrawingAllMatrix()
     {
-        Debug.Log("drawStart");
         foreach (var pair in dataViewDict)
         {
             Vector2 worldPos = GetWorldPos(pair.Key.Pos);
@@ -132,6 +117,23 @@ public class PuzzleMatrixView : MonoBehaviour
         dataViewDict.Add(data, view);
     }
 
+    // 데이터와 뷰를 함께 해제하는 단일 창구.
+    // Bubble.ReturnToPool() -> PuzzlePool 콜백 -> PuzzleManager.RemoveAtMatrix() -> 여기로 들어옵니다.
+    // 뷰 반납 주체를 이곳 하나로 통일해야 모델 경로(InitializeBoard 리롤, ClearBoardAndPool)에서
+    // PuzzleView가 회수되지 않고 새어나가는 것을 막을 수 있습니다.
+    public void ReleaseView(Bubble data)
+    {
+        if (dataViewDict.TryGetValue(data, out PuzzleView view))
+        {
+            view.ReturnToPool();
+        }
+        else
+        {
+            Debug.LogWarning($"[PuzzleMatrixView] dict에 없는 Bubble 반납 시도 (이미 반납됨?) pos={data?.Pos}");
+        }
+        dataViewDict.Remove(data);
+    }
+
     // 연출이 끝난 시점의 뷰는 언제나 모델(Bubble.Pos)과 일치해야 합니다.
     //
     // DOTween의 OnStart는 UpdateMode.Update로 진입할 때만 발화합니다. 한 프레임의 deltaTime이
@@ -153,24 +155,10 @@ public class PuzzleMatrixView : MonoBehaviour
 
             if (!view.gameObject.activeSelf)
             {
-                PWarn($"[RECONCILE] 비활성으로 남은 뷰를 복구합니다. Pos={data.Pos} (OnStart 스킵 의심)");
+                Debug.LogWarning($"[PuzzleMatrixView] 비활성으로 남은 뷰를 복구합니다. Pos={data.Pos} (OnStart 스킵 의심)");
                 view.gameObject.SetActive(true);
             }
         }
-    }
-
-    public void ReleaseView(Bubble data)
-    {
-        if (dataViewDict.TryGetValue(data, out PuzzleView view))
-        {
-            PLog($"  [ReleaseView] 뷰 반납 '{view.name}' (dict {dataViewDict.Count} -> {dataViewDict.Count - 1})");
-            view.ReturnToPool();
-        }
-        else
-        {
-            PWarn($"  [ReleaseView] dict에 없는 Bubble 반납 시도 (이미 반납됨?) pos={data?.Pos}");
-        }
-        dataViewDict.Remove(data);
     }
 
     public void PuzzleActionStart(MoveReceipt receipt)
@@ -178,67 +166,31 @@ public class PuzzleMatrixView : MonoBehaviour
         // 연출이 도는 동안 선택/호버/힌트 표시는 모두 내립니다.
         ClearAllHighlights();
 
-        // ===== [진입] 환경 및 영수증 상태 덤프 =====
-        PLog("========== PuzzleActionStart 진입 ==========");
-        PLog($"[ENV] timeScale={Time.timeScale} / DOTween 재생중 트윈={DOTween.TotalPlayingTweens()} / dataViewDict={dataViewDict.Count}개");
-        PLog($"[RECEIPT] SwapMoves={receipt.SwapMoves.Count} / ChainSteps={receipt.ChainSteps.Count} / " +
-             $"ShuffleMoves={receipt.ShuffleMoves.Count} / IsChainOccurred={receipt.IsChainOccurred}");
-        for (int i = 0; i < receipt.ChainSteps.Count; i++)
-        {
-            var s = receipt.ChainSteps[i];
-            PLog($"[RECEIPT]   Step{i}: Matches={s.Matches.Count}, Gravity={s.GravityMoves.Count}, Refill={s.RefillMoves.Count}");
-        }
-
         Sequence mainSeq = DOTween.Sequence();
 
         // -------------------------------------------------------------
-        // [1단계] 스왑 및 롤백 연출 (SwapMoves)
+        // [1단계] 스왑 및 롤백 연출
         // -------------------------------------------------------------
-        bool swapA = receipt.SwapMoves.Count >= 2 && dataViewDict.ContainsKey(receipt.SwapMoves[0].Data);
-        bool swapB = receipt.SwapMoves.Count >= 2 && dataViewDict.ContainsKey(receipt.SwapMoves[1].Data);
-        PLog($"[SWAP] 조회결과 A={swapA}, B={swapB} (둘 다 true여야 스왑 연출이 붙습니다)");
-
         if (receipt.SwapMoves.Count >= 2
             && dataViewDict.TryGetValue(receipt.SwapMoves[0].Data, out PuzzleView viewA)
             && dataViewDict.TryGetValue(receipt.SwapMoves[1].Data, out PuzzleView viewB))
         {
-            Vector2 targetPosA = GetWorldPos(receipt.SwapMoves[0].ToPos);
-            Vector2 targetPosB = GetWorldPos(receipt.SwapMoves[1].ToPos);
+            mainSeq.Append(viewA.transform.DOMove(GetWorldPos(receipt.SwapMoves[0].ToPos), swapDuration));
+            mainSeq.Join(viewB.transform.DOMove(GetWorldPos(receipt.SwapMoves[1].ToPos), swapDuration));
 
-            PLog($"[SWAP] A '{viewA.name}' active={viewA.gameObject.activeInHierarchy} scale={viewA.transform.localScale} " +
-                 $"현재pos={(Vector2)viewA.transform.position} -> 목표={targetPosA}");
-            PLog($"[SWAP] B '{viewB.name}' active={viewB.gameObject.activeInHierarchy} scale={viewB.transform.localScale} " +
-                 $"현재pos={(Vector2)viewB.transform.position} -> 목표={targetPosB}");
-
-            Transform trA = viewA.transform;
-            mainSeq.Append(trA.DOMove(targetPosA, 0.15f)
-                .OnStart(() => PLog($"[SWAP-A] 트윈 시작. from={(Vector2)trA.position} -> {targetPosA}"))
-                .OnComplete(() => PLog($"[SWAP-A] 트윈 완료. pos={(Vector2)trA.position}")));
-            mainSeq.Join(viewB.transform.DOMove(targetPosB, 0.15f));
-
-            // SwapMoves가 4개인 경우 롤백이므로 제자리로 복귀하는 2차 이동 추가
+            // SwapMoves가 4개면 롤백이므로 제자리로 복귀하는 2차 이동을 잇습니다.
             if (receipt.SwapMoves.Count == 4)
             {
-                Vector2 originPosA = GetWorldPos(receipt.SwapMoves[2].ToPos);
-                Vector2 originPosB = GetWorldPos(receipt.SwapMoves[3].ToPos);
-                PLog($"[SWAP] 롤백 구간 추가. A->{originPosA}, B->{originPosB}");
-
-                mainSeq.Append(viewA.transform.DOMove(originPosA, 0.15f));
-                mainSeq.Join(viewB.transform.DOMove(originPosB, 0.15f));
+                mainSeq.Append(viewA.transform.DOMove(GetWorldPos(receipt.SwapMoves[2].ToPos), swapDuration));
+                mainSeq.Join(viewB.transform.DOMove(GetWorldPos(receipt.SwapMoves[3].ToPos), swapDuration));
             }
         }
-        else
-        {
-            PWarn("[SWAP] 스왑 연출이 통째로 스킵되었습니다! (SwapMoves 부족 또는 dict 조회 실패)");
-        }
 
-        // 스왑 이후에 연출할 것이 아무것도 없는 경우(= 롤백)에는 여기서 완수 보고 후 종료
+        // 스왑 이후에 연출할 것이 없는 경우(= 롤백)에는 여기서 완수 보고 후 종료
         if (!receipt.HasPostSwapAction)
         {
-            PLog($"[EXIT-ROLLBACK] 연쇄 없음. mainSeq duration={mainSeq.Duration():F3}s, active={mainSeq.IsActive()}, playing={mainSeq.IsPlaying()}");
             mainSeq.OnComplete(() =>
             {
-                PLog("[EXIT-ROLLBACK] mainSeq OnComplete -> ReceiveCompleteSignal()");
                 ReconcileViewsToModel();
                 puzzleManager.ReceiveCompleteSignal();
             });
@@ -246,120 +198,80 @@ public class PuzzleMatrixView : MonoBehaviour
         }
 
         // -------------------------------------------------------------
-        // [2단계] 단계별 콤보/연쇄 연출 루프 (1차 -> 2차 -> 3차...)
+        // [2단계] 단계별 연쇄 연출 (1차 -> 2차 -> 3차...)
         // -------------------------------------------------------------
-        int stepIndex = -1;
         foreach (var step in receipt.ChainSteps)
         {
-            stepIndex++;
-            int si = stepIndex; // 클로저 캡처용
-            PLog($"--- [BUILD] Step{si} 조립 시작 (누적 duration={mainSeq.Duration():F3}s) ---");
-
-            // A. 이번 콤보 터짐 연출
+            // A. 이번 단계에서 터지는 버블
             if (step.Matches.Count > 0)
             {
                 Sequence matchSeq = DOTween.Sequence();
-                int hit = 0, miss = 0;
                 foreach (var move in step.Matches)
                 {
-                    if (dataViewDict.TryGetValue(move.Data, out PuzzleView view))
+                    if (!dataViewDict.TryGetValue(move.Data, out PuzzleView view))
                     {
-                        hit++;
-                        Bubble targetBubble = move.Data;
-                        Vector2Int at = move.ToPos;
-                        matchSeq.Join(view.transform.DOScale(Vector3.zero, 0.15f)
-                            .OnStart(() => PLog($"[S{si}-MATCH] 터짐 시작 {at} '{view.name}' active={view.gameObject.activeInHierarchy}"))
-                            .OnComplete(() =>
-                            {
-                                PLog($"[S{si}-MATCH] 터짐 완료 {at} -> ReturnToPool");
-                                targetBubble.ReturnToPool();
-                            }));
+                        Debug.LogWarning($"[PuzzleMatrixView] 터짐 연출 대상 뷰를 찾지 못했습니다. pos={move.ToPos}");
+                        continue;
                     }
-                    else
-                    {
-                        miss++;
-                        PWarn($"[S{si}-MATCH] dict 조회 실패! pos={move.ToPos} (연출 누락)");
-                    }
+
+                    // ReturnToPool() 한 번이면 ReleaseView()를 타고 뷰까지 함께 회수됩니다.
+                    Bubble targetBubble = move.Data;
+                    matchSeq.Join(view.transform.DOScale(Vector3.zero, matchDuration)
+                        .OnComplete(() => targetBubble.ReturnToPool()));
                 }
-                PLog($"[S{si}-MATCH] 조립완료 hit={hit} miss={miss} matchSeq.duration={matchSeq.Duration():F3}s");
                 mainSeq.Append(matchSeq);
             }
 
-            // B. 이번 콤보 중력 낙하 연출
+            // B. 중력 낙하
             if (step.GravityMoves.Count > 0)
             {
                 Sequence gravitySeq = DOTween.Sequence();
-                int hit = 0, miss = 0;
                 foreach (var move in step.GravityMoves)
                 {
-                    if (dataViewDict.TryGetValue(move.Data, out PuzzleView view))
+                    if (!dataViewDict.TryGetValue(move.Data, out PuzzleView view))
                     {
-                        hit++;
-                        Vector2 targetPos = GetWorldPos(move.ToPos);
-                        Transform tr = view.transform;
-                        Vector2Int from = move.FromPos, to = move.ToPos;
-                        gravitySeq.Join(tr.DOMove(targetPos, GetFallDuration(from, to)).SetEase(Ease.InQuad)
-                            .OnStart(() => PLog($"[S{si}-GRAV] 낙하 시작 {from}->{to} 실제pos={(Vector2)tr.position} active={tr.gameObject.activeInHierarchy}"))
-                            .OnComplete(() => PLog($"[S{si}-GRAV] 낙하 완료 {to} 실제pos={(Vector2)tr.position}")));
+                        Debug.LogWarning($"[PuzzleMatrixView] 낙하 연출 대상 뷰를 찾지 못했습니다. {move.FromPos}->{move.ToPos}");
+                        continue;
                     }
-                    else
-                    {
-                        miss++;
-                        PWarn($"[S{si}-GRAV] dict 조회 실패! {move.FromPos}->{move.ToPos} (연출 누락)");
-                    }
+
+                    gravitySeq.Join(view.transform
+                        .DOMove(GetWorldPos(move.ToPos), GetFallDuration(move.FromPos, move.ToPos))
+                        .SetEase(Ease.InQuad));
                 }
-                PLog($"[S{si}-GRAV] 조립완료 hit={hit} miss={miss} gravitySeq.duration={gravitySeq.Duration():F3}s");
                 mainSeq.Append(gravitySeq);
             }
 
-            // C. 이번 콤보 리필 낙하 연출 (중력 낙하와 자연스럽게 병합/연동)
+            // C. 리필 낙하 (중력과 같은 시점에 시작해 함께 쏟아지도록 병합)
             if (step.RefillMoves.Count > 0)
             {
                 Sequence refillSeq = DOTween.Sequence();
-                int hit = 0, miss = 0;
                 foreach (var move in step.RefillMoves)
                 {
-                    if (dataViewDict.TryGetValue(move.Data, out PuzzleView view))
+                    if (!dataViewDict.TryGetValue(move.Data, out PuzzleView view))
                     {
-                        hit++;
-                        Vector2 spawnPos = GetWorldPos(move.FromPos);
-                        Vector2 targetPos = GetWorldPos(move.ToPos);
-                        PuzzleView captured = view;
-
-                        // 1. 위치와 스케일은 DOMove 생성 전 확정 (Startup이 spawnPos를 시작값으로 캡처)
-                        captured.transform.position = spawnPos;
-                        captured.transform.localScale = Vector3.one;
-
-                        // 2. 화면 노출(SetActive)만 실제 트윈 재생 시점(OnStart)으로 이관하여 유령 버블 방지
-                        //    리필도 컬럼마다 낙하 거리가 달라지므로 거리 비례 시간을 씁니다.
-                        refillSeq.Join(captured.transform.DOMove(targetPos, GetFallDuration(move.FromPos, move.ToPos))
-                            .SetEase(Ease.OutBounce)
-                            .OnStart(() =>
-                            {
-                                PLog($"[S{si}-REFILL] 등장 {spawnPos}->{targetPos} '{captured.name}' 실제pos={(Vector2)captured.transform.position}");
-                                captured.gameObject.SetActive(true);
-                            })
-                            .OnComplete(() => PLog($"[S{si}-REFILL] 착지 {targetPos} 실제pos={(Vector2)captured.transform.position}")));
+                        Debug.LogWarning($"[PuzzleMatrixView] 리필 연출 대상 뷰를 찾지 못했습니다. ->{move.ToPos}");
+                        continue;
                     }
-                    else
-                    {
-                        miss++;
-                        PWarn($"[S{si}-REFILL] dict 조회 실패! ->{move.ToPos} (연출 누락, 버블이 영영 안 보임)");
-                    }
-                }
-                PLog($"[S{si}-REFILL] 조립완료 hit={hit} miss={miss} refillSeq.duration={refillSeq.Duration():F3}s");
 
-                // 중력 낙하가 있었다면 중력과 리필을 함께/이어서 병합 연출
-                if (step.GravityMoves.Count > 0)
-                {
-                    mainSeq.Join(refillSeq);
-                    PLog($"[S{si}-REFILL] 중력과 Join 병합");
+                    Vector2 spawnPos = GetWorldPos(move.FromPos);
+                    PuzzleView captured = view;
+
+                    // 위치/스케일은 트윈 생성 "전"에 확정해야 합니다.
+                    // DOTween은 Startup()에서 시작값을 캡처하고 그 뒤에 OnStart를 부르므로,
+                    // OnStart 안에서 위치를 잡으면 이미 늦습니다.
+                    captured.transform.position = spawnPos;
+                    captured.transform.localScale = Vector3.one;
+
+                    // 반면 화면 노출은 시작값과 무관하므로 재생 시점으로 미룹니다.
+                    // 그러지 않으면 2·3차 연쇄용 버블까지 0프레임에 보드 위로 튀어나옵니다.
+                    refillSeq.Join(captured.transform
+                        .DOMove(GetWorldPos(move.ToPos), GetFallDuration(move.FromPos, move.ToPos))
+                        .SetEase(Ease.OutBounce)
+                        .OnStart(() => captured.gameObject.SetActive(true)));
                 }
-                else
-                {
-                    mainSeq.Append(refillSeq);
-                    PLog($"[S{si}-REFILL] 중력 없음 -> Append");
-                }
+
+                if (step.GravityMoves.Count > 0) mainSeq.Join(refillSeq);
+                else mainSeq.Append(refillSeq);
             }
         }
 
@@ -368,52 +280,26 @@ public class PuzzleMatrixView : MonoBehaviour
         // -------------------------------------------------------------
         if (receipt.ShuffleMoves.Count > 0)
         {
-            PLog($"[SHUFFLE] 데드락 셔플 {receipt.ShuffleMoves.Count}개 이동 조립");
-
             Sequence shuffleSeq = DOTween.Sequence();
-            int hit = 0, miss = 0;
             foreach (var move in receipt.ShuffleMoves)
             {
-                if (dataViewDict.TryGetValue(move.Data, out PuzzleView view))
+                if (!dataViewDict.TryGetValue(move.Data, out PuzzleView view))
                 {
-                    hit++;
-                    Vector2 targetPos = GetWorldPos(move.ToPos);
-                    shuffleSeq.Join(view.transform.DOMove(targetPos, 0.45f).SetEase(Ease.InOutQuad));
+                    Debug.LogWarning($"[PuzzleMatrixView] 셔플 연출 대상 뷰를 찾지 못했습니다. {move.FromPos}->{move.ToPos}");
+                    continue;
                 }
-                else
-                {
-                    miss++;
-                    PWarn($"[SHUFFLE] dict 조회 실패! {move.FromPos}->{move.ToPos}");
-                }
+
+                shuffleSeq.Join(view.transform
+                    .DOMove(GetWorldPos(move.ToPos), shuffleDuration)
+                    .SetEase(Ease.InOutQuad));
             }
-            PLog($"[SHUFFLE] 조립완료 hit={hit} miss={miss} duration={shuffleSeq.Duration():F3}s");
             mainSeq.Append(shuffleSeq);
         }
 
-        // ===== [조립 완료] 최종 시퀀스 상태 점검 =====
-        PLog($"========== 조립 완료: mainSeq duration={mainSeq.Duration():F3}s / active={mainSeq.IsActive()} / playing={mainSeq.IsPlaying()} / DOTween 재생중={DOTween.TotalPlayingTweens()} ==========");
-        if (mainSeq.Duration() <= 0f)
+        mainSeq.OnComplete(() =>
         {
-            PWarn("!!! mainSeq의 duration이 0입니다. 트윈이 하나도 안 붙었다는 뜻이며, 다음 프레임에 즉시 완료 처리됩니다 !!!");
-        }
-
-        int updateTicks = 0;
-        mainSeq.OnPlay(() => PLog(">>> mainSeq OnPlay (재생 시작)"))
-               .OnUpdate(() =>
-               {
-                   // 실제로 프레임이 흐르며 갱신되는지 확인 (앞 8틱만 출력)
-                   if (updateTicks < 8)
-                   {
-                       updateTicks++;
-                       PLog($"    mainSeq OnUpdate #{updateTicks} elapsed={mainSeq.Elapsed():F3}/{mainSeq.Duration():F3}");
-                   }
-               })
-               .OnKill(() => PLog("<<< mainSeq OnKill (시퀀스 파기)"))
-               .OnComplete(() =>
-               {
-                   PLog($"<<< mainSeq OnComplete. 총 OnUpdate 틱 수={updateTicks} (이 값이 0~1이면 애니메이션이 한 프레임에 씹힌 것입니다)");
-                   ReconcileViewsToModel();
-                   puzzleManager.ReceiveCompleteSignal();
-               });
+            ReconcileViewsToModel();
+            puzzleManager.ReceiveCompleteSignal();
+        });
     }
 }

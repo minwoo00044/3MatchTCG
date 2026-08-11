@@ -59,7 +59,6 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
     // GameManager의 OnPuzzleAction 이벤트를 수신받았을 때 실행되는 함수
     private void HandleOnPuzzleAction()
     {
-        Debug.Log($"[PZ|f{Time.frameCount}] (2) HandleOnPuzzleAction 수신 -> IsFreeze=true, PuzzleState를 PuzzleAction으로 전환");
         IsFreeze = true; // 입력방지
         // 연출이 끝나고 다시 대기 상태가 되면 힌트 타이머가 처음부터 돌아야 합니다.
         ResetHintTimer();
@@ -161,9 +160,7 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
         if (!puzzleModel.IsInBoardRange(targetPos)) return; // 보드 밖으로 미는 동작
         if (puzzleModel.GetBubbleAt(targetPos) == null) return;
 
-        Debug.Log($"[PZ|f{Time.frameCount}] (1) Swap 실행: {origin.Pos} <-> {targetPos} (드래그 {dragDelta})");
         cachedReceipt = puzzleModel.Swap(origin.Pos, targetPos);
-        Debug.Log($"[PZ|f{Time.frameCount}] (1) Swap 완료. 영수증 SwapMoves={cachedReceipt.SwapMoves.Count}, ChainSteps={cachedReceipt.ChainSteps.Count}");
 
         ResetHintTimer();
         gameManager.ReceiveCompleteSignal();
@@ -213,8 +210,6 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
 
     public void PlayPuzzleAnimateSequence()
     {
-        Debug.Log($"[PZ|f{Time.frameCount}] (3) PlayPuzzleAnimateSequence 호출. cachedReceipt={(cachedReceipt == null ? "NULL" : "있음")}");
-
         if (cachedReceipt == null)
         {
             // 연출할 영수증이 없는데 그냥 return하면 PuzzlePuzzleActionState가
