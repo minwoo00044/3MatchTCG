@@ -11,13 +11,10 @@ public class BaseStateMachine<T, O>
     public IState CurrentState { get; private set; }
     protected Dictionary<T, IState> _stateTable = new Dictionary<T, IState>();
 
-    // [추가] 상태(Enum)에 따른 이벤트(Action) 리모컨을 미리 구워둘 보관함
-    private Dictionary<T, FieldInfo> _eventFieldCache = new Dictionary<T, FieldInfo>();
     public BaseStateMachine(O owner)
     {
         this.Owner = owner;
         AutoInsertStates();
-        CacheOwnerEventFields(); // 생성과 동시에 (오너의 Awake 시점) 캐싱 시작
     }
     private void AutoInsertStates()
     {
@@ -55,58 +52,29 @@ public class BaseStateMachine<T, O>
 
         Debug.Log($"[{typeof(O).Name}] 상태 머신 세팅 완료. 총 {_stateTable.Count}개의 상태가 자동 등록됨.");
     }
-    // [핵심] 오너의 모든 이벤트를 싹 긁어서 미리 딕셔너리에 구워둡니다.
-    private void CacheOwnerEventFields()
-    {
-        Type ownerType = typeof(O);
-        foreach (T state in Enum.GetValues(typeof(T)))
-        {
-            string stateName = state.ToString();
-
-            FieldInfo field = ownerType.GetField("On" + stateName,
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-            if (field == null)
-            {
-                field = ownerType.GetField(stateName,
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            }
-
-            if (field != null)
-            {
-                // [수정] 값 대신 필드 정보 자체를 저장
-                _eventFieldCache[state] = field;
-            }
-        }
-    }
 
     public void ChangeState(T newState)
     {
         CurrentState?.OnExit();
         IState nextState = null;
         _stateTable.TryGetValue(newState, out nextState);
-        if(nextState is null)
+        if (nextState is null)
         {
             Debug.Log("null state change");
             return;
         }
         if (nextState is IBroadcastableState broadcastable)
         {
-            // 딕셔너리에서 필드 정보를 가져옴
-            if (_eventFieldCache.TryGetValue(newState, out FieldInfo field))
+            if (Owner is GameManager gameManager && newState is EGameState gameState)
             {
-                // [핵심] 상태 전환 시점에 오너의 실시간 이벤트 인스턴스(Action)를 추출!
-                // 하위 매니저들이 += 등록을 마친 상태이므로 더 이상 null이 아닙니다.
-                Action currentRuntimeEvent = field.GetValue(Owner) as Action;
+                Action currentRuntimeEvent = gameManager.GetStateEvent(gameState);
 
-                // 런타임 이벤트가 null이 아닐 때만 주입 (구독자가 아무도 없으면 null일 수 있음)
                 if (currentRuntimeEvent != null)
                 {
                     broadcastable.InjectBroadCastTask(currentRuntimeEvent);
                 }
             }
         }
-
         CurrentState = nextState;
         CurrentState?.OnEnter();
         Debug.Log($"{this},{CurrentState} init");

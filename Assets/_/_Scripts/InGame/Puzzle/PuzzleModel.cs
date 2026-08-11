@@ -48,81 +48,185 @@ public class PuzzleModel
         Debug.Log(sb.ToString());
         puzzleManager.ReceiveCompleteSignal();
     }
-    private HashSet<Vector2Int> GetConnectedBubbles(Vector2Int start, string soName)
-    {
-        HashSet<Vector2Int> connected = new HashSet<Vector2Int>();
-        Stack<Vector2Int> stack = new Stack<Vector2Int>();
-
-        stack.Push(start);
-        connected.Add(start);
-
-        while (stack.Count > 0)
-        {
-            Vector2Int current = stack.Pop();
-
-            // 상하좌우 4방향 체크
-            foreach (Vector2Int dir in _directions) // {Up, Down, Left, Right}
-            {
-                Vector2Int next = current + dir;
-
-                // 1. 보드 범위 안인지 2. 이미 체크했는지 3. 동일한 SO 인지 확인
-                if (IsInBounds(next) && !connected.Contains(next) &&
-                    bubbles[next.x][next.y]?.Spec.SOName == soName)
-                {
-                    connected.Add(next);
-                    stack.Push(next);
-                }
-            }
-        }
-        return connected;
-    }
     private bool IsInBounds(Vector2Int next)
     {
         return next.x >= 0 && next.x < Size && next.y >= 0 && next.y < Size;
     }
 
+    // 보드 밖이거나 빈 칸이면 null을 돌려주는 안전 조회.
+    // null은 어떤 이름과도 같지 않으므로 런(run) 계산에서 자연스럽게 경계 역할을 합니다.
+    private string NameAt(int x, int y)
+    {
+        if (x < 0 || x >= Size || y < 0 || y >= Size) return null;
+        return bubbles[x][y]?.Spec?.SOName;
+    }
+
+    // [기획 규칙] 매치는 "가로 또는 세로 직선 3개 이상"만 인정합니다.
+    // ㄱ/ㄴ/T자 같은 꺾인 연결은 매치가 아닙니다.
+    // 단, 가로 런과 세로 런이 각각 3개 이상이면서 한 칸을 공유하는 경우(T/L자)는
+    // 양쪽 직선이 모두 성립한 것이므로 둘 다 포함합니다.
+    private HashSet<Vector2Int> GetLineMatchesAt(Vector2Int pos)
+    {
+        HashSet<Vector2Int> result = new HashSet<Vector2Int>();
+        if (!IsInBounds(pos)) return result;
+
+        string name = NameAt(pos.x, pos.y);
+        if (string.IsNullOrEmpty(name)) return result;
+
+        // 가로 런
+        int left = pos.x;
+        while (NameAt(left - 1, pos.y) == name) left--;
+        int right = pos.x;
+        while (NameAt(right + 1, pos.y) == name) right++;
+        if (right - left + 1 >= 3)
+        {
+            for (int x = left; x <= right; x++) result.Add(new Vector2Int(x, pos.y));
+        }
+
+        // 세로 런
+        int down = pos.y;
+        while (NameAt(pos.x, down - 1) == name) down--;
+        int up = pos.y;
+        while (NameAt(pos.x, up + 1) == name) up++;
+        if (up - down + 1 >= 3)
+        {
+            for (int y = down; y <= up; y++) result.Add(new Vector2Int(pos.x, y));
+        }
+
+        return result;
+    }
+
+    // 시작 칸에서 성립한 직선 매치를 기점으로, 그 안의 칸들이 가진 직교 방향 직선까지
+    // 더 이상 늘지 않을 때까지 확장합니다. (T/L자 매치의 팔 전체를 한 번에 처리)
+    private HashSet<Vector2Int> GetLineMatchGroup(Vector2Int start)
+    {
+        HashSet<Vector2Int> group = GetLineMatchesAt(start);
+        if (group.Count == 0) return group;
+
+        Stack<Vector2Int> pending = new Stack<Vector2Int>(group);
+        while (pending.Count > 0)
+        {
+            Vector2Int current = pending.Pop();
+            foreach (var p in GetLineMatchesAt(current))
+            {
+                if (group.Add(p)) pending.Push(p);
+            }
+        }
+        return group;
+    }
+
+    public bool IsInBoardRange(Vector2Int pos) => IsInBounds(pos);
+
+    public Bubble GetBubbleAt(Vector2Int pos)
+    {
+        return IsInBounds(pos) ? bubbles[pos.x][pos.y] : null;
+    }
+
+    // 유저에게 보여줄 힌트를 한 건 찾습니다.
+    //
+    // 반환 좌표는 "실제로 터질 버블들이 지금 있는 자리"입니다.
+    // 스왑 후 좌표를 그대로 주면 안 됩니다. 매치가 성립하는 칸 중 하나에는
+    // 아직 밀려날 무관한 버블이 앉아 있어서, 그 버블까지 강조되어 버립니다.
+    // 따라서 [매치 칸들] 에서 [스왑으로 채워질 칸]을 빼고, 그 자리를 채울 버블의
+    // 현재 위치(moveFrom)를 대신 넣습니다.
+    public bool TryFindHint(out List<Vector2Int> hintCells)
+    {
+        hintCells = new List<Vector2Int>();
+
+        for (int x = 0; x < Size; x++)
+        {
+            for (int y = 0; y < Size; y++)
+            {
+                Vector2Int current = new Vector2Int(x, y);
+                if (bubbles[x][y] == null) continue;
+
+                foreach (var dir in _directions)
+                {
+                    Vector2Int next = current + dir;
+                    if (!IsInBounds(next) || bubbles[next.x][next.y] == null) continue;
+
+                    // 가상 스왑 -> 판정 -> 원상 복구
+                    SwapData(current, next);
+
+                    HashSet<Vector2Int> matched = GetLineMatchGroup(current);
+                    Vector2Int origin = current;
+                    if (matched.Count == 0)
+                    {
+                        matched = GetLineMatchGroup(next);
+                        origin = next;
+                    }
+
+                    SwapData(current, next);
+
+                    if (matched.Count > 0)
+                    {
+                        // origin = 스왑으로 채워질 칸. 지금 저기 있는 버블은 밀려날 버블이므로 제외합니다.
+                        // 그 자리를 채울 버블은 반대편(moveFrom)에 있으니 그쪽을 대신 넣습니다.
+                        Vector2Int moveFrom = (origin == current) ? next : current;
+
+                        foreach (var cell in matched)
+                        {
+                            if (cell == origin) continue;
+                            hintCells.Add(cell);
+                        }
+                        hintCells.Add(moveFrom);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public bool IsMatchable(Vector2Int start)
     {
-        var bubble = bubbles[start.x][start.y];
-        if (bubble == null) return false;
-
-        // 연결된 개수가 3개 이상인지 확인
-        return GetConnectedBubbles(start, bubble.Spec.SOName).Count >= 3;
+        return GetLineMatchesAt(start).Count >= 3;
     }
     public List<Vector2Int> GetMatchList(Vector2Int start)
     {
-        var bubble = bubbles[start.x][start.y];
-        if (bubble == null) return new List<Vector2Int>();
-
-        var connected = GetConnectedBubbles(start, bubble.Spec.SOName);
-
-        // 3개 이상일 때만 리스트 반환, 아니면 빈 리스트
-        return connected.Count >= 3 ? connected.ToList() : new List<Vector2Int>();
+        return GetLineMatchGroup(start).ToList();
     }
     public MoveReceipt Swap(Vector2Int selectedBubblesPos, Vector2Int targetBubblesPos)
     {
         MoveReceipt ret = new MoveReceipt();
-        SwapData(selectedBubblesPos, targetBubblesPos);
-        ret.SwapMoves.Add(new MoveStep(bubbles[selectedBubblesPos.x][selectedBubblesPos.y], selectedBubblesPos, targetBubblesPos));
-        ret.SwapMoves.Add(new MoveStep(bubbles[targetBubblesPos.x][targetBubblesPos.y], targetBubblesPos, selectedBubblesPos));
 
+        // [중요] 스왑을 수행하기 "전에" 각 좌표의 버블 참조를 확보합니다.
+        // SwapData() 이후에 bubbles[]를 다시 읽으면 이미 자리를 맞바꾼 상대편 버블이 잡히고,
+        // 그 결과 Data와 From/To의 짝이 엇갈려 "이동 거리 0"짜리 트윈이 만들어집니다.
+        Bubble bubbleAtSelected = bubbles[selectedBubblesPos.x][selectedBubblesPos.y];
+        Bubble bubbleAtTarget = bubbles[targetBubblesPos.x][targetBubblesPos.y];
+
+        SwapData(selectedBubblesPos, targetBubblesPos);
+        ret.SwapMoves.Add(new MoveStep(bubbleAtSelected, selectedBubblesPos, targetBubblesPos));
+        ret.SwapMoves.Add(new MoveStep(bubbleAtTarget, targetBubblesPos, selectedBubblesPos));
 
         List<Vector2Int> selectedPosList = GetMatchList(selectedBubblesPos);
         List<Vector2Int> targetPosList = GetMatchList(targetBubblesPos);
+
         if (selectedPosList.Count < 1 && targetPosList.Count < 1)
         {
             SwapData(selectedBubblesPos, targetBubblesPos);
-            ret.SwapMoves.Add(new MoveStep(bubbles[selectedBubblesPos.x][selectedBubblesPos.y], selectedBubblesPos, targetBubblesPos));
-            ret.SwapMoves.Add(new MoveStep(bubbles[targetBubblesPos.x][targetBubblesPos.y], targetBubblesPos, selectedBubblesPos));
+
+            // 롤백은 각자 "원래 자리"로 되돌아가는 이동입니다.
+            // 뷰는 SwapMoves[2]를 [0]과 동일한 버블로 간주하므로 순서를 맞춰야 합니다.
+            ret.SwapMoves.Add(new MoveStep(bubbleAtSelected, targetBubblesPos, selectedBubblesPos));
+            ret.SwapMoves.Add(new MoveStep(bubbleAtTarget, selectedBubblesPos, targetBubblesPos));
         }
         else
         {
-            HashSet<Vector2Int> allMatchPos = new HashSet<Vector2Int>(selectedPosList);
-            allMatchPos.UnionWith(targetPosList);
-            ret.MatchPositions = allMatchPos.ToList();
+            HashSet<Vector2Int> seedMatchSet = new HashSet<Vector2Int>(selectedPosList);
+            seedMatchSet.UnionWith(targetPosList);
 
-            // 5. 연쇄 로직 시작: 데이터 삭제 -> 중력 -> 리필 (재귀 또는 반복)
-            ProcessChainReaction(ret);
+            // 5. 연쇄 로직 시작 (시드 매치 좌표 전달)
+            ProcessChainReaction(ret, seedMatchSet.ToList());
+
+            // 6. 연쇄가 끝난 보드에 둘 수 있는 수가 하나도 없으면(데드락) 자동으로 다시 섞습니다.
+            //    롤백된 스왑은 보드를 바꾸지 않으므로 검사할 필요가 없습니다.
+            if (!CanAnyMatchExist())
+            {
+                Debug.Log("[Deadlock] 둘 수 있는 수가 없어 보드를 다시 섞습니다.");
+                ShuffleBoard(ret);
+            }
         }
         return ret;
     }
@@ -134,28 +238,36 @@ public class PuzzleModel
         SetBubbleAt(a.x, a.y, tempB);
         SetBubbleAt(b.x, b.y, tempA);
     }
-    private void ProcessChainReaction(MoveReceipt receipt)
+    private void ProcessChainReaction(MoveReceipt receipt, List<Vector2Int> currentMatchPositions)
     {
         bool hasMoreMatches = true;
         while (hasMoreMatches)
         {
-            foreach (var pos in receipt.MatchPositions)
+            ChainStep currentStep = new ChainStep();
+
+            // 1. 이번 연쇄 반응 단계에서 터진 버블과 좌표 기록 (ReturnToPool은 호출하지 않음 - 뷰 연출 완료 시점으로 미룸)
+            foreach (var pos in currentMatchPositions)
             {
-                var target = bubbles[pos.x][pos.y];
-                if (target != null)
+                var targetBubble = bubbles[pos.x][pos.y];
+                if (targetBubble != null)
                 {
-                    target.ReturnToPool();
-                    SetBubbleAt(pos.x, pos.y, null); // null 대입 시에도 메서드 사용
+                    currentStep.Matches.Add(new MoveStep(targetBubble, pos, pos));
+                    SetBubbleAt(pos.x, pos.y, null);
                 }
             }
 
-            ApplyGravity(receipt);
-            FillEmptySlots(receipt);
+            // 2. 중력 및 리필 기록 (currentStep에 기록)
+            ApplyGravity(currentStep);
+            FillEmptySlots(currentStep);
 
+            // 3. 이번 단계 연쇄 영수증을 메인 영수증에 추가
+            receipt.ChainSteps.Add(currentStep);
+
+            // 4. 다음 연쇄 매치 탐색
             List<Vector2Int> newMatches = GetAllMatches();
             if (newMatches.Count > 0)
             {
-                receipt.MatchPositions = newMatches;
+                currentMatchPositions = newMatches;
                 hasMoreMatches = true;
             }
             else
@@ -164,33 +276,50 @@ public class PuzzleModel
             }
         }
     }
+    // 보드 전체에서 가로/세로 직선 3개 이상인 구간을 모두 수집합니다.
     private List<Vector2Int> GetAllMatches()
     {
         HashSet<Vector2Int> allMatches = new HashSet<Vector2Int>();
-        HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
 
-        for (int x = 0; x < Size; x++)
+        // 가로 런 스캔 (행 단위)
+        for (int y = 0; y < Size; y++)
         {
-            for (int y = 0; y < Size; y++)
+            int runStart = 0;
+            for (int x = 1; x <= Size; x++)
             {
-                Vector2Int pos = new Vector2Int(x, y);
-                if (visited.Contains(pos) || bubbles[x][y] == null) continue;
+                string head = NameAt(runStart, y);
+                bool continues = x < Size && head != null && NameAt(x, y) == head;
+                if (continues) continue;
 
-                // 이미 구현하신 GetConnectedBubbles 활용
-                var connected = GetConnectedBubbles(pos, bubbles[x][y].Spec.SOName);
-
-                // 방문 처리 (성능 최적화)
-                foreach (var p in connected) visited.Add(p);
-
-                if (connected.Count >= 3)
+                if (head != null && x - runStart >= 3)
                 {
-                    allMatches.UnionWith(connected);
+                    for (int i = runStart; i < x; i++) allMatches.Add(new Vector2Int(i, y));
                 }
+                runStart = x;
             }
         }
+
+        // 세로 런 스캔 (열 단위)
+        for (int x = 0; x < Size; x++)
+        {
+            int runStart = 0;
+            for (int y = 1; y <= Size; y++)
+            {
+                string head = NameAt(x, runStart);
+                bool continues = y < Size && head != null && NameAt(x, y) == head;
+                if (continues) continue;
+
+                if (head != null && y - runStart >= 3)
+                {
+                    for (int i = runStart; i < y; i++) allMatches.Add(new Vector2Int(x, i));
+                }
+                runStart = y;
+            }
+        }
+
         return allMatches.ToList();
     }
-    private void ApplyGravity(MoveReceipt receipt)
+    private void ApplyGravity(ChainStep step)
     {
         for (int x = 0; x < Size; x++)
         {
@@ -208,18 +337,19 @@ public class PuzzleModel
                     SetBubbleAt(x, emptyRow, data); // 이동 및 위치 기록
                     SetBubbleAt(x, y, null);        // 이전 자리 비움
 
-                    receipt.GravityMoves.Add(new MoveStep(data, new Vector2Int(x, y), new Vector2Int(x, emptyRow)));
+                    step.GravityMoves.Add(new MoveStep(data, new Vector2Int(x, y), new Vector2Int(x, emptyRow)));
                     emptyRow++;
                 }
             }
         }
     }
-    private void FillEmptySlots(MoveReceipt receipt)
+    private void FillEmptySlots(ChainStep step)
     {
         for (int x = 0; x < Size; x++)
         {
             int fillCount = 0;
-            for (int y = Size - 1; y >= 0; y--)
+            // 버그 수정: 아래(y = 0)부터 위(y = Size - 1)로 스캔하여 스폰 높이 역전 방지
+            for (int y = 0; y < Size; y++)
             {
                 if (bubbles[x][y] == null)
                 {
@@ -229,7 +359,7 @@ public class PuzzleModel
 
                     Vector2Int spawnPos = new Vector2Int(x, Size + fillCount);
                     Vector2Int targetPos = new Vector2Int(x, y);
-                    receipt.RefillMoves.Add(new MoveStep(newData, spawnPos, targetPos));
+                    step.RefillMoves.Add(new MoveStep(newData, spawnPos, targetPos));
                     fillCount++;
                 }
             }
@@ -261,77 +391,96 @@ public class PuzzleModel
                 }
             }
 
+            // 최종 안전망: 성립중인 매치가 0개이면서, 둘 수 있는 수가 존재해야 합니다.
+            // (배치 로직이 어떤 이유로든 매치를 남기면 여기서 잡아 통째로 다시 깝니다)
+            int standing = GetAllMatches().Count;
+            if (standing > 0)
+            {
+                Debug.LogWarning($"[InitializeBoard] 성립중인 매치가 {standing}개 남아 재생성합니다.");
+                continue;
+            }
+
             if (CanAnyMatchExist()) isBoardPlayable = true;
         }
     }
-    // 초기 배치용 간이 매치 체크 (왼쪽 2칸, 아래쪽 2칸만 확인)
+    // 초기 배치용 매치 체크.
+    // [중요] 실제 매치 판정과 반드시 동일한 규칙(직선 3개 이상)을 써야 합니다.
+    // 두 규칙이 어긋나면 "터지지 않는 매치"나 "시작하자마자 터지는 보드"가 생깁니다.
+    // 아직 배치되지 않은 칸은 null이라 런 계산에서 자동으로 경계 처리됩니다.
     private bool CheckInitialMatch(int x, int y)
     {
-        string currentName = bubbles[x][y].Spec.SOName;
-
-        // 가로 체크 (왼쪽으로 2칸)
-        if (x >= 2 &&
-            bubbles[x - 1][y]?.Spec.SOName == currentName &&
-            bubbles[x - 2][y]?.Spec.SOName == currentName) return true;
-
-        // 세로 체크 (아래쪽으로 2칸)
-        if (y >= 2 &&
-            bubbles[x][y - 1]?.Spec.SOName == currentName &&
-            bubbles[x][y - 2]?.Spec.SOName == currentName) return true;
-
-        return false;
+        return GetLineMatchesAt(new Vector2Int(x, y)).Count > 0;
     }
-    public MoveReceipt ShuffleBoard()
+    private const int ShuffleMaxAttempts = 500;
+
+    // 보드의 버블을 파괴하지 않고 자리만 다시 섞습니다.
+    // 결과 이동은 receipt.ShuffleMoves에 담깁니다.
+    public void ShuffleBoard(MoveReceipt receipt)
     {
-        MoveReceipt ret = new MoveReceipt();
         List<Bubble> allExistingBubbles = new List<Bubble>();
+
+        // [중요] 셔플 "전" 좌표를 미리 스냅샷으로 떠 둡니다.
+        // 아래 검증에서 호출하는 CanAnyMatchExist()가 내부적으로 SwapData -> SetBubbleAt을 돌려
+        // Bubble.Pos를 현재 보드 좌표로 덮어쓰기 때문에, Pos를 나중에 읽으면 출발지를 잃습니다.
+        Dictionary<Bubble, Vector2Int> originPos = new Dictionary<Bubble, Vector2Int>();
 
         for (int x = 0; x < Size; x++)
         {
             for (int y = 0; y < Size; y++)
             {
-                if (bubbles[x][y] != null) allExistingBubbles.Add(bubbles[x][y]);
+                Bubble b = bubbles[x][y];
+                if (b == null) continue;
+                allExistingBubbles.Add(b);
+                originPos[b] = new Vector2Int(x, y);
             }
         }
 
         bool isValid = false;
-        // [개선] 검증 단계에서는 실물 보드(bubbles)를 건드리지 않고 리스트 셔플만 돌립니다.
-        while (!isValid)
+        int attempts = 0;
+        // 검증 단계에서는 버블을 파괴하지 않고 배열 링크만 바꿔가며 시도합니다.
+        while (!isValid && attempts < ShuffleMaxAttempts)
         {
+            attempts++;
             allExistingBubbles = allExistingBubbles.OrderBy(a => Guid.NewGuid()).ToList();
 
-            // 임시로 실물 보드에 배치해보고 검증
             int index = 0;
             for (int x = 0; x < Size; x++)
             {
                 for (int y = 0; y < Size; y++)
                 {
-                    // 실제 주소값만 잠시 링크를 바꿔서 테스트
                     bubbles[x][y] = allExistingBubbles[index++];
                 }
             }
 
-            // 검증 통과하면 탈출, 실패하면 실물 버블 파괴 없이 리스트 순서만 다시 섞음
-            if (GetAllMatches().Count == 0 && CanAnyMatchExist())
-            {
-                isValid = true;
-            }
+            // 이미 터진 상태로 시작하면 안 되고(매치 0), 둘 수 있는 수는 있어야 합니다.
+            if (GetAllMatches().Count == 0 && CanAnyMatchExist()) isValid = true;
         }
 
-        // [추가] 최종 확정된 배치 상태를 기반으로 포지션 값 동기화
+        if (!isValid)
+        {
+            // 현재 버블 구성으로는 조건을 만족하는 배치를 못 찾은 경우.
+            // 무한 루프로 에디터를 얼리지 않도록 빠져나오되, 눈에 띄게 알립니다.
+            Debug.LogError($"[ShuffleBoard] {ShuffleMaxAttempts}회 시도했지만 유효한 배치를 찾지 못했습니다. " +
+                           $"버블 종류 수가 너무 적거나 보드 구성이 편향되었을 수 있습니다.");
+        }
+
+        // 확정된 배치로 Pos를 동기화하면서, 실제로 자리가 바뀐 버블만 이동으로 기록합니다.
         for (int x = 0; x < Size; x++)
         {
             for (int y = 0; y < Size; y++)
             {
-                if (bubbles[x][y] != null)
+                Bubble b = bubbles[x][y];
+                if (b == null) continue;
+
+                Vector2Int to = new Vector2Int(x, y);
+                b.Pos = to;
+
+                if (originPos.TryGetValue(b, out Vector2Int from) && from != to)
                 {
-                    bubbles[x][y].Pos = new Vector2Int(x, y);
-                    ret.GravityMoves.Add(new MoveStep(bubbles[x][y], new Vector2Int(-1, -1), new Vector2Int(x, y)));
+                    receipt.ShuffleMoves.Add(new MoveStep(b, from, to));
                 }
             }
         }
-
-        return ret;
     }
     public bool CanAnyMatchExist()
     {

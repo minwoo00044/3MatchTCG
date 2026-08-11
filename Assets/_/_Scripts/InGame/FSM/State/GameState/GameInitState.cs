@@ -14,7 +14,7 @@ public class GameInitState : BaseState<EGameState, GameManager>, IReportableStat
     {
         readyCount = 0;
         var owner = machine.Owner as GameManager;
-        totalTargetCount = owner != null ? owner.GetMinorManager() : 0;
+        totalTargetCount = owner != null ? owner.GetSubscriberCount(EGameState.Init) : 0;
         _cachedBroadCastAction?.Invoke();
         if (totalTargetCount == 0) OnAllTasksComplete();
     }

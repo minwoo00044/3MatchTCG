@@ -10,9 +10,19 @@ public class BaseManager : MonoBehaviour
 
     protected virtual void Awake()
     {
-        gameManager.OnInit+=OnInit;
-        gameManager.OnUpdate+=OnUpdate;
+        gameManager.Subscribe(EGameState.Init, OnInit);
+        gameManager.OnUpdate += OnUpdate;
     }
+
+    protected virtual void OnDestroy()
+    {
+        if (gameManager != null)
+        {
+            gameManager.Unsubscribe(EGameState.Init, OnInit);
+            gameManager.OnUpdate -= OnUpdate;
+        }
+    }
+
     void Start()
     {
         

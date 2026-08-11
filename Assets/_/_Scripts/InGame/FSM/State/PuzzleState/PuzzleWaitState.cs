@@ -11,17 +11,15 @@ public class PuzzleWaitState : BaseState<EPuzzleState, PuzzleManager>
 
     public override void OnEnter()
     {
-        machine.Owner.IsFreeze = true;
+        machine.Owner.IsFreeze = false;
     }
 
     public override void OnExit()
     {
-        throw new System.NotImplementedException();
     }
 
     public override void OnUpdate()
     {
-        throw new System.NotImplementedException();
     }
 
 

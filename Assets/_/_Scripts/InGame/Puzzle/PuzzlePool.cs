@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 public class PuzzlePool
 {
     private Queue<Bubble> dataPool;
@@ -57,6 +58,11 @@ public class PuzzlePool
             view = GameObject.Instantiate(viewPrefab,poolParent);
         }
 
+        // 풀에서 꺼낼 때 트윈 잔재와 변형을 초기 상태로 되돌립니다.
+        // (DOScale(0)으로 사라진 뷰가 재사용되면 스케일 0인 채로 나오기 때문)
+        view.transform.DOKill();
+        view.transform.localScale = Vector3.one;
+
         view.gameObject.SetActive(false);
         view.Initialize(ReturnView);
         return view;
@@ -64,8 +70,9 @@ public class PuzzlePool
 
     public void ReturnView(PuzzleView view)
     {
+        view.transform.DOKill();
+        view.transform.localScale = Vector3.one;
         view.gameObject.SetActive(false);
-        // 위치를 보이지 않는 곳으로 옮겨두기도 합니다.
         viewPool.Enqueue(view);
     }
 }
