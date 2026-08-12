@@ -22,6 +22,14 @@
   - **스킬 3종**: 캐릭터 색상 바탕 위 고유 문양/아이콘(Icon 1, 2, 3)으로 구별.
 - **스킬(버블) 가중치**: `BubbleSO.spawnWeight` 필드를 통해 각 스킬/버블별 생성 가중치를 부여한다.
 
+### 2.3 캐릭터 및 덱 데이터 구조 명세 (`CharacterSO` & `DeckSO`)
+- **`CharacterSO`**: `characterName`, `characterImage`, `mainColor`, 고유 기본 스탯(`MaxHP`, `MaxShield`, `BaseThreat`), 전용 스킬 `BubbleSO` 3개 배열.
+- **`DeckSO`**: `CharacterSO` 3개 리스트로 1개의 플레이어 덱을 편성한다.
+- **시전자(`caster`) 역참조 인덱싱 규칙 (AGENT.md §1 준수)**:
+  - `BubbleSO` 내에 캐릭터 역참조 필드를 두지 않는다. (순환 참조 및 에셋 커플링 방지)
+  - `PuzzleManager`가 전투 시작 시 `CharacterSO` ↔ `PlayerActor` ↔ `BubbleSO` 간 런타임 1:1 역참조 인덱스 매핑 테이블을 구축한다.
+  - 이를 통해 스킬 레시피 실행 시 `BubbleSO` 스펙만으로 해당 스킬의 시전자 `PlayerActor`를 역추적하여 `FindTarget(caster)`에 넘긴다.
+
 ---
 
 ## 3. 인게임 퍼즐 보드 메커니즘 (Board & Spawning)
@@ -64,6 +72,10 @@
   - `MaxShield` / `Shield`: 캐릭터/NPC별 최대 한도(`MaxShield`)를 갖는 흡수형 방어막. 공격받아 제거되지 않는 한 무한 유지.
   - `BaseThreat` (기본 위협도): 캐릭터별 고유 기본 위협도 (전투 시작 시 초기 타깃 결정용).
   - `Threat` (실시간 위협도): 최근 N초(예: 최근 10초) 동안의 DPS + HPS 누적 수치를 기반으로 실시간 갱신. 특정 어그로 스킬로 강제 상승 가능.
+- **전투 규칙 확정 사항**:
+  - **방어막 관통 규칙**: 피격 시 데미지는 방어막(`Shield`)에서 우선 차감하고, 초과 데미지만 HP로 이월 차감한다.
+  - **타깃 생존자 필터**: 사망 대상(`IsDead == true`)은 모든 타겟팅 룰의 기본 대상 검색에서 제외한다.
+  - **팀 구별 (`ETeam`)**: `ETeam.Player`(플레이어 캐릭터 팀), `ETeam.Enemy`(적 NPC 팀).
 - **모델 진실 및 이벤트 수치 적용 (AGENT.md §3 준수)**: 
   - 모델의 스탯(`CurrentHP`, `IsDead`) 및 이벤트(`OnHPChanged`, `OnDeath`)는 계산 및 영수증 작성 시점에 **즉시 변경 및 발화**한다.
   - UI(HP바)는 모델을 조급하게 직접 읽지 않고 영수증 타임라인(DOTween `InsertCallback`)을 순차적으로 소비하여 연출 타격 시점에 맞춰 체력바 감소를 시각화한다.
