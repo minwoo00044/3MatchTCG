@@ -6,6 +6,7 @@ public class AllActors : ActionTarget
     // 전장 전체 (아군 + 적군)
     public override Actor[] FindTarget(Actor caster)
     {
-        throw new System.NotImplementedException();
+        if (!HasField(caster)) return None;
+        return caster.Field.AliveActors();
     }
 }

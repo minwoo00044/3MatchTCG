@@ -6,6 +6,7 @@ public class AllEnemies : ActionTarget
     // caster와 반대 팀 전체
     public override Actor[] FindTarget(Actor caster)
     {
-        throw new System.NotImplementedException();
+        if (!HasField(caster)) return None;
+        return caster.Field.EnemiesOf(caster);
     }
 }

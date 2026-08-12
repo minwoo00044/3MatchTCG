@@ -16,6 +16,9 @@ public abstract class Actor
     // 튜닝 대상이 되면 ActionManager가 주입하는 형태로 옮깁니다.
     private const float ThreatWindow = 10f;
 
+    // 자기가 선 전장. ActionTarget이 시전자만 받고도 명단에 닿는 통로입니다. (GDD §4.3)
+    public Battlefield Field { get; private set; }
+
     public ETeam Team { get; private set; }
     public int MaxHP { get; private set; }
     public int CurrentHP { get; private set; }
@@ -38,8 +41,13 @@ public abstract class Actor
     // gameTime은 단조 증가하므로 큐의 앞쪽이 항상 가장 오래된 항목입니다.
     private readonly Queue<(float time, float amount)> threatLog = new Queue<(float time, float amount)>();
 
-    protected Actor(ETeam team, int maxHP, int maxShield, float baseThreat)
+    protected Actor(Battlefield field, ETeam team, int maxHP, int maxShield, float baseThreat)
     {
+        // 명단에 오르지 않은 Actor는 어떤 타깃 검색에도 잡히지 않습니다.
+        // 등록을 잊는 실수를 원천에서 막으려고 생성자에서 직접 올립니다.
+        Field = field;
+        field?.Register(this);
+
         Team = team;
         MaxHP = maxHP;
         CurrentHP = maxHP;
