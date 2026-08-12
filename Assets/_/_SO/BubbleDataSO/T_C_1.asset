@@ -17,5 +17,6 @@ MonoBehaviour:
   target: {fileID: 11400000, guid: 47d8a6da0a0d28b44ae6ea437cf1a3cb, type: 2}
   bubbleImage: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
   bubbleColor: {r: 0, g: 0, b: 1, a: 1}
+  spawnWeight: 1
   value: 10
-  addPerBubble: 10
+  chainWeights: []

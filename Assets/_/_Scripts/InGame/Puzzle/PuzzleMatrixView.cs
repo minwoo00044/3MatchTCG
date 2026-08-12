@@ -203,21 +203,26 @@ public class PuzzleMatrixView : MonoBehaviour
         foreach (var step in receipt.ChainSteps)
         {
             // A. 이번 단계에서 터지는 버블
-            if (step.Matches.Count > 0)
+            // 매치 그룹별로 나뉘어 있지만 팝 연출은 한 번에 함께 터집니다.
+            // (그룹 경계는 스킬 발동 단위이지 연출 단위가 아닙니다 - GDD §4.5)
+            if (step.MatchGroups.Count > 0)
             {
                 Sequence matchSeq = DOTween.Sequence();
-                foreach (var move in step.Matches)
+                foreach (var group in step.MatchGroups)
                 {
-                    if (!dataViewDict.TryGetValue(move.Data, out PuzzleView view))
+                    foreach (var move in group)
                     {
-                        Debug.LogWarning($"[PuzzleMatrixView] 터짐 연출 대상 뷰를 찾지 못했습니다. pos={move.ToPos}");
-                        continue;
-                    }
+                        if (!dataViewDict.TryGetValue(move.Data, out PuzzleView view))
+                        {
+                            Debug.LogWarning($"[PuzzleMatrixView] 터짐 연출 대상 뷰를 찾지 못했습니다. pos={move.ToPos}");
+                            continue;
+                        }
 
-                    // ReturnToPool() 한 번이면 ReleaseView()를 타고 뷰까지 함께 회수됩니다.
-                    Bubble targetBubble = move.Data;
-                    matchSeq.Join(view.transform.DOScale(Vector3.zero, matchDuration)
-                        .OnComplete(() => targetBubble.ReturnToPool()));
+                        // ReturnToPool() 한 번이면 ReleaseView()를 타고 뷰까지 함께 회수됩니다.
+                        Bubble targetBubble = move.Data;
+                        matchSeq.Join(view.transform.DOScale(Vector3.zero, matchDuration)
+                            .OnComplete(() => targetBubble.ReturnToPool()));
+                    }
                 }
                 mainSeq.Append(matchSeq);
             }

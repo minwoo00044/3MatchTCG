@@ -214,11 +214,8 @@ public class PuzzleModel
         }
         else
         {
-            HashSet<Vector2Int> seedMatchSet = new HashSet<Vector2Int>(selectedPosList);
-            seedMatchSet.UnionWith(targetPosList);
-
-            // 5. 연쇄 로직 시작 (시드 매치 좌표 전달)
-            ProcessChainReaction(ret, seedMatchSet.ToList());
+            // 5. 연쇄 로직 시작 (성립 중인 매치는 ProcessChainReaction이 직접 조회합니다)
+            ProcessChainReaction(ret);
 
             // 6. 연쇄가 끝난 보드에 둘 수 있는 수가 하나도 없으면(데드락) 자동으로 다시 섞습니다.
             //    롤백된 스왑은 보드를 바꾸지 않으므로 검사할 필요가 없습니다.
@@ -238,22 +235,32 @@ public class PuzzleModel
         SetBubbleAt(a.x, a.y, tempB);
         SetBubbleAt(b.x, b.y, tempA);
     }
-    private void ProcessChainReaction(MoveReceipt receipt, List<Vector2Int> currentMatchPositions)
+    private void ProcessChainReaction(MoveReceipt receipt)
     {
-        bool hasMoreMatches = true;
-        while (hasMoreMatches)
+        // 스왑 직후 보드에 성립해 있는 매치가 곧 1차 연쇄입니다.
+        // 시드 좌표를 넘겨받지 않고 여기서 직접 조회합니다. 스왑한 두 칸의 그룹을 합쳐서
+        // 넘기면, 두 칸이 같은 그룹에 속한 경우(같은 SOName을 서로 맞바꾼 경우) 같은 그룹이
+        // 두 번 담겨 스킬이 두 번 발동합니다.
+        List<HashSet<Vector2Int>> currentGroups = GetAllMatchGroups();
+
+        while (currentGroups.Count > 0)
         {
             ChainStep currentStep = new ChainStep();
 
-            // 1. 이번 연쇄 반응 단계에서 터진 버블과 좌표 기록 (ReturnToPool은 호출하지 않음 - 뷰 연출 완료 시점으로 미룸)
-            foreach (var pos in currentMatchPositions)
+            // 1. 이번 연쇄 단계에서 터진 버블을 매치 그룹 단위로 기록
+            //    (ReturnToPool은 호출하지 않음 - 뷰 연출 완료 시점으로 미룸)
+            foreach (var group in currentGroups)
             {
-                var targetBubble = bubbles[pos.x][pos.y];
-                if (targetBubble != null)
+                List<MoveStep> groupMoves = new List<MoveStep>();
+                foreach (var pos in group)
                 {
-                    currentStep.Matches.Add(new MoveStep(targetBubble, pos, pos));
+                    var targetBubble = bubbles[pos.x][pos.y];
+                    if (targetBubble == null) continue;
+
+                    groupMoves.Add(new MoveStep(targetBubble, pos, pos));
                     SetBubbleAt(pos.x, pos.y, null);
                 }
+                if (groupMoves.Count > 0) currentStep.MatchGroups.Add(groupMoves);
             }
 
             // 2. 중력 및 리필 기록 (currentStep에 기록)
@@ -264,60 +271,36 @@ public class PuzzleModel
             receipt.ChainSteps.Add(currentStep);
 
             // 4. 다음 연쇄 매치 탐색
-            List<Vector2Int> newMatches = GetAllMatches();
-            if (newMatches.Count > 0)
-            {
-                currentMatchPositions = newMatches;
-                hasMoreMatches = true;
-            }
-            else
-            {
-                hasMoreMatches = false;
-            }
+            currentGroups = GetAllMatchGroups();
         }
     }
-    // 보드 전체에서 가로/세로 직선 3개 이상인 구간을 모두 수집합니다.
-    private List<Vector2Int> GetAllMatches()
+    // 보드 전체에서 성립 중인 매치를 "그룹 단위"로 수집합니다.
+    //
+    // 예전에는 여기서 가로/세로 런을 따로 스캔했는데, 그건 GetLineMatchGroup과
+    // 같은 질문("무엇이 매치인가")에 답하는 두 번째 구현이었습니다. (AGENT.md §5)
+    // 지금은 GetLineMatchGroup 하나만 쓰고, 덤으로 그룹 경계가 보존됩니다.
+    private List<HashSet<Vector2Int>> GetAllMatchGroups()
     {
-        HashSet<Vector2Int> allMatches = new HashSet<Vector2Int>();
+        List<HashSet<Vector2Int>> groups = new List<HashSet<Vector2Int>>();
+        HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
 
-        // 가로 런 스캔 (행 단위)
-        for (int y = 0; y < Size; y++)
-        {
-            int runStart = 0;
-            for (int x = 1; x <= Size; x++)
-            {
-                string head = NameAt(runStart, y);
-                bool continues = x < Size && head != null && NameAt(x, y) == head;
-                if (continues) continue;
-
-                if (head != null && x - runStart >= 3)
-                {
-                    for (int i = runStart; i < x; i++) allMatches.Add(new Vector2Int(i, y));
-                }
-                runStart = x;
-            }
-        }
-
-        // 세로 런 스캔 (열 단위)
         for (int x = 0; x < Size; x++)
         {
-            int runStart = 0;
-            for (int y = 1; y <= Size; y++)
+            for (int y = 0; y < Size; y++)
             {
-                string head = NameAt(x, runStart);
-                bool continues = y < Size && head != null && NameAt(x, y) == head;
-                if (continues) continue;
+                Vector2Int pos = new Vector2Int(x, y);
+                if (visited.Contains(pos)) continue;
 
-                if (head != null && y - runStart >= 3)
-                {
-                    for (int i = runStart; i < y; i++) allMatches.Add(new Vector2Int(x, i));
-                }
-                runStart = y;
+                HashSet<Vector2Int> group = GetLineMatchGroup(pos);
+                if (group.Count == 0) continue;
+
+                // 같은 그룹의 나머지 칸을 다시 시작점으로 삼으면 그룹이 중복 생성됩니다.
+                foreach (var p in group) visited.Add(p);
+                groups.Add(group);
             }
         }
 
-        return allMatches.ToList();
+        return groups;
     }
     private void ApplyGravity(ChainStep step)
     {
@@ -393,10 +376,10 @@ public class PuzzleModel
 
             // 최종 안전망: 성립중인 매치가 0개이면서, 둘 수 있는 수가 존재해야 합니다.
             // (배치 로직이 어떤 이유로든 매치를 남기면 여기서 잡아 통째로 다시 깝니다)
-            int standing = GetAllMatches().Count;
+            int standing = GetAllMatchGroups().Count;
             if (standing > 0)
             {
-                Debug.LogWarning($"[InitializeBoard] 성립중인 매치가 {standing}개 남아 재생성합니다.");
+                Debug.LogWarning($"[InitializeBoard] 성립중인 매치 그룹이 {standing}개 남아 재생성합니다.");
                 continue;
             }
 
@@ -453,7 +436,7 @@ public class PuzzleModel
             }
 
             // 이미 터진 상태로 시작하면 안 되고(매치 0), 둘 수 있는 수는 있어야 합니다.
-            if (GetAllMatches().Count == 0 && CanAnyMatchExist()) isValid = true;
+            if (GetAllMatchGroups().Count == 0 && CanAnyMatchExist()) isValid = true;
         }
 
         if (!isValid)
