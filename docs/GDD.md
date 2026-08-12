@@ -146,19 +146,20 @@
 
 ### 4.5 영수증(Skill Recipe) 생성 및 전용 상태 실행 규칙
 - **생성 시점 및 단품 정의**:
-  - `PuzzleModel.Swap()` 시점에 전체 연출 레시피(`MoveReceipt`)를 생성할 때, 각 연쇄 단계(`ChainStep`)별 **스킬 레시피(Skill Recipe)**를 동시에 작성한다.
-  - **스킬 레시피 1건의 정의**: 1개의 연결된 **매치 그룹(Match Group - 직선 연결 덩어리)**을 스킬 레시피 1건으로 산정하여 독립 기록한다.
+  - `PuzzleModel.Swap()` 시점에 전체 연출 영수증(`MoveReceipt`)을 생성할 때, 각 연쇄 단계(`ChainStep`)별로 터진 **매치 그룹(`MatchGroup`)**을 기록하고 그 버블의 `BubbleSO` 스펙을 스냅샷으로 확보한다.
+  - **스킬 레시피 1건의 정의**: 1개의 연결된 **매치 그룹(Match Group - 직선 연결 덩어리)**을 스킬 레시피 1건으로 산정한다.
+  - **작성 주체 (계층 분리)**: 퍼즐은 "무슨 버블이 몇 차 연쇄에 몇 개 터졌는가"라는 **보드 사실만** 기록하며, 스킬·시전자·수치 같은 전투 개념을 알지 않는다. 매치 그룹을 스킬 레시피로 해석하는 것은 `ActionManager`의 책임이다.
+    - **근거**: `matchCount`와 `chainIndex`는 매치 그룹 구조에서 파생되는 값이라 퍼즐이 따로 적으면 같은 사실에 대한 기록이 두 벌이 된다(AGENT.md §5). 퍼즐이 반드시 잡아야 하는 것은 풀 반납으로 소멸하는 `BubbleSO` 스펙 하나뿐이다.
 - **실행 시점 규칙 (전용 FSM 상태)**:
   - 스킬 실행은 퍼즐 연쇄 연출이 **전부 끝난 뒤** 전용 상태(`EGameState.Action` / `GameActionState`)에서 일괄 수행한다.
   - 전체 흐름: `GameWaitState` → (유저 스왑) → `GamePuzzleActionState`(연쇄 연출 완주) → **`GameActionState`(스킬 실행)** → `GameWaitState`
-  - 뷰(`PuzzleMatrixView`)는 연출만 담당하며 스킬 발동에 관여하지 않는다. 연출 완주 시 `PuzzleManager`가 `MoveReceipt` 전체의 스킬 레시피를 **연쇄 차수 순서대로 평탄화**하여 `GameManager`에 제출하고, `GameActionState`가 이를 `ActionManager`에 하달한다.
+  - 뷰(`PuzzleMatrixView`)는 연출만 담당하며 스킬 발동에 관여하지 않는다. 연출 완주 시 `PuzzleManager`가 `MoveReceipt`를 `GameManager`에 제출하고, `GameActionState`의 브로드캐스트를 받은 `ActionManager`가 이를 꺼내어 **연쇄 차수 순서대로** 스킬 레시피로 해석해 실행한다.
   - **근거**: 스킬 실행이 DOTween 시퀀스 내부에서 일어나면 `GameManager`가 전투 흐름의 주도권을 갖지 못하고, 캐릭터 공격 모션·데미지 표시 등 스킬 연출을 놓을 시간축이 퍼즐 낙하 연출과 겹친다. 또한 §4.4의 "상태 전이는 연출 완주 후" 규칙과 자연히 일치한다.
   - Time Freeze는 `GamePuzzleActionState`와 `GameActionState` **두 구간 모두**에서 유지된다.
-- **선(先)배치 실행 규칙**: 하나의 `ChainStep` 내에 이후 스킬에 영향을 주는 효과(증폭/버프 등)가 포함된 경우, **해당 레시피 생성 시 반드시 그 `ChainStep` 레시피 목록의 가장 앞(0번 인덱스)에 우선 담아 선발동**하도록 보장한다. 정렬 범위는 해당 `ChainStep` 내부로 한정하며, 앞선 `ChainStep`으로 소급하지 않는다.
+- **선(先)배치 실행 규칙**: 하나의 연쇄 차수 안에 이후 스킬에 영향을 주는 효과(증폭/버프 등)가 포함된 경우, **`ActionManager`가 스킬 레시피로 해석할 때 그 차수 목록의 가장 앞(0번 인덱스)에 우선 배치하여 선발동**하도록 보장한다. 정렬 범위는 해당 차수 내부로 한정하며, 앞선 차수로 소급하지 않는다. 선발동 여부는 버블이 아니라 액션의 성질이므로 `GameAction.IsPreemptive`가 답한다.
 - **기록 데이터 항목 (Null Safety)**:
-  - `BubbleSO` 스펙 참조 (스냅샷 복사: 풀 반납 후 `_spec` null 방지 - AGENT.md §3 준수)
-  - `matchCount`: 해당 매치 그룹으로 터진 버블 개수
-  - `chainIndex`: 발생한 체인(연쇄) 순서 (1-based index)
+  - 퍼즐(`MatchGroup`): `BubbleSO` 스펙 참조 (스냅샷 복사: 풀 반납 후 `_spec` null 방지 - AGENT.md §3 준수), 터진 칸 목록
+  - 전투(`SkillRecipe`): `BubbleSO` 스펙, `matchCount`(해당 매치 그룹으로 터진 버블 개수), `chainIndex`(발생한 체인 순서, 1-based index)
 
 ### 4.6 스킬 수치 계산 공식
 - **최종 수치 공식**: `최종 수치 = value × matchCount × chainWeight(chainIndex)`

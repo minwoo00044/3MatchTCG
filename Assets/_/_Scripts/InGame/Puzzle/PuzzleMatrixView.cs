@@ -212,7 +212,7 @@ public class PuzzleMatrixView : MonoBehaviour
                 Sequence matchSeq = DOTween.Sequence();
                 foreach (var group in step.MatchGroups)
                 {
-                    foreach (var move in group)
+                    foreach (var move in group.Cells)
                     {
                         if (!dataViewDict.TryGetValue(move.Data, out PuzzleView view))
                         {

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 // 퍼즐 연출이 전부 끝난 뒤 스킬을 일괄 실행하는 구간입니다. (GDD §4.5)
@@ -34,15 +32,17 @@ public class GameActionState : BaseState<EGameState, GameManager>, IBroadcastabl
         var owner = machine.Owner;
         totalTargetCount = owner != null ? owner.GetSubscriberCount(EGameState.Action) : 0;
 
-        // 구독자(ActionManager)는 이 브로드캐스트를 받고 GameManager에서 레시피를 꺼내 갑니다.
+        // 구독자(ActionManager)는 이 브로드캐스트를 받고 GameManager에서 영수증을 꺼내 갑니다.
         _cachedBroadCastAction?.Invoke();
 
-        // 아직 아무도 구독하지 않는 동안([5] 이전)에는 레시피가 그대로 남습니다.
-        // 조용히 버리면 레시피 작성이 맞는지 확인할 방법이 없어 내역을 찍고 비웁니다.
-        // ActionManager가 붙으면 이 분기는 더 이상 타지 않습니다.
         if (totalTargetCount == 0)
         {
-            ReportUnconsumedRecipes(owner);
+            // 스킬을 해석할 구독자가 없다는 뜻입니다. 이 턴의 전투가 통째로 사라집니다.
+            // 상태에서 나가는 길은 확보해야 하므로 흘려보내되 조용히 넘기지는 않습니다. (AGENT.md §8)
+            if (owner != null && owner.HasPendingMoveReceipt)
+            {
+                Debug.LogWarning("[GameActionState] 스킬을 해석할 구독자가 없어 이번 턴의 영수증을 버립니다.");
+            }
             OnAllTasksComplete();
         }
     }
@@ -60,35 +60,16 @@ public class GameActionState : BaseState<EGameState, GameManager>, IBroadcastabl
 
     public override void OnExit()
     {
-        // 불변식: 이 상태를 나갈 때 제출된 레시피는 남아 있으면 안 된다.
-        // 남아 있다는 건 하달됐지만 아무도 가져가지 않았다는 뜻입니다. (AGENT.md §9)
+        // 불변식: 이 상태를 나갈 때 제출된 영수증은 남아 있으면 안 된다.
+        // 남아 있다는 건 구독자가 꺼내 가지 않았다는 뜻이고, 다음 턴 제출과 섞입니다. (AGENT.md §9)
         var owner = machine.Owner;
-        if (owner == null) return;
+        if (owner == null || !owner.HasPendingMoveReceipt) return;
 
-        int leaked = owner.PeekSkillRecipeCount();
-        if (leaked > 0)
-        {
-            Debug.LogWarning($"[GameActionState] 소비되지 않은 스킬 레시피 {leaked}건이 남은 채 상태를 벗어납니다.");
-            owner.ConsumeSkillRecipes();
-        }
+        Debug.LogWarning("[GameActionState] 소비되지 않은 영수증이 남은 채 상태를 벗어납니다.");
+        owner.ConsumeMoveReceipt();
     }
 
     public override void OnUpdate()
     {
-    }
-
-    private void ReportUnconsumedRecipes(GameManager owner)
-    {
-        IReadOnlyList<SkillRecipe> recipes = owner.ConsumeSkillRecipes();
-        if (recipes.Count == 0) return;
-
-        StringBuilder sb = new StringBuilder();
-        sb.Append($"[GameActionState] 하달 대상이 없어 스킬 레시피 {recipes.Count}건을 실행하지 못했습니다.");
-        foreach (var recipe in recipes)
-        {
-            string specName = recipe.Spec != null ? recipe.Spec.SOName : "(null)";
-            sb.Append($"\n  chain {recipe.ChainIndex} / {specName} / matchCount {recipe.MatchCount}");
-        }
-        Debug.LogWarning(sb.ToString());
     }
 }

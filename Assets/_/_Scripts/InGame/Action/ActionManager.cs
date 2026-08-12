@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -134,12 +135,13 @@ public class ActionManager : BaseManager
         return found;
     }
 
-    // ===================== 스킬 처리 =====================
+    // ===================== 스킬 해석 =====================
 
     // GameActionState가 이 상태에 들어오며 브로드캐스트한 뒤 호출됩니다.
     private void HandleOnAction()
     {
-        IReadOnlyList<SkillRecipe> recipes = gameManager.ConsumeSkillRecipes();
+        MoveReceipt receipt = gameManager.ConsumeMoveReceipt();
+        List<SkillRecipe> recipes = BuildSkillRecipes(receipt);
 
         foreach (var recipe in recipes)
         {
@@ -147,6 +149,44 @@ public class ActionManager : BaseManager
         }
 
         gameManager.ReceiveCompleteSignal();
+    }
+
+    // 퍼즐 영수증을 실행 순서대로 늘어놓은 스킬 목록으로 옮깁니다. (GDD §4.5)
+    //
+    // 퍼즐은 "무슨 버블이 몇 차에 몇 개 터졌나"까지만 적습니다.
+    // 덩어리 1개 = 스킬 1건이라는 판정도, 차수와 개수를 세는 것도 여기서 합니다.
+    private List<SkillRecipe> BuildSkillRecipes(MoveReceipt receipt)
+    {
+        List<SkillRecipe> ret = new List<SkillRecipe>();
+        if (receipt == null) return ret;
+
+        for (int i = 0; i < receipt.ChainSteps.Count; i++)
+        {
+            // 연쇄 차수는 1-based입니다.
+            int chainIndex = i + 1;
+            List<SkillRecipe> ofStep = new List<SkillRecipe>();
+
+            foreach (var group in receipt.ChainSteps[i].MatchGroups)
+            {
+                if (group.Spec == null) continue;
+                ofStep.Add(new SkillRecipe(group.Spec, group.Cells.Count, chainIndex));
+            }
+
+            // 선(先)배치 실행 규칙 - 증폭/버프를 이 차수의 가장 앞으로 당깁니다. (GDD §4.5)
+            //
+            // 정렬 범위는 이번 차수뿐입니다. 앞선 차수로 소급되면 이미 발동이 끝난 스킬의
+            // 수치가 뒤늦게 바뀝니다. OrderBy는 안정 정렬이라 나머지 순서는 보존됩니다.
+            if (ofStep.Count > 1)
+            {
+                ofStep = ofStep
+                    .OrderByDescending(r => r.Spec.action != null && r.Spec.action.IsPreemptive)
+                    .ToList();
+            }
+
+            ret.AddRange(ofStep);
+        }
+
+        return ret;
     }
 
     // 5a 단계에서는 타깃 선정까지만 합니다. 수치 적용은 GameAction 3종을 구현하는 다음 단계입니다.

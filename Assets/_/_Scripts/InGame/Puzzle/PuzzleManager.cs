@@ -190,10 +190,12 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
     public void ReceiveCompleteSignal()
     {
         // 퍼즐 연출이 끝나는 유일한 지점입니다. 완수 보고로 상태를 넘기기 "전에"
-        // 레시피를 제출해야 GameActionState가 진입 시점에 바로 집어갈 수 있습니다.
-        SubmitSkillRecipes();
+        // 영수증을 올려야 GameActionState가 진입 시점에 바로 집어갈 수 있습니다.
+        //
+        // 퍼즐이 하는 일은 여기까지입니다. 이 영수증이 무슨 스킬이 되는지는 모릅니다.
+        if (playingReceipt != null) gameManager.SubmitMoveReceipt(playingReceipt);
 
-        // 영수증의 수명도 여기서 끝납니다. 남겨두면 다음 연출이 지난 레시피를 다시 제출합니다.
+        // 영수증의 수명도 여기서 끝납니다. 남겨두면 다음 연출이 지난 것을 다시 제출합니다.
         playingReceipt = null;
 
         stateReportHub.ReceiveCompleteSignal();
@@ -315,26 +317,6 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         playingReceipt = receipt;
 
         puzzleMatrixView.PuzzleActionStart(receipt);
-    }
-
-    // ===================== 스킬 레시피 =====================
-
-    // 연출이 끝난 영수증에서 스킬 레시피를 걷어 GameManager에 제출합니다. (GDD §4.5)
-    //
-    // 평탄화 순서가 곧 실행 순서입니다. 연쇄 차수 순으로 돌고, 한 ChainStep 안에서는
-    // 이미 선배치 정렬이 끝난 리스트 순서를 그대로 따릅니다.
-    // 하위 매니저끼리 직접 넘기지 않고 GameManager를 거칩니다.
-    private void SubmitSkillRecipes()
-    {
-        if (playingReceipt == null) return;
-
-        List<SkillRecipe> flattened = new List<SkillRecipe>();
-        foreach (var step in playingReceipt.ChainSteps)
-        {
-            flattened.AddRange(step.SkillRecipes);
-        }
-
-        if (flattened.Count > 0) gameManager.SubmitSkillRecipes(flattened);
     }
 
 }
