@@ -30,7 +30,6 @@ public class BaseManager : MonoBehaviour
     // Update is called once per frame
     protected virtual void OnInit()
     {
-        Debug.Log($"{this} init");
     }
     protected virtual void OnUpdate()
     {

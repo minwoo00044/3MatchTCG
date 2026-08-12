@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Collections.Generic;
 
 using System.Linq;
-using System.Text;
 
 public class PuzzleModel
 {
@@ -35,17 +34,6 @@ public class PuzzleModel
 
         InitializeBoard();
         callback?.Invoke();
-        // 디버깅 로그 출력
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < Size; i++)
-        {
-            for (int j = 0; j < Size; j++)
-            {
-                sb.Append(bubbles[i][j].Spec.SOName + "/");
-            }
-            sb.Append("\n");
-        }
-        Debug.Log(sb.ToString());
         puzzleManager.ReceiveCompleteSignal();
     }
     private bool IsInBounds(Vector2Int next)

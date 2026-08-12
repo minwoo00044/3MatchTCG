@@ -48,7 +48,13 @@ public class PuzzleInitState : BaseState<EPuzzleState, PuzzleManager>, IReportab
     public void ReceiveCompleteSignal()
     {
         readyCount++;
-        Debug.Log($"{readyCount}:{totalTargetCount}");
+
+        // 불변식: 완수 보고는 기다리는 수만큼만 온다. (AGENT.md §9)
+        if (readyCount > totalTargetCount)
+        {
+            Debug.LogWarning($"[PuzzleInitState] 완수 보고가 초과했습니다. {readyCount}/{totalTargetCount}");
+        }
+
         if (readyCount >= totalTargetCount) OnAllTasksComplete();
     }
 }

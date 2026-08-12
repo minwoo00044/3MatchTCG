@@ -30,7 +30,14 @@ public class GamePuzzleActionState : BaseState<EGameState, GameManager>, IBroadc
     public void ReceiveCompleteSignal()
     {
         readyCount++;
-        Debug.Log($"GamePuzzleActionState readyCount: {readyCount}/{totalTargetCount}");
+
+        // 불변식: 완수 보고는 기다리는 수만큼만 온다.
+        // 초과분은 같은 작업이 두 번 보고했다는 뜻이고, 그대로 두면 다음 상태를 조기에 끝냅니다.
+        if (readyCount > totalTargetCount)
+        {
+            Debug.LogWarning($"[GamePuzzleActionState] 완수 보고가 초과했습니다. {readyCount}/{totalTargetCount}");
+        }
+
         if (readyCount >= totalTargetCount) OnAllTasksComplete();
     }
 
