@@ -36,6 +36,23 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
         return action;
     }
 
+    // ===================== 전투 덱 =====================
+    //
+    // 덱은 전투 전체의 데이터이고 소비자가 둘입니다.
+    // PuzzleManager(버블 색 매핑, 스포닝 비율)와 ActionManager(Actor 3인 생성).
+    // 각자 [SerializeField]로 들면 배선이 두 벌이 되고, 어긋나면 화면의 버블 색과
+    // 실제 필드에 선 캐릭터가 다른 덱을 가리키게 됩니다. (AGENT.md §5)
+    //
+    // 소유는 여기, 파생(BubbleSO -> CharacterSO 매핑 등)은 각 매니저가 만듭니다. (GDD §2.3)
+    // 하위 매니저는 아무 때나 읽지 않고 Init 브로드캐스트를 받은 OnInit 안에서만 읽습니다.
+    [Header("BATTLE")]
+    [SerializeField]
+    private DeckSO deck;
+
+    // DeckSO 타입이 아니라 목록으로 노출합니다. 나중에 공급원이 편성 UI의 세이브 데이터로
+    // 바뀌어도 소비하는 쪽 코드는 그대로 둘 수 있습니다.
+    public IReadOnlyList<CharacterSO> Characters => deck != null ? deck.characters : null;
+
     // ===================== 스킬 레시피 중계 =====================
     //
     // 하위 매니저끼리 직접 소통하지 않습니다. PuzzleManager는 위로 제출하고,

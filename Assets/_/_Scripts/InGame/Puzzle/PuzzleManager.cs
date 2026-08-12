@@ -6,6 +6,14 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
     [Header("TEST")]
     [SerializeField]
     private List<BubbleSO> testTable;
+
+    [Header("BUBBLE COLOR")]
+    [Tooltip("소속 캐릭터가 없는 공용 특수 버블(T_O)의 색. 목업 값입니다")]
+    [SerializeField]
+    private Color commonBubbleColor = Color.yellow;
+
+    // BubbleSO -> 소속 CharacterSO. 정적 파이프이므로 PuzzleManager가 소유합니다. (GDD §2.3)
+    private readonly Dictionary<BubbleSO, CharacterSO> skillOwners = new Dictionary<BubbleSO, CharacterSO>();
     [SerializeField]
     private int size;
     [SerializeField]
@@ -86,12 +94,57 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
     {
         Bubble data = puzzleFactory.PackBubble(puzzlePool.RequestData());
         PuzzleView puzzleView = puzzlePool.RequestView();
-        puzzleView.Injection(data, OnPuzzleViewClickDown, OnPuzzleViewClickUp, OnPuzzleViewHover);
+        puzzleView.Injection(data, ResolveBubbleColor(data.Spec), OnPuzzleViewClickDown, OnPuzzleViewClickUp, OnPuzzleViewHover);
         puzzleMatrixView.RegistBubble(data, puzzleView);
         return data;
     }
+    // ===================== 버블 색 =====================
+    //
+    // 색을 묻는 곳이 여럿 생기므로 답하는 함수는 여기 하나만 둡니다. (AGENT.md §5)
+    private void BuildSkillOwnerMap()
+    {
+        skillOwners.Clear();
+
+        // 덱의 소유자는 GameManager입니다. 읽는 시점은 Init 브로드캐스트 안으로 한정합니다.
+        IReadOnlyList<CharacterSO> characters = gameManager != null ? gameManager.Characters : null;
+        if (characters == null)
+        {
+            Debug.LogWarning("[PuzzleManager] 덱이 배정되지 않아 모든 버블이 공용 색으로 그려집니다.");
+            return;
+        }
+
+        foreach (var character in characters)
+        {
+            if (character == null || character.skills == null) continue;
+
+            foreach (var skill in character.skills)
+            {
+                if (skill == null) continue;
+
+                // 한 버블이 두 캐릭터에 걸려 있으면 색이 스왑 때마다 달라 보입니다.
+                if (skillOwners.ContainsKey(skill))
+                {
+                    Debug.LogWarning($"[PuzzleManager] {skill.SOName}이(가) 캐릭터 둘 이상에 배정돼 있습니다.");
+                    continue;
+                }
+                skillOwners.Add(skill, character);
+            }
+        }
+    }
+
+    public Color ResolveBubbleColor(BubbleSO spec)
+    {
+        // 소속 캐릭터가 없는 공용 버블(T_O)은 폴백 색을 씁니다.
+        if (spec == null) return commonBubbleColor;
+        if (!skillOwners.TryGetValue(spec, out CharacterSO owner)) return commonBubbleColor;
+
+        return owner.mainColor;
+    }
+
     public void PuzzleInitialize()
     {
+        // 보드를 채우기 전에 색 매핑이 서 있어야 합니다. 순서가 뒤집히면 첫 보드가 전부 공용 색이 됩니다.
+        BuildSkillOwnerMap();
         puzzleFactory.InjectBubbleSpecs(testTable);
         puzzleModel.SetBubbles(() =>
         {
