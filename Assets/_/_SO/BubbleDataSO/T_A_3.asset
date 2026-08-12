@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SOName: T_A_3
   action: {fileID: 11400000, guid: 5e3ee5f433ad388468ccb863033df4f4, type: 2}
-  target: {fileID: 11400000, guid: 47d8a6da0a0d28b44ae6ea437cf1a3cb, type: 2}
+  target: {fileID: 11400000, guid: ab6cf25b78a2a434b9d2b892ee5918a6, type: 2}
   bubbleImage: {fileID: 21300000, guid: db427fab3e94daf4caa704d9314a77a1, type: 3}
-  bubbleColor: {r: 1, g: 0, b: 0, a: 1}
   spawnWeight: 1
-  value: 10
+  value: 15
   chainWeights: []
+  threatMultiplier: 1

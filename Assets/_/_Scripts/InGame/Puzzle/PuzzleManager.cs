@@ -3,12 +3,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class PuzzleManager : BaseManager, IReceivableMachineManager
 {
-    [Header("TEST")]
+    [Header("COMMON BUBBLE")]
+    [Tooltip("어느 캐릭터에도 속하지 않는 공용 특수 버블(T_O). 스포닝 지분 10% (GDD §3.2)")]
     [SerializeField]
-    private List<BubbleSO> testTable;
-
-    [Header("BUBBLE COLOR")]
-    [Tooltip("소속 캐릭터가 없는 공용 특수 버블(T_O)의 색. 목업 값입니다")]
+    private List<BubbleSO> commonBubbles;
+    [Tooltip("공용 버블의 색. 소속 캐릭터가 없어 mainColor를 물려받을 수 없습니다. 목업 값")]
     [SerializeField]
     private Color commonBubbleColor = Color.yellow;
 
@@ -141,11 +140,37 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         return owner.mainColor;
     }
 
+    // 보드에 뽑힐 후보 목록. 덱 3인의 스킬 9종 + 공용 버블입니다.
+    //
+    // 스폰 원천과 색 원천이 같은 덱 하나로 모입니다. 둘이 갈려 있으면 화면에 있는데
+    // 뽑히지 않거나, 뽑히는데 색이 없는 버블이 생깁니다.
+    private List<BubbleSO> BuildSpawnTable()
+    {
+        List<BubbleSO> ret = new List<BubbleSO>();
+
+        // skillOwners는 BuildSkillOwnerMap이 중복까지 걸러둔 목록입니다.
+        // 여기서 덱을 다시 순회하면 같은 질문에 답하는 코드가 둘이 됩니다. (AGENT.md §5)
+        foreach (var skill in skillOwners.Keys) ret.Add(skill);
+
+        if (commonBubbles != null)
+        {
+            foreach (var bubble in commonBubbles)
+            {
+                if (bubble != null) ret.Add(bubble);
+            }
+        }
+
+        if (ret.Count == 0) Debug.LogWarning("[PuzzleManager] 스폰 후보가 비어 있습니다. 덱과 공용 버블 배정을 확인하세요.");
+
+        return ret;
+    }
+
     public void PuzzleInitialize()
     {
-        // 보드를 채우기 전에 색 매핑이 서 있어야 합니다. 순서가 뒤집히면 첫 보드가 전부 공용 색이 됩니다.
+        // 보드를 채우기 전에 색 매핑이 서 있어야 합니다.
+        // 스폰 후보도 이 매핑에서 나오므로 순서가 뒤집히면 보드가 공용 버블로만 채워집니다.
         BuildSkillOwnerMap();
-        puzzleFactory.InjectBubbleSpecs(testTable);
+        puzzleFactory.InjectBubbleSpecs(BuildSpawnTable());
         puzzleModel.SetBubbles(() =>
         {
             puzzleMatrixView.DrawingAllMatrix();

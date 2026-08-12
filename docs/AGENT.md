@@ -232,7 +232,13 @@ early return 하기 전에 **"이 상태를 누가 끝내주나"**를 확인한�
 | Cosmetic (판매 가능) | 스프라이트, 색, 파티클, 사운드 |
 | Gameplay (고정) | 매치 규칙, 보드 크기, 연출 타이밍, 스폰 확률 |
 
-현재 `BubbleSO`는 `bubbleImage`/`bubbleColor`(코스메틱)와 `action`/`value`/`addPerBubble`(게임플레이)을 한 클래스에 들고 있다. 스킨을 붙일 때 첫 작업은 여기를 가르는 것이다.
+색은 이미 갈라져 나갔다. `BubbleSO.bubbleColor`를 없애고 `CharacterSO.mainColor`를 단일 원천으로 삼았다.
+버블 색을 묻는 곳은 `PuzzleManager.ResolveBubbleColor` 하나뿐이고, 뷰는 받은 색을 칠하기만 한다.
+
+남은 것은 `BubbleSO` 안에 섞여 있는 `bubbleImage`(코스메틱)와
+`action`/`target`/`value`/`spawnWeight`/`chainWeights`/`threatMultiplier`(게임플레이)다.
+`CharacterSO`도 `characterImage`/`mainColor`(코스메틱)와 `maxHP`/`maxShield`/`baseThreat`/`skills`(게임플레이)를 함께 들고 있다.
+스킨을 붙일 때 첫 작업은 이 둘을 가르는 것이다.
 
 ---
 
