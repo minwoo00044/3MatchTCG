@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3297933077d7493409bd4479c133b62c, type: 3}
+  m_Name: B
+  m_EditorClassIdentifier: 
+  characterName: B
+  characterImage: {fileID: 0}
+  mainColor: {r: 0.26666668, g: 0.8, b: 0.26666668, a: 1}
+  maxHP: 600
+  maxShield: 200
+  baseThreat: 300
+  skills:
+  - {fileID: 11400000, guid: c40d66159e9494d4ebbeeec374e4e23d, type: 2}
+  - {fileID: 11400000, guid: 83d1782ca1b0e8447879abb8245165f8, type: 2}
+  - {fileID: 11400000, guid: 83876f4f975e5744b91fcbddd4306a9c, type: 2}
