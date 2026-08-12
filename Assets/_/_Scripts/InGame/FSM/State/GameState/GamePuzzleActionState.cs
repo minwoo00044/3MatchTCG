@@ -36,7 +36,8 @@ public class GamePuzzleActionState : BaseState<EGameState, GameManager>, IBroadc
 
     public void OnAllTasksComplete()
     {
-        machine.ChangeState(EGameState.Wait);
+        // 퍼즐 연출이 끝나도 곧바로 대기로 돌아가지 않고 스킬 실행 구간을 거칩니다. (GDD §4.5)
+        machine.ChangeState(EGameState.Action);
     }
 
     public override void OnExit()

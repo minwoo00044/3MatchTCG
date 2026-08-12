@@ -32,8 +32,8 @@ public class BubbleSO : ScriptableObject
     return chainWeights[i];
   }
 
-  public void Excute(Actor caster)
+  public void Execute(Actor caster)
   {
-    action.OnExcute(target.FindTarget(caster));
+    action.OnExecute(target.FindTarget(caster));
   }
 }

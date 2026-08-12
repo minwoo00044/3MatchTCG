@@ -14,4 +14,11 @@ public class ChainStep
 
     // 3. 이번 콤보/연쇄 단계에서 리필된 이동들
     public List<MoveStep> RefillMoves { get; set; } = new List<MoveStep>();
+
+    // 4. 이번 단계에서 발동할 스킬 레시피. MatchGroups 1개당 1건입니다. (GDD §4.5)
+    //
+    // 선(先)배치 규칙의 정렬 범위는 "이 리스트 하나"입니다.
+    // 증폭이 앞선 ChainStep으로 소급되면 이미 발동한 스킬의 수치가 뒤늦게 바뀌므로,
+    // 스텝 경계를 넘겨 재배치하지 않습니다.
+    public List<SkillRecipe> SkillRecipes { get; set; } = new List<SkillRecipe>();
 }

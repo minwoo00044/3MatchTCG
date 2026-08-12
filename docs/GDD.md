@@ -140,17 +140,21 @@
 - **패배 조건**: 플레이어 캐릭터 3인 중 **2명 사망** (생존자 1명 이하) ➡️ 게임 오버 (`GameEndState`)
 - **FSM 상태 자동 등록 규칙 준수 (AGENT.md §2)**: 
   - enum 값을 `EGameState.End`로 명시하여 `GameManager`(owner = "Game")와 결합 시 상태 클래스명이 **`GameEndState`**로 정확히 일치하도록 등록한다.
+  - 스킬 실행 전용 상태는 enum 값 `EGameState.Action` / 클래스 `GameActionState`로 등록한다 (§4.5).
   - 미사용 `EGameState.CharacterAction` 상태는 1차 MVP 스코프에서 완전 삭제.
 - **연출 완주 및 전이 연기 (Overkill 방지)**: 오버킬 또는 사망 상황이 발생하더라도 수치 및 영수증은 즉시 반영하되, **승패 상태 전이는 진행 중인 퍼즐 연출 시퀀스가 완전히 종료(완주)된 뒤에 수행**한다 (뷰/오브젝트 풀 누수 및 불변식 깨짐 방지 - AGENT.md §9 준수).
 
-### 4.5 영수증(Skill Recipe) 동시 생성 및 시퀀스 콜백 실행 규칙
+### 4.5 영수증(Skill Recipe) 생성 및 전용 상태 실행 규칙
 - **생성 시점 및 단품 정의**:
   - `PuzzleModel.Swap()` 시점에 전체 연출 레시피(`MoveReceipt`)를 생성할 때, 각 연쇄 단계(`ChainStep`)별 **스킬 레시피(Skill Recipe)**를 동시에 작성한다.
   - **스킬 레시피 1건의 정의**: 1개의 연결된 **매치 그룹(Match Group - 직선 연결 덩어리)**을 스킬 레시피 1건으로 산정하여 독립 기록한다.
-- **시퀀스 콜백 발동 규칙**: 
-  - 스킬 실행은 각 `ChainStep`의 **팝 연출 직후 시퀀스 콜백(`mainSeq.AppendCallback`)으로 발동하며, FSM 상태 전이를 동반하지 않는다.**
-  - 뷰(`PuzzleMatrixView`)는 팝 완료 시점에 `ChainStep` 인덱스를 콜백으로 전달하고, `PuzzleManager`가 레시피를 소비하여 `ActionManager`로 전달/실행한다.
-- **선(先)배치 실행 규칙**: 하나의 `ChainStep` 내에 이후 스킬에 영향을 주는 효과(증폭/버프 등)가 포함된 경우, **해당 레시피 생성 시 반드시 레시피의 가장 앞(0번 인덱스)에 우선 담아 선발동**하도록 보장한다.
+- **실행 시점 규칙 (전용 FSM 상태)**:
+  - 스킬 실행은 퍼즐 연쇄 연출이 **전부 끝난 뒤** 전용 상태(`EGameState.Action` / `GameActionState`)에서 일괄 수행한다.
+  - 전체 흐름: `GameWaitState` → (유저 스왑) → `GamePuzzleActionState`(연쇄 연출 완주) → **`GameActionState`(스킬 실행)** → `GameWaitState`
+  - 뷰(`PuzzleMatrixView`)는 연출만 담당하며 스킬 발동에 관여하지 않는다. 연출 완주 시 `PuzzleManager`가 `MoveReceipt` 전체의 스킬 레시피를 **연쇄 차수 순서대로 평탄화**하여 `GameManager`에 제출하고, `GameActionState`가 이를 `ActionManager`에 하달한다.
+  - **근거**: 스킬 실행이 DOTween 시퀀스 내부에서 일어나면 `GameManager`가 전투 흐름의 주도권을 갖지 못하고, 캐릭터 공격 모션·데미지 표시 등 스킬 연출을 놓을 시간축이 퍼즐 낙하 연출과 겹친다. 또한 §4.4의 "상태 전이는 연출 완주 후" 규칙과 자연히 일치한다.
+  - Time Freeze는 `GamePuzzleActionState`와 `GameActionState` **두 구간 모두**에서 유지된다.
+- **선(先)배치 실행 규칙**: 하나의 `ChainStep` 내에 이후 스킬에 영향을 주는 효과(증폭/버프 등)가 포함된 경우, **해당 레시피 생성 시 반드시 그 `ChainStep` 레시피 목록의 가장 앞(0번 인덱스)에 우선 담아 선발동**하도록 보장한다. 정렬 범위는 해당 `ChainStep` 내부로 한정하며, 앞선 `ChainStep`으로 소급하지 않는다.
 - **기록 데이터 항목 (Null Safety)**:
   - `BubbleSO` 스펙 참조 (스냅샷 복사: 풀 반납 후 `_spec` null 방지 - AGENT.md §3 준수)
   - `matchCount`: 해당 매치 그룹으로 터진 버블 개수

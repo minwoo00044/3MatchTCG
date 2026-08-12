@@ -6,7 +6,7 @@ public class PuzzleFactory
     //임시 가중치 테이블
     int[] testTable = {100,100,100,100,100,100,100,100,100,100};
     private List<BubbleSO> bubbleSpecs;
-    public void InJectBubbleSpecs(List<BubbleSO> bubbleSO)
+    public void InjectBubbleSpecs(List<BubbleSO> bubbleSO)
     {
         bubbleSpecs = bubbleSO;
     }

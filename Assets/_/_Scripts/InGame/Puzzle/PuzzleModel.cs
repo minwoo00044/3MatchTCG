@@ -247,20 +247,51 @@ public class PuzzleModel
         {
             ChainStep currentStep = new ChainStep();
 
+            // 연쇄 차수는 1-based입니다. (GDD §4.5) 아직 이번 스텝을 담기 전이므로 +1.
+            int chainIndex = receipt.ChainSteps.Count + 1;
+
             // 1. 이번 연쇄 단계에서 터진 버블을 매치 그룹 단위로 기록
             //    (ReturnToPool은 호출하지 않음 - 뷰 연출 완료 시점으로 미룸)
             foreach (var group in currentGroups)
             {
                 List<MoveStep> groupMoves = new List<MoveStep>();
+                BubbleSO groupSpec = null;
+
                 foreach (var pos in group)
                 {
                     var targetBubble = bubbles[pos.x][pos.y];
                     if (targetBubble == null) continue;
 
+                    // [중요] 스펙은 지금 확보합니다. 연출 중에는 Bubble.Spec이 이미 null입니다.
+                    // 같은 그룹은 매치 규칙상 SOName이 모두 같으므로 하나만 잡으면 됩니다. (AGENT.md §3)
+                    if (groupSpec == null) groupSpec = targetBubble.Spec;
+
                     groupMoves.Add(new MoveStep(targetBubble, pos, pos));
                     SetBubbleAt(pos.x, pos.y, null);
                 }
-                if (groupMoves.Count > 0) currentStep.MatchGroups.Add(groupMoves);
+
+                if (groupMoves.Count == 0) continue;
+
+                currentStep.MatchGroups.Add(groupMoves);
+
+                // 매치 그룹 1개 = 스킬 레시피 1건. 평면으로 세면 보드 양쪽의 무관한 3매치가
+                // 6개짜리 하나로 뭉쳐 데미지가 두 배가 됩니다. (GDD §4.5)
+                if (groupSpec != null)
+                {
+                    currentStep.SkillRecipes.Add(new SkillRecipe(groupSpec, groupMoves.Count, chainIndex));
+                }
+            }
+
+            // 선(先)배치 실행 규칙 - 증폭/버프를 이 스텝의 가장 앞으로 당깁니다. (GDD §4.5)
+            //
+            // 정렬 범위는 이 ChainStep의 리스트 하나뿐입니다. 앞선 스텝으로 소급되면
+            // 이미 발동이 끝난 스킬의 수치가 뒤늦게 바뀝니다.
+            // OrderBy는 안정 정렬이라 증폭이 아닌 것들끼리의 순서는 보존됩니다.
+            if (currentStep.SkillRecipes.Count > 1)
+            {
+                currentStep.SkillRecipes = currentStep.SkillRecipes
+                    .OrderByDescending(r => r.Spec != null && r.Spec.action != null && r.Spec.action.IsPreemptive)
+                    .ToList();
             }
 
             // 2. 중력 및 리필 기록 (currentStep에 기록)

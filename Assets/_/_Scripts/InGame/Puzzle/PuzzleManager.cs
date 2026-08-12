@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class PuzzleManager : BaseManager, IReceiverableMachineManager
+public class PuzzleManager : BaseManager, IReceivableMachineManager
 {
     [Header("TEST")]
     [SerializeField]
@@ -19,6 +19,11 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
     private StateReportHub<EPuzzleState, PuzzleManager> stateReportHub;
     private Bubble selected;
     private MoveReceipt cachedReceipt;
+
+    // 연출이 도는 동안의 영수증. cachedReceipt는 소비 즉시 비우므로 별도로 들고 있습니다.
+    // (재진입 방지와 콜백 조회는 목적이 달라 같은 필드를 겸하게 하지 않습니다)
+    private MoveReceipt playingReceipt;
+
 
     [Header("INPUT")]
     [Tooltip("이 거리(월드 단위, 셀 1칸 = 1) 미만으로 끌면 제자리 탭으로 보고 무시합니다.")]
@@ -87,7 +92,7 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
     }
     public void PuzzleInitialize()
     {
-        puzzleFactory.InJectBubbleSpecs(testTable);
+        puzzleFactory.InjectBubbleSpecs(testTable);
         puzzleModel.SetBubbles(() =>
         {
             puzzleMatrixView.DrawingAllMatrix();
@@ -106,6 +111,13 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
 
     public void ReceiveCompleteSignal()
     {
+        // 퍼즐 연출이 끝나는 유일한 지점입니다. 완수 보고로 상태를 넘기기 "전에"
+        // 레시피를 제출해야 GameActionState가 진입 시점에 바로 집어갈 수 있습니다.
+        SubmitSkillRecipes();
+
+        // 영수증의 수명도 여기서 끝납니다. 남겨두면 다음 연출이 지난 레시피를 다시 제출합니다.
+        playingReceipt = null;
+
         stateReportHub.ReceiveCompleteSignal();
     }
 
@@ -222,8 +234,29 @@ public class PuzzleManager : BaseManager, IReceiverableMachineManager
         // (재진입 시 이미 풀로 반납된 Bubble을 참조해 연출이 깨지는 것을 방지)
         MoveReceipt receipt = cachedReceipt;
         cachedReceipt = null;
+        playingReceipt = receipt;
 
         puzzleMatrixView.PuzzleActionStart(receipt);
+    }
+
+    // ===================== 스킬 레시피 =====================
+
+    // 연출이 끝난 영수증에서 스킬 레시피를 걷어 GameManager에 제출합니다. (GDD §4.5)
+    //
+    // 평탄화 순서가 곧 실행 순서입니다. 연쇄 차수 순으로 돌고, 한 ChainStep 안에서는
+    // 이미 선배치 정렬이 끝난 리스트 순서를 그대로 따릅니다.
+    // 하위 매니저끼리 직접 넘기지 않고 GameManager를 거칩니다.
+    private void SubmitSkillRecipes()
+    {
+        if (playingReceipt == null) return;
+
+        List<SkillRecipe> flattened = new List<SkillRecipe>();
+        foreach (var step in playingReceipt.ChainSteps)
+        {
+            flattened.AddRange(step.SkillRecipes);
+        }
+
+        if (flattened.Count > 0) gameManager.SubmitSkillRecipes(flattened);
     }
 
 }
