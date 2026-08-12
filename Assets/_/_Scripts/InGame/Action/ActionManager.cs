@@ -112,16 +112,28 @@ public class ActionManager : BaseManager
     // ===================== 시전자 역추적 =====================
 
     // 레시피는 버블 스펙만 들고 옵니다. 누가 쓴 스킬인지는 여기서 되짚습니다. (GDD §2.3)
-    private Actor ResolveCaster(BubbleSO spec)
+    //
+    // 시전자를 못 찾는 두 경우를 구별해야 합니다.
+    //   - 소속 캐릭터가 죽었다  -> 스킬 무효. 다른 아군이 대신 쓰지 않는다 (GDD §3.2.1)
+    //   - 소속 캐릭터가 없다    -> 공용 버블. 생존 아군 중 BaseThreat 최고가 쓴다 (GDD §3.3)
+    // 둘을 뭉뚱그리면 죽은 캐릭터의 버블이 남의 손을 빌려 계속 발동합니다.
+    private bool TryResolveCaster(BubbleSO spec, out Actor caster)
     {
-        if (spec != null && skillCasters.TryGetValue(spec, out PlayerActor caster) && !caster.IsDead)
+        caster = null;
+        if (spec == null) return false;
+
+        if (skillCasters.TryGetValue(spec, out PlayerActor owner))
         {
-            return caster;
+            // 사망 무효 판정은 작성 시점이 아니라 실행 시점에 합니다.
+            // 연쇄 중간에 죽어도 그 이후 스킬이 정확히 걸러집니다. (GDD §3.2.1)
+            if (owner.IsDead) return false;
+
+            caster = owner;
+            return true;
         }
 
-        // 소속 캐릭터가 없는 공용 버블(T_O)은 생존 아군 중 BaseThreat가 가장 높은 캐릭터가 씁니다. (GDD §3.3)
-        // 시전자가 이미 죽은 경우에도 같은 규칙으로 넘깁니다 - 스킬 무효화 판정은 실행 단계의 몫입니다.
-        return HighestBaseThreatAlly();
+        caster = HighestBaseThreatAlly();
+        return caster != null;
     }
 
     private Actor HighestBaseThreatAlly()
@@ -143,10 +155,15 @@ public class ActionManager : BaseManager
         MoveReceipt receipt = gameManager.ConsumeMoveReceipt();
         List<SkillRecipe> recipes = BuildSkillRecipes(receipt);
 
+        // 수치는 여기서 전부 확정됩니다. 연출은 나중에 이 기록을 재생할 뿐입니다. (GDD §4.1, §4.5)
+        BattleReceipt battle = new BattleReceipt();
         foreach (var recipe in recipes)
         {
-            ExecuteRecipe(recipe);
+            ExecuteRecipe(recipe, battle);
         }
+
+        // 연출 담당이 생기면 이 영수증을 재생합니다. 지금은 소비자가 없어 내역만 찍습니다.
+        ReportBattleReceipt(battle);
 
         gameManager.ReceiveCompleteSignal();
     }
@@ -189,39 +206,68 @@ public class ActionManager : BaseManager
         return ret;
     }
 
-    // 5a 단계에서는 타깃 선정까지만 합니다. 수치 적용은 GameAction 3종을 구현하는 다음 단계입니다.
-    private void ExecuteRecipe(SkillRecipe recipe)
+    // ===================== 스킬 실행 =====================
+
+    private void ExecuteRecipe(SkillRecipe recipe, BattleReceipt battle)
     {
         if (recipe == null || recipe.Spec == null) return;
+        BubbleSO spec = recipe.Spec;
 
-        Actor caster = ResolveCaster(recipe.Spec);
-        if (caster == null)
+        // 소속 캐릭터가 죽었으면 여기서 걸러집니다. 버블은 이미 터졌고 효과만 없습니다. (GDD §3.2.1)
+        if (!TryResolveCaster(spec, out Actor caster)) return;
+
+        if (spec.action == null || spec.target == null)
         {
-            // 아군이 전멸했다는 뜻입니다. 승패 판정이 붙으면 여기까지 오지 않습니다([8]).
-            Debug.LogWarning($"[ActionManager] {recipe.Spec.SOName}의 시전자를 찾지 못했습니다.");
+            Debug.LogWarning($"[ActionManager] {spec.SOName}에 액션 또는 타깃이 배정되지 않았습니다.");
             return;
         }
 
-        if (recipe.Spec.target == null)
+        Actor[] targets = spec.target.FindTarget(caster);
+        if (targets.Length == 0) return;
+
+        // 최종 수치 = value * matchCount * chainWeight (GDD §4.6)
+        //
+        // 여기서 정수로 확정합니다. Actor의 HP/실드가 int인 이유는, float로 두면
+        // "0.0001 남아 안 죽은 적"이 생기고 그 판정이 타깃 필터와 승패까지 번지기 때문입니다.
+        int amount = Mathf.RoundToInt(spec.value * recipe.MatchCount * spec.GetChainWeight(recipe.ChainIndex));
+        if (amount <= 0) return;
+
+        int before = battle.Steps.Count;
+        spec.action.OnExecute(new SkillContext(caster, spec, targets, amount, battle));
+
+        AccumulateThreat(caster, spec, battle, before);
+    }
+
+    // 위협도는 실제 적용량이 아니라 "부여량" 기준입니다. 상한을 넘겨 버려진 힐/실드도 셉니다.
+    // 탱커가 방어 행위를 계속하는 한 어그로를 유지하는 게 의도입니다. (HANDOFF §7)
+    //
+    // 대상 수만큼 합산합니다. 광역 힐은 1인 힐보다 총량이 크므로 어그로도 그만큼 끌립니다. (GDD §4.1)
+    // 방금 적힌 기록에서 요청량을 걷어오므로, 액션이 무엇을 했든 셈이 어긋나지 않습니다.
+    private void AccumulateThreat(Actor caster, BubbleSO spec, BattleReceipt battle, int fromIndex)
+    {
+        int requested = 0;
+        for (int i = fromIndex; i < battle.Steps.Count; i++)
         {
-            Debug.LogWarning($"[ActionManager] {recipe.Spec.SOName}에 타깃이 배정되지 않았습니다.");
-            return;
+            requested += battle.Steps[i].Requested;
         }
+        if (requested <= 0) return;
 
-        Actor[] targets = recipe.Spec.target.FindTarget(caster);
+        caster.AddThreat(requested * spec.threatMultiplier, battlefield.GameTime);
+    }
 
-        // 타깃 선정이 맞는지 확인하는 임시 로그입니다.
-        // 수치가 실제로 들어가기 시작하면 이 로그는 제거합니다. (AGENT.md §9)
+    // 전투 결과 확인용 임시 로그입니다. 연출이 이 영수증을 소비하기 시작하면 제거합니다. (AGENT.md §9)
+    private void ReportBattleReceipt(BattleReceipt battle)
+    {
+        if (battle.Steps.Count == 0) return;
+
         StringBuilder sb = new StringBuilder();
-        sb.Append($"[ActionManager] chain {recipe.ChainIndex} / {caster} -> {recipe.Spec.SOName} (x{recipe.MatchCount}) => ");
-        if (targets.Length == 0) sb.Append("대상 없음");
-        else
+        sb.Append($"[ActionManager] 전투 {battle.Steps.Count}건");
+        foreach (var step in battle.Steps)
         {
-            for (int i = 0; i < targets.Length; i++)
-            {
-                if (i > 0) sb.Append(", ");
-                sb.Append($"{targets[i]}({targets[i].CurrentHP}/{targets[i].MaxHP})");
-            }
+            sb.Append($"\n  {step.Caster} -{step.Spec.SOName}-> {step.Target} " +
+                      $"{step.Effect} {step.Applied}(요청 {step.Requested}) " +
+                      $"HP {step.HPAfter}/{step.Target.MaxHP} 실드 {step.ShieldAfter}");
+            if (step.Died) sb.Append(" [사망]");
         }
         Debug.Log(sb.ToString());
     }

@@ -36,8 +36,7 @@ public class BubbleSO : ScriptableObject
     return chainWeights[i];
   }
 
-  public void Execute(Actor caster)
-  {
-    action.OnExecute(target.FindTarget(caster));
-  }
+  // 여기서 스킬을 실행하는 함수는 두지 않습니다.
+  // 실행 경로는 ActionManager 하나뿐이어야 합니다. 스킬은 멱등이 아니라
+  // 경로가 둘이면 그중 하나가 이중 적용이 됩니다. (AGENT.md §5)
 }

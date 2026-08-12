@@ -88,6 +88,12 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     // 불변식 검사용. 꺼내지 않고 남아 있는지만 봅니다.
     public bool HasPendingMoveReceipt => pendingReceipt != null;
 
+    // 전투 영수증(BattleReceipt)은 여기를 거치지 않습니다.
+    //
+    // MoveReceipt가 중계를 타는 건 생산자(PuzzleManager)와 소비자(ActionManager)가 다른
+    // 매니저이기 때문입니다. 전투 영수증은 ActionManager가 만들고 아직 소비자가 없어
+    // 중계할 이유가 없습니다. 연출 담당이 별도 매니저로 생기면 그때 같은 모양으로 놓습니다. (AGENT.md §10)
+
     // 4. 특정 상태를 기다리는 구독자(하위 매니저) 수 반환
     public int GetSubscriberCount(EGameState state)
     {
