@@ -17,22 +17,43 @@
 ### 2.2 캐릭터 스킬 및 시각 매핑 규칙 (AGENT.md §6 준수)
 - **캐릭터별 스킬 수**: 캐릭터 1명당 **3개의 전용 스킬**을 보유한다. (덱 전체 총 9개 스킬)
 - **1 스킬 ↔ 1 버블 매핑**: 캐릭터의 각 스킬은 인게임의 **전용 버블 1종류와 1:1로 대응**한다.
-- **시각 매핑 규칙**:
-  - **캐릭터 1인**: 고유 메인 칼라(Color) 할당 (예: 캐릭터 A = Red 계열, 캐릭터 B = Green 계열, 캐릭터 C = Blue 계열)
+- **시각 매핑 규칙 (Single Source of Truth)**:
+  - **캐릭터 1인**: 고유 메인 칼라(`CharacterSO.mainColor`)가 단일 원천이다 (`BubbleSO.bubbleColor` 필드 제거).
+    - 캐릭터 A = Red 계열 (`#FF4444`)
+    - 캐릭터 B = Green 계열 (`#44CC44`)
+    - 캐릭터 C = Blue 계열 (`#4488FF`)
   - **스킬 3종**: 캐릭터 색상 바탕 위 고유 문양/아이콘(Icon 1, 2, 3)으로 구별.
-- **스킬(버블) 가중치**: `BubbleSO.spawnWeight` 필드를 통해 각 스킬/버블별 생성 가중치를 부여한다.
+- **스킬(버블) 가중치 및 위협도 배수**: 
+  - `BubbleSO.spawnWeight` 필드를 통해 버블 생성 가중치를 부여한다.
+  - `BubbleSO.threatMultiplier` 필드(기본값 1.0)를 통해 스킬별 위협도 누적 가중치를 부여한다.
 
 ### 2.3 캐릭터 및 덱 데이터 구조 명세 (Character & Deck SO)
 - **`CharacterSO` 데이터 구조**:
   - `characterName`, `characterImage`, `mainColor` (시각 및 메타 정보)
   - `MaxHP`, `MaxShield`, `BaseThreat` (캐릭터 고유 기본 스탯)
   - `skills`: 해당 캐릭터의 전용 `BubbleSO` 3개 배열
-- **덱(`DeckSO` 또는 덱 설정) 데이터 구조**:
+- **덱(`DeckSO`) 데이터 구조**:
   - `CharacterSO` 3개 리스트로 1개의 플레이어 전투 덱을 편성한다.
-- **시전자(`caster`) 역참조 및 버블 소속 인덱싱 규칙**:
-  - `BubbleSO` 내에 직접적인 캐릭터 역참조 필드를 두지 않는다 (순환 참조 방지 및 에셋 커플링 해제 - AGENT.md §1 준수).
-  - `PuzzleManager`가 전투 시작 시 덱의 3인 `CharacterSO`와 생성된 `PlayerActor` 인스턴스, 그리고 전용 `BubbleSO` 9종 간의 1:1 역참조 인덱스 매핑 테이블을 런타임에 구축한다.
-  - 스킬 레시피 실행 시 버블의 `BubbleSO` 스펙을 바탕으로 시전자 `PlayerActor`를 즉시 역추적하여 `FindTarget(caster)`에 전달하고, 사망 시 스포닝 재정규화 및 회색조 대상 판정에 활용한다.
+- **계층 분리 및 시전자(`caster`) 역참조 규칙 (AGENT.md §1 준수)**:
+  - `PuzzleManager`는 정적 파이프(`DeckSO` ↔ `BubbleSO`)와 스포닝 비율만 다루며, `Actor` 인스턴스를 직접 참조하지 않는다.
+  - `ActionManager`가 전투 시작 시 `CharacterSO` ↔ `Actor` 런타임 매핑을 소유하고, 스킬 레시피 실행 시 `BubbleSO` 스냅샷을 바탕으로 시전자 `PlayerActor`를 역추적하여 `FindTarget(caster)`에 전달한다.
+
+### 2.4 캐릭터 3인 기본 스탯 및 9종 스킬 밸런스 카탈로그
+- **캐릭터 A (딜러 - Red)**:
+  - 기본 스탯: `MaxHP`: 400, `MaxShield`: 100, `BaseThreat`: 100
+  - Skill A1 (버블 A1): `AttackAction` / `LowestHPEnemy` / value: 20 / spawnWeight: 1.0 / threatMultiplier: 1.0
+  - Skill A2 (버블 A2): `AttackAction` / `HighestThreatEnemy` / value: 30 / spawnWeight: 1.0 / threatMultiplier: 1.0
+  - Skill A3 (버블 A3): `AttackAction` / `AllEnemies` / value: 15 / spawnWeight: 1.0 / threatMultiplier: 1.0
+- **캐릭터 B (탱커 - Green)**:
+  - 기본 스탯: `MaxHP`: 600, `MaxShield`: 200, `BaseThreat`: 300
+  - Skill B1 (버블 B1): `DefenseAction` / `LowestHPAlly` / value: 25 / spawnWeight: 1.0 / threatMultiplier: 1.5
+  - Skill B2 (버블 B2): `DefenseAction` / `AllAllies` / value: 15 / spawnWeight: 1.0 / threatMultiplier: 1.5
+  - Skill B3 (버블 B3): `AttackAction` (도발/어그로) / `HighestThreatEnemy` / value: 10 / spawnWeight: 1.0 / **threatMultiplier: 5.0** (고위협도 어그로 유지)
+- **캐릭터 C (힐러/지원 - Blue)**:
+  - 기본 스탯: `MaxHP`: 350, `MaxShield`: 50, `BaseThreat`: 50
+  - Skill C1 (버블 C1): `HealAction` / `LowestHPAlly` / value: 20 / spawnWeight: 1.0 / threatMultiplier: 1.0
+  - Skill C2 (버블 C2): `HealAction` / `AllAllies` / value: 12 / spawnWeight: 1.0 / threatMultiplier: 1.0
+  - Skill C3 (버블 C3): `DefenseAction` / `AllAllies` / value: 10 / spawnWeight: 1.0 / threatMultiplier: 1.0
 
 ---
 
@@ -53,16 +74,20 @@
 - **스포닝 제외 및 재정규화**: 
   - 특수 버블(`T_O`) 10% 지분 고정.
   - 캐릭터 1인 사망 시, 남은 생존 캐릭터 2인 각 45% + 특수 버블 10% = 100% 비율로 재정규화하며, 45% 내에서는 해당 생존 캐릭터의 3개 스킬 `spawnWeight` 비율로 최종 추첨한다.
-  - **적용 시점**: 사망 발생 후 **다음 스왑(Swap) 조작부터 적용**된다. (현재 조작으로 진행 중인 연쇄의 리필 버블은 이미 불변 영수증으로 확정된 상태임)
-  - **아키텍처 규칙(AGENT.md §1)**: `PuzzleManager`가 `Actor` 사망 이벤트를 구독하고, 갱신된 비율을 계산하여 순수 클래스인 `PuzzleFactory`에 주입한다.
+  - **적용 시점**: 사망 발생 후 **다음 스왑(Swap) 조작부터 적용**된다 (현재 조작으로 진행 중인 연쇄의 리필 버블은 이미 불변 영수증으로 확정된 상태임 - AGENT.md §3 준수).
+  - **아키텍처 규칙 (AGENT.md §1 계층 분리 준수)**: `ActionManager`가 `Actor` 사망 이벤트를 처리하여 `CharacterSO` 단위 사망 이벤트(`OnCharacterDied`)를 재발행하고, `PuzzleManager`가 이를 구독하여 갱신된 비율을 순수 클래스인 `PuzzleFactory`에 주입한다.
 - **보드 잔여 버블 처리 & 사망 무효화 판정**: 
   - 이미 보드에 배치되어 있던 사망 캐릭터의 버블은 3매치 조작 및 연쇄 팝(터짐)은 가능하지만, **스킬 효과는 발동하지 않고 단순 파괴 연출만 수행**한다.
   - **사망 스킬 무효화 판정 시점**: 레시피 작성 시점이 아닌 **스킬 실행 시점(시퀀스 콜백 발화 시점)**에 판단하여, 연쇄 진행 중 중간 사망 발생 시에도 안전하게 무효화한다.
-- **시각적 구별**: 사망 이벤트 발생 시 보드에 남아 있는 해당 사망 캐릭터의 버블은 화면에서 즉시 **회색조(Grayscale)** 시각 효과를 적용하여 플레이어가 명확히 구별할 수 있도록 한다.
+- **시각적 구별**: 사망 이벤트 발생 시 보드에 남아 있는 해당 사망 캐릭터의 버블은 화면에서 즉시 **회색조(Grayscale)** 시각 효과를 적용한다.
 - **부활 불가 규칙**: 전투 중 한번 사망한 캐릭터는 영구 사망 처리되며, 부활 메커니즘은 존재하지 않는다.
 
 ### 3.3 공용 특수 버블 (`T_O`) 규칙
-- **설정 방식 & 슬롯**: T_O 특수 버블의 효과는 플레이어가 캐릭터 스킬과 마찬가지로 사전 세팅해 오는 전략 요소이며, **전용 1개 슬롯** (10% 스포닝 지분, 1개 시각 에셋)을 사용한다.
+- **설정 방식 & 슬롯**: T_O 특수 버블은 **전용 1개 슬롯** (10% 스포닝 지분)을 사용한다.
+- **T_O 스킬 효과 및 수치 연산 공식**:
+  - **증폭 배율**: 개수와 무관하게 고정 **1.2배 증폭** (동일 스왑 퍼즐 연쇄 조작 구간 내 2개 이상 파괴 시 합연산 1.4배, 최대 상한 2.0배).
+  - **회복량**: `50 × matchCount` (1버블당 50 기본 수치 공식을 따름). 체력 비율이 가장 낮은 아군 1인 회복.
+- **지속 범위**: 증폭 효과는 플레이어가 퍼즐을 조작하여 발생한 **해당 1회 스왑(MoveReceipt 전체) 퍼즐 연쇄 조작 구간** 동안 유지된다 (`PuzzleWaitState` 복귀 시 리셋).
 - **시전자(Caster) 자동 지정**: T_O 버블 발동 시 타겟팅 연산을 위한 시전자(`caster`)는 **현재 생존 아군 캐릭터 중 `BaseThreat`가 가장 높은 캐릭터**로 자동 지정된다.
 
 ---
@@ -75,18 +100,25 @@
 - **주요 스탯**:
   - `MaxHP` / `CurrentHP`: 개별 체력 (플레이어 캐릭터 3인 각각 개별 HP 보유).
   - `MaxShield` / `Shield`: 캐릭터/NPC별 최대 한도(`MaxShield`)를 갖는 흡수형 방어막. 피격 시 방어막 우선 차감, 초과 데미지만 HP 차감되며 공격받아 제거되지 않는 한 무한 유지.
-  - `BaseThreat` (기본 위협도): 캐릭터별 고유 기본 위협도 (전투 시작 시 초기 타깃 결정용).
-  - `Threat` (실시간 위협도): 최근 N초(예: 최근 10초) 동안의 DPS + HPS 누적 수치를 기반으로 실시간 갱신. 특정 어그로 스킬로 강제 상승 가능.
+  - `BaseThreat` (기본 위협도): 캐릭터별 고유 상시 고정 기본 위협도.
+  - `Threat` (실시간 누적 위협도): 최근 10초 유효 전투 시간(`GameTime`) 동안의 `(딜량 + 힐량 + 쉴드부여량) × threatMultiplier` 누적 수치.
+  - **총 위협도 (Total Threat) 산출 공식**: `총 위협도 = BaseThreat + 실시간 누적 Threat`
+    - 이를 통해 탱커 B는 기본 Baseline(`BaseThreat: 300`)과 쉴드부여/도발 스킬(`threatMultiplier: 1.5~5.0`)을 통해 딜러 A(`BaseThreat: 100`, 평균 위협도) 대비 상시 및 전투 진행 중 우위의 어그로를 안정적으로 유지한다.
 - **타겟팅 생존자 전용 필터**: 사망한 대상(`IsDead == true`)은 모든 타겟팅 룰의 기본 대상 검색에서 즉시 제외된다.
 - **모델 진실 및 이벤트 수치 적용 (AGENT.md §3 준수)**: 
   - 모델의 스탯(`CurrentHP`, `IsDead`) 및 이벤트(`OnHPChanged`, `OnDeath`)는 계산 및 영수증 작성 시점에 **즉시 변경 및 발화**한다.
-  - UI(HP바)는 모델을 조급하게 직접 읽지 않고 영수증 타임라인(DOTween `InsertCallback`)을 순차적으로 소비하여 연출 타격 시점에 맞춰 체력바 감소를 시각화한다.
+  - UI(HP바)는 모델을 조급하게 직접 읽지 않고 영수증 타임라인(DOTween `InsertCallback`)을 순차적으로 소비하여 연출 타격 시점에 맞춰 체력바 감소를 시각화한다 (AGENT.md §3 준수).
 
-### 4.2 실시간 적 공격 및 연출 제어 (Wait & Time Freeze)
+### 4.2 적 NPC 규격 및 실시간 적 공격 제어
+- **적 NPC 기본 스탯 및 수치 연산**:
+  - `MaxHP`: 3,000 / `MaxShield`: 0 / 공격 주기: 3.0초
+  - 기본 스킬: `AttackAction` / `HighestThreatEnemy` / value: 50
+  - **적 데미지 계산**: 적 공격은 버블 매치가 없으므로 `최종 데미지 = skillValue` (50) 고정 수치를 적용한다.
+  - MVP 적 스킬 정의는 당분간 `BubbleSO` 컨테이너를 재사용한다.
 - **Wait 상태 적 타이머 공격**: 게임 상태가 `GameWaitState`일 때, `GameWaitState.OnUpdate()`에서 시간 기반(타이머)으로 적 NPC 공격이 발동한다. 적 NPC의 스킬 연출에 의한 시간 정지(Time Freeze)는 발생하지 않는다.
 - **조작/액션 일시정지 (Time Freeze)**: 플레이어의 퍼즐 스왑 ➡️ 연쇄 연출(`GamePuzzleActionState`) 진행 동안에는 적 NPC의 공격 타이머가 완전 정지한다.
 - **적 데미지 확정 시점 (모델 선확정 영수증 패턴)**: 적 스킬 발동(연출 시작) 시점에 모델에서 데미지 및 피격 결과를 영수증으로 선확정하며, 연출은 그 결과를 표현한다.
-- **유효 전투 시간 시계 (`GameTime`)**: 적 공격 타이머 및 위협도 10초 윈도우 시계는 Time Freeze 구간을 제외한 **실제 유효 전투 시간(`GameTime`)**을 공용 시계로 사용한다. (DOTween 연출용 `Time.time`과 분리)
+- **유효 전투 시간 시계 (`GameTime`)**: 적 공격 타이머 및 위협도 10초 윈도우 시계는 Time Freeze 구간을 제외한 **실제 유효 전투 시간(`GameTime`)**을 공용 시계로 사용한다.
 
 ### 4.3 ScriptableObject 기반 자동 타겟팅 (ActionTarget System)
 - **원칙 (AGENT.md §1, §5 준수)**: 타겟팅 로직은 기존 `ActionTarget` ScriptableObject 계층 구조를 단일 원천(Single Source of Truth)으로 유지한다.
@@ -109,7 +141,7 @@
 - **FSM 상태 자동 등록 규칙 준수 (AGENT.md §2)**: 
   - enum 값을 `EGameState.End`로 명시하여 `GameManager`(owner = "Game")와 결합 시 상태 클래스명이 **`GameEndState`**로 정확히 일치하도록 등록한다.
   - 미사용 `EGameState.CharacterAction` 상태는 1차 MVP 스코프에서 완전 삭제.
-- **연출 완주 및 전이 연기 (Overkill 방지)**: 오버킬 또는 사망 상황이 발생하더라도 수치 및 영수증은 즉시 반영하되, **승패 상태 전이는 진행 중인 퍼즐 연출 시퀀스가 완전히 종료(완주)된 뒤에 수행**한다. (뷰/오브젝트 풀 누수 방지)
+- **연출 완주 및 전이 연기 (Overkill 방지)**: 오버킬 또는 사망 상황이 발생하더라도 수치 및 영수증은 즉시 반영하되, **승패 상태 전이는 진행 중인 퍼즐 연출 시퀀스가 완전히 종료(완주)된 뒤에 수행**한다 (뷰/오브젝트 풀 누수 및 불변식 깨짐 방지 - AGENT.md §9 준수).
 
 ### 4.5 영수증(Skill Recipe) 동시 생성 및 시퀀스 콜백 실행 규칙
 - **생성 시점 및 단품 정의**:
