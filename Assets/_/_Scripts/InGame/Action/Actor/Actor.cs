@@ -45,7 +45,8 @@ public abstract class Actor
         CurrentHP = maxHP;
         MaxShield = maxShield;
         // 실드는 0에서 시작합니다. 흡수막은 DefenseAction으로 부여받는 것이고
-        // maxShield는 그 상한이라고 읽었습니다. (GDD §4.1에 초기값 명시가 없어 세운 가정)
+        // maxShield는 그 상한입니다. 방어막을 쌓는 행위 자체에 퍼즐 조작의 의미를 두기 위함입니다.
+        // (GDD §4.1에 초기값 명시가 없어 확인받은 사항 - GDD 반영 제안 대기)
         Shield = 0;
         BaseThreat = baseThreat;
         IsDead = false;
