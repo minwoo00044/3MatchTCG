@@ -12,8 +12,10 @@ public class Battlefield
     private readonly List<Actor> actors = new List<Actor>();
 
     // 유효 전투 시간. 프리즈 구간을 제외한 시계이며 DOTween이 쓰는 Time.time과 다릅니다.
-    // 실제로 시간을 흘려보내는 것은 GameTime 작업([7])이며, 그전까지는 0에 머뭅니다.
-    // 위협도 윈도우가 0에 고정되므로 그동안은 누적분이 만료되지 않습니다.
+    //
+    // 전진시키는 곳은 ActionManager.HandleWaitTick 하나뿐입니다. 그 틱은 GameWaitState에서만
+    // 열리므로 퍼즐 연출과 스킬 실행 동안에는 이 값이 멈춥니다. (GDD §4.2 Time Freeze)
+    // 적 공격 타이머와 위협도 10초 윈도우가 이 시계 하나를 공유합니다.
     public float GameTime { get; set; }
 
     public void Register(Actor actor)

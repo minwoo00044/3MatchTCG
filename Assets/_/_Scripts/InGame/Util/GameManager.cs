@@ -88,6 +88,44 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     // 불변식 검사용. 꺼내지 않고 남아 있는지만 봅니다.
     public bool HasPendingMoveReceipt => pendingReceipt != null;
 
+    // ===================== Wait 구간 틱 =====================
+    //
+    // 적 공격 타이머와 GameTime을 굴리려면 매 프레임 신호가 하위 매니저까지 내려가야 합니다.
+    // 그런데 GameWaitState는 적 Actor에 닿을 수 없습니다. Battlefield는 ActionManager가 소유하고
+    // GameManager는 하위 매니저 참조를 들지 않기 때문입니다. 기존 배선은 상태 진입 시 1회
+    // 브로드캐스트뿐이라 매 프레임을 실어 나를 길이 없었습니다.
+    //
+    // 그래서 Wait 전용 틱을 엽니다. 발동 지점은 여전히 GameWaitState.OnUpdate()이므로
+    // GDD §4.2 문안 그대로이고, GameManager가 열어주지 않으면 시간이 흐르지 않으므로
+    // Time Freeze가 구조로 보장됩니다. GameManager.OnUpdate(전 구간)와 구별해야 합니다.
+    public event Action<float> OnWaitTick;
+
+    public void TickWait(float delta) => OnWaitTick?.Invoke(delta);
+
+    // ===================== 승패 예약 =====================
+    //
+    // 승패 판정은 전장을 소유한 ActionManager가 하지만, 전이 시점은 다릅니다.
+    // 수치와 사망은 즉시 확정하되 상태 전이는 진행 중인 연출이 완주한 뒤로 미룹니다.
+    // 즉시 전이하면 재생 중이던 시퀀스가 남고 ReturnToPool()이 안 불린 뷰가
+    // dataViewDict에 남아 불변식이 깨집니다. (GDD §4.4, AGENT.md §9)
+    //
+    // 그래서 판정하는 쪽은 여기에 결과를 적어두기만 하고,
+    // 연출이 끝나는 지점(GameActionState의 완수, GameWaitState의 틱)이 확인해 전이합니다.
+    private EGameResult pendingResult = EGameResult.None;
+
+    public EGameResult PendingResult => pendingResult;
+    public bool HasPendingResult => pendingResult != EGameResult.None;
+
+    // 먼저 들어온 결과만 채택합니다. 같은 연출 배치 안에서 아군 2인 사망과 적 사망이
+    // 함께 일어날 수 있는데, 나중 것으로 덮으면 실행 순서에 따라 승패가 뒤집힙니다.
+    public void RequestGameEnd(EGameResult result)
+    {
+        if (result == EGameResult.None) return;
+        if (pendingResult != EGameResult.None) return;
+
+        pendingResult = result;
+    }
+
     // 전투 영수증(BattleReceipt)은 여기를 거치지 않습니다.
     //
     // MoveReceipt가 중계를 타는 건 생산자(PuzzleManager)와 소비자(ActionManager)가 다른

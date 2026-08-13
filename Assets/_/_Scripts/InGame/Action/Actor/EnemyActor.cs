@@ -1,7 +1,7 @@
 // 적 NPC. (GDD §4.2)
 //
 // 1차 MVP는 1마리이고 스킬 컨테이너로 BubbleSO를 재사용합니다.
-// 공격 타이머는 여기가 아니라 GameWaitState가 굴립니다([7]). 이 클래스는 스탯만 듭니다.
+// 공격 주기를 세는 것은 EnemyController, 실행은 ActionManager입니다. 이 클래스는 스탯만 듭니다.
 public class EnemyActor : Actor
 {
     private readonly string displayName;

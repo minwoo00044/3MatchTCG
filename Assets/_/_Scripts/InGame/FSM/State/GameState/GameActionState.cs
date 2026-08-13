@@ -55,6 +55,16 @@ public class GameActionState : BaseState<EGameState, GameManager>, IBroadcastabl
 
     public void OnAllTasksComplete()
     {
+        // 퍼즐 연쇄와 스킬 실행이 모두 끝난 지점입니다.
+        // 사망과 수치는 실행 도중 이미 확정됐지만 승패 전이는 여기까지 미뤄 둔 것입니다.
+        // 오버킬로 즉시 전이하면 재생 중인 시퀀스가 남고 뷰가 누수됩니다. (GDD §4.4, AGENT.md §9)
+        var owner = machine.Owner;
+        if (owner != null && owner.HasPendingResult)
+        {
+            machine.ChangeState(EGameState.End);
+            return;
+        }
+
         machine.ChangeState(EGameState.Wait);
     }
 

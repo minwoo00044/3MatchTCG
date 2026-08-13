@@ -24,10 +24,16 @@ public class ActionManager : BaseManager
     [Tooltip("적 스킬. MVP는 BubbleSO 컨테이너를 재사용합니다 (GDD §4.2)")]
     [SerializeField]
     private BubbleSO enemySkill;
+    [Tooltip("적 공격 주기(초). 유효 전투 시간 기준이며 연출 중에는 흐르지 않습니다 (GDD §4.2)")]
+    [SerializeField]
+    private float enemyAttackInterval = 3f;
 
     private Battlefield battlefield;
     private readonly List<PlayerActor> playerActors = new List<PlayerActor>();
     private EnemyActor enemyActor;
+
+    // 적의 공격 주기를 세는 쪽. 실행은 이 매니저가 합니다.
+    private EnemyController enemyController;
 
     // 버블 -> 시전자 역추적. (GDD §2.3)
     //
@@ -39,6 +45,10 @@ public class ActionManager : BaseManager
     {
         base.Awake();
         gameManager.Subscribe(EGameState.Action, HandleOnAction);
+
+        // Wait 구간에서만 열리는 틱입니다. BaseManager가 거는 OnUpdate(전 구간)와 다릅니다.
+        // 적 타이머와 GameTime은 이쪽에만 매달아야 Time Freeze가 성립합니다. (GDD §4.2)
+        gameManager.OnWaitTick += HandleWaitTick;
     }
 
     protected override void OnDestroy()
@@ -47,6 +57,7 @@ public class ActionManager : BaseManager
         if (gameManager != null)
         {
             gameManager.Unsubscribe(EGameState.Action, HandleOnAction);
+            gameManager.OnWaitTick -= HandleWaitTick;
         }
     }
 
@@ -83,10 +94,21 @@ public class ActionManager : BaseManager
                 PlayerActor actor = new PlayerActor(battlefield, character);
                 playerActors.Add(actor);
                 RegisterSkills(character, actor);
+                actor.OnDeath += HandleActorDeath;
             }
         }
 
         enemyActor = new EnemyActor(battlefield, enemyName, enemyMaxHP, enemyMaxShield, enemyBaseThreat, enemySkill);
+        enemyActor.OnDeath += HandleActorDeath;
+
+        enemyController = new EnemyController(enemyAttackInterval);
+
+        // 스킬이 없으면 적은 영원히 아무것도 하지 않습니다. 매 발동 시점에 찍으면 주기마다 반복되므로
+        // 배선을 확인할 수 있는 이 시점에 한 번만 알립니다. (AGENT.md §9)
+        if (enemySkill == null)
+        {
+            Debug.LogWarning("[ActionManager] 적 스킬이 배정되지 않아 적이 공격하지 않습니다.");
+        }
 
         Debug.Log($"[ActionManager] 전장 구성 완료. 아군 {playerActors.Count}인, 적 1마리");
     }
@@ -216,6 +238,24 @@ public class ActionManager : BaseManager
         // 소속 캐릭터가 죽었으면 여기서 걸러집니다. 버블은 이미 터졌고 효과만 없습니다. (GDD §3.2.1)
         if (!TryResolveCaster(spec, out Actor caster)) return;
 
+        // 최종 수치 = value * matchCount * chainWeight (GDD §4.6)
+        //
+        // 여기서 정수로 확정합니다. Actor의 HP/실드가 int인 이유는, float로 두면
+        // "0.0001 남아 안 죽은 적"이 생기고 그 판정이 타깃 필터와 승패까지 번지기 때문입니다.
+        int amount = Mathf.RoundToInt(spec.value * recipe.MatchCount * spec.GetChainWeight(recipe.ChainIndex));
+
+        ExecuteSkill(caster, spec, amount, battle);
+    }
+
+    // 스킬 1건이 실제로 발동하는 유일한 지점입니다.
+    //
+    // 플레이어와 적이 갈라지는 것은 여기까지 오는 길(시전자를 어떻게 찾는가, 수치를 어떻게 세는가)
+    // 뿐이고, 타깃 검색·적용·기록·위협도는 완전히 같습니다. 적 공격용 실행 함수를 따로 만들면
+    // 경로가 둘이 되고, 이후 규칙이 하나만 고쳐질 때 한쪽이 조용히 틀려집니다. (AGENT.md §5)
+    private void ExecuteSkill(Actor caster, BubbleSO spec, int amount, BattleReceipt battle)
+    {
+        if (caster == null || spec == null || amount <= 0) return;
+
         if (spec.action == null || spec.target == null)
         {
             Debug.LogWarning($"[ActionManager] {spec.SOName}에 액션 또는 타깃이 배정되지 않았습니다.");
@@ -225,17 +265,82 @@ public class ActionManager : BaseManager
         Actor[] targets = spec.target.FindTarget(caster);
         if (targets.Length == 0) return;
 
-        // 최종 수치 = value * matchCount * chainWeight (GDD §4.6)
-        //
-        // 여기서 정수로 확정합니다. Actor의 HP/실드가 int인 이유는, float로 두면
-        // "0.0001 남아 안 죽은 적"이 생기고 그 판정이 타깃 필터와 승패까지 번지기 때문입니다.
-        int amount = Mathf.RoundToInt(spec.value * recipe.MatchCount * spec.GetChainWeight(recipe.ChainIndex));
-        if (amount <= 0) return;
-
         int before = battle.Steps.Count;
         spec.action.OnExecute(new SkillContext(caster, spec, targets, amount, battle));
 
         AccumulateThreat(caster, spec, battle, before);
+    }
+
+    // ===================== 적 공격 =====================
+
+    // GameWaitState.OnUpdate()가 연 틱입니다. 이 구간 밖에서는 호출되지 않으므로
+    // 퍼즐 연쇄 연출과 스킬 실행 동안 시계가 완전히 멈춥니다. (GDD §4.2 Time Freeze)
+    private void HandleWaitTick(float delta)
+    {
+        if (battlefield == null || enemyController == null) return;
+
+        // 유효 전투 시간을 전진시키는 유일한 지점입니다. 적 타이머와 위협도 10초 윈도우가
+        // 같은 시계를 봐야 "연출로 번 시간"이 양쪽에 똑같이 적용됩니다. (GDD §4.2)
+        battlefield.GameTime += delta;
+
+        if (!enemyController.Tick(delta)) return;
+
+        ExecuteEnemyAttack();
+    }
+
+    private void ExecuteEnemyAttack()
+    {
+        if (enemyActor == null || enemyActor.IsDead) return;
+
+        BubbleSO skill = enemyActor.Skill;
+        if (skill == null) return; // 배선 경고는 BuildBattlefield에서 한 번만 찍습니다.
+
+        // 적 공격은 버블 매치가 없으므로 최종 데미지 = value 고정입니다.
+        // matchCount와 chainWeight를 곱하지 않습니다. (GDD §4.2)
+        int amount = Mathf.RoundToInt(skill.value);
+
+        // 발동 시점에 수치를 영수증으로 선확정하고, 연출은 나중에 그 기록을 재생합니다. (GDD §4.2)
+        // 플레이어 배치와 섞이지 않도록 이 공격 한 건만 담은 영수증을 만듭니다.
+        // 배치가 다르면 연출 타임라인도 다르므로 한 장에 이어붙이면 순서가 뭉갭니다.
+        BattleReceipt battle = new BattleReceipt();
+        ExecuteSkill(enemyActor, skill, amount, battle);
+        ReportBattleReceipt(battle);
+
+        // 여기서 상태를 전이시키지 않습니다. GameWaitState에서 나가는 길은 플레이어 스왑이며,
+        // 적 공격은 연출로도 흐름을 끊지 않습니다. 승패만 예외인데 그 전이는
+        // HandleActorDeath가 예약하고 GameWaitState가 확인합니다. (GDD §4.2, §4.4)
+    }
+
+    // ===================== 승패 판정 =====================
+
+    // 전장을 소유한 쪽이 판정합니다. 다만 전이는 하지 않고 예약만 합니다 —
+    // 사망 시점에 곧바로 전이하면 진행 중인 연출 시퀀스가 남고 뷰가 누수됩니다. (GDD §4.4, AGENT.md §9)
+    private void HandleActorDeath(Actor actor)
+    {
+        if (actor == null || gameManager == null) return;
+
+        if (actor.Team == ETeam.Enemy)
+        {
+            // MVP는 적 1마리입니다. 여러 마리가 되면 여기를 생존 수 판정으로 바꿉니다. (GDD §4.2)
+            gameManager.RequestGameEnd(EGameResult.Victory);
+            return;
+        }
+
+        // 패배 조건은 3인 중 2명 사망, 즉 생존자 1명 이하입니다. (GDD §4.4)
+        if (AliveAllyCount() <= 1)
+        {
+            gameManager.RequestGameEnd(EGameResult.Defeat);
+        }
+    }
+
+    private int AliveAllyCount()
+    {
+        int ret = 0;
+        foreach (var actor in playerActors)
+        {
+            if (!actor.IsDead) ret++;
+        }
+        return ret;
     }
 
     // 위협도는 실제 적용량이 아니라 "부여량" 기준입니다. 상한을 넘겨 버려진 힐/실드도 셉니다.

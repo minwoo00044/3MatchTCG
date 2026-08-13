@@ -47,6 +47,17 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
 
     public MoveReceipt CachedReceipt { get => cachedReceipt; set => cachedReceipt = value; }
 
+    // 전투 종료 여부. IsFreeze와 겸하지 않는 이유는 수명이 다르기 때문입니다.
+    //
+    // IsFreeze는 연출 중 일시 차단이고 PuzzleWaitState.OnEnter가 매번 되돌립니다.
+    // 그런데 승패는 GameActionState에서 확정되고, 그 뒤 PuzzlePuzzleActionState가
+    // EPuzzleState.Wait로 넘어가며 IsFreeze를 다시 풉니다. 종료를 IsFreeze로 표현하면
+    // 바로 그 지점에서 조용히 풀려 게임 오버 후에도 스왑이 됩니다.
+    private bool isGameOver;
+
+    // 입력을 받아도 되는가. 묻는 곳이 넷이므로 답하는 곳은 여기 하나만 둡니다. (AGENT.md §5)
+    private bool CanAcceptInput => !IsFreeze && !isGameOver;
+
     protected override void Awake()
     {
         base.Awake();
@@ -57,6 +68,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         puzzleMatrixView.Init(this);
         stateReportHub = new StateReportHub<EPuzzleState, PuzzleManager>(puzzleStateMachine);
         gameManager.Subscribe(EGameState.PuzzleAction, HandleOnPuzzleAction);
+        gameManager.Subscribe(EGameState.End, HandleOnGameEnd);
     }
 
     protected override void OnDestroy()
@@ -65,7 +77,17 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         if (gameManager != null)
         {
             gameManager.Unsubscribe(EGameState.PuzzleAction, HandleOnPuzzleAction);
+            gameManager.Unsubscribe(EGameState.End, HandleOnGameEnd);
         }
+    }
+
+    // 전투가 끝나면 보드는 더 이상 입력을 받지 않습니다. (GDD §4.4)
+    //
+    // GameEndState는 완수 보고를 세지 않으므로 여기서 보고하지 않습니다.
+    // 보고하면 "완수 보고를 받지 않는 상태"라는 경고만 남습니다. (AGENT.md §8)
+    private void HandleOnGameEnd()
+    {
+        isGameOver = true;
     }
 
     // GameManager의 OnPuzzleAction 이벤트를 수신받았을 때 실행되는 함수
@@ -209,7 +231,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
 
     private void OnPuzzleViewHover(Bubble data, bool entered)
     {
-        if (IsFreeze) return;
+        if (!CanAcceptInput) return;
 
         if (entered) puzzleMatrixView.SetHovered(data);
         else puzzleMatrixView.ClearHoveredIf(data);
@@ -217,7 +239,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
 
     private void OnPuzzleViewClickDown(Bubble data)
     {
-        if (IsFreeze) return;
+        if (!CanAcceptInput) return;
         if (selected != null) return;
 
         selected = data;
@@ -238,7 +260,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         selected = null;
         puzzleMatrixView.SetSelected(null);
 
-        if (IsFreeze) return;
+        if (!CanAcceptInput) return;
 
         Vector2 dragDelta = GetMouseWorldPos() - dragStartWorldPos;
         if (dragDelta.magnitude < dragDeadZone) return; // 제자리 탭 - 아무 동작 없음
@@ -262,8 +284,9 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
 
     private void UpdateHintTimer()
     {
-        // 연출 중(IsFreeze)에는 타이머를 돌리지 않습니다.
-        if (IsFreeze)
+        // 연출 중이거나 전투가 끝났으면 타이머를 돌리지 않습니다.
+        // 스왑할 수 없는 상태에서 "여기를 스왑하라"고 알려주면 안 됩니다.
+        if (!CanAcceptInput)
         {
             idleTimer = 0f;
             return;
