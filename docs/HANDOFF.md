@@ -113,23 +113,93 @@ GameWaitState → (스왑) → GamePuzzleActionState → GameActionState → Gam
 | # | 작업 | 선행 | 비고 |
 |---|---|---|---|
 | 6 | `PuzzleFactory` 3:3:3:1 추첨 + 사망 재정규화 | 8 | `OnCharacterDied` 구독. 후보 목록은 이미 덱 기반 |
-| 7 | 적 NPC 타이머 + `GameTime` | — | **다음에 할 것.** 프리즈 연동, `Battlefield.GameTime` 구동 |
+| 7 | `EnemyController` + `GameTime` | — | **다음에 할 것.** 아래 구조 참고. 설계는 확정됨 |
 | 8 | `GameEndState` + 승패 | 7 | **클래스명 주의** (§5). 적이 때려야 질 수 있다 |
-| 9 | 전투 연출 + `UIManager` HP바 | 7 | `BattleReceipt` 재생. **소비자는 하나여야 한다** (§5) |
+| 9 | `BattleSequencer` + `ActorView` | 7 | `BattleReceipt` 재생. **소비자는 하나여야 한다** (§5) |
 | 10 | `T_O` 증폭 액션 + 사망 버블 회색조 | 8,9 | `IsPreemptive` override 한 줄이면 켜진다 |
 
 **[7]을 먼저 하는 이유**는 §1에 적은 미검증 4건(위협도·실드 흡수·사망·`chainWeight`)이 전부 "적이 때려야" 확인되기 때문이다.
 [7]과 [8]은 붙여서 가는 편이 자연스럽다 — 적이 때리면 아군이 죽는데 `GameEndState`가 없으면 죽고도 게임이 계속된다.
 
-### [9] 연출을 시작하기 전에 정할 것
+### 확정된 전투 구조 — 퍼즐과 같은 네 층
+
+**개발자 승인 완료. 이 그림대로 만든다.** 퍼즐이 이미 이 구조로 서 있으므로 새 개념이 아니다.
+
+```
+                    GameManager
+                    FSM · 영수증 중계
+                   ┌──────┴──────┐
+            PuzzleManager    ActionManager
+                 │                │
+   결정      PuzzleFactory    EnemyController      ← [7] 없음
+   모델      PuzzleModel      Battlefield
+             Bubble           Actor
+   영수증    MoveReceipt      BattleReceipt
+   뷰        PuzzleMatrixView BattleSequencer      ← [9] 없음
+             PuzzleView       ActorView            ← [9] 없음
+```
+
+세로선은 **소유 관계**이지 실행 순서가 아니다.
+가로로 읽으면 **모델과 영수증은 양쪽 다 서 있고, 비어 있는 건 전투의 결정과 뷰 둘뿐이다.**
+
+| 층 | 책임 | 하지 않는 것 |
+|---|---|---|
+| `ActionManager` | 전투 모델 소유, 스킬 해석·실행, 위협도, 영수증 작성 | **뷰를 판단하지 않는다** |
+| `EnemyController` | 주기를 세어 "지금 공격한다"만 결정 | 실행하지 않는다. `ActionManager`의 기존 경로를 탄다 |
+| `ActorView` | 캐릭터 하나의 모션·HP바·실드 게이지 | **언제 보여줄지 모른다** |
+| `BattleSequencer` | `BattleReceipt`를 읽어 시퀀스 조립, `ActorView` 호출 | 수치를 계산하지 않는다 |
+
+**왜 적을 별도 매니저로 빼지 않았나** — 플레이어와 적이 다른 건 발동 계기(이벤트/시간)와 수치 공식뿐이고,
+타깃 선정·적용·기록·위협도는 전부 같다. 별도 매니저로 빼면 `Battlefield` 소유권이 갈리고
+**실행 경로가 둘이 된다**(§5). 그래서 "결정"만 컴포넌트로 분리한다.
+
+**`Actor`는 자기 뷰를 참조하지 않는다.** 알기 시작하면 `GameAction`(ScriptableObject)이
+`Actor`를 통해 씬 객체에 닿는다. 짝 관리는 `BattleSequencer`가 한다 — `PuzzleMatrixView.dataViewDict`와 같다.
+
+**타임라인 소유자는 하나다.** `ActorView`들이 각자 재생하면 영수증이 정한 순서가 사라진다.
+
+### [7] 착수 지점 — 매 프레임 신호를 내려보낼 길이 없다
+
+GDD §4.2가 *"`GameWaitState.OnUpdate()`에서 시간 기반으로 적 공격이 발동한다"*고 못박았다.
+그런데 `GameWaitState`는 적 `Actor`에 닿을 수 없다 — `Battlefield`는 `ActionManager`가 소유하고,
+`GameManager`는 하위 매니저 참조를 들지 않는다. 기존 배선은 **상태 진입 시 1회 브로드캐스트**뿐이다.
+
+**제안(GDD 문안 변경 불필요)** — `GameManager`에 Wait 전용 틱을 하나 연다.
+
+```csharp
+// GameManager
+public event Action<float> OnWaitTick;
+public void TickWait(float delta) => OnWaitTick?.Invoke(delta);
+```
+
+`GameWaitState.OnUpdate()`가 `owner.TickWait(Time.deltaTime)`를 부르고 `ActionManager`가 구독한다.
+발동 지점이 여전히 `GameWaitState.OnUpdate()`라 §4.2 문안 그대로이고,
+**`GameManager`가 열어주지 않으면 시간이 흐르지 않으므로 Time Freeze가 구조로 보장된다.**
+
+구현 시 주의할 것.
+
+- **적 데미지는 `value` 고정.** `matchCount`·`chainWeight`를 곱하지 않는다 (GDD §4.2)
+- **적 공격은 상태 전이를 동반하지 않는다.** `GameWaitState`는 플레이어 스왑 신호로만 나간다
+- 적도 `AddThreat`를 쌓아야 `HighestThreatEnemy`가 플레이어를 고르는 근거가 생긴다
+- `Battlefield.GameTime`을 여기서 전진시킨다. 지금은 0에 고정이라 **위협도 누적이 만료되지 않는다**
+
+여기서 §1의 미검증 3건이 한꺼번에 풀린다. 적 50딜이면 C(HP 350)가 7대에 죽으므로
+**적 HP 3000을 깎는 것보다 사망 검증이 훨씬 빠르다.**
+
+### [9] 시작 전에 정할 것
 
 연출의 **내용**(모션, 시간, 데미지 숫자 스타일, 캐릭터 스프라이트)은 아직 기획이 없다.
-다만 **구조는 이미 정해져 있어** 지금 시작해도 막히지 않는다.
+**구조는 위에서 확정됐으므로 내용이 없어도 막히지 않는다.** 수치는 이미 다 끝나 있고 재생만 하면 된다.
 
-- 수치는 이미 다 끝나 있다. 연출은 `BattleReceipt`를 위에서 아래로 재생만 한다
-- 스킬 1건당 연출 1건으로 순차 재생하는 것은 그 위에서 자유롭게 구성한다
-- 연출 담당이 `ActionManager` 안에 살지 별도 매니저로 나갈지만 정하면 된다.
-  **별도로 빼면** `MoveReceipt`와 같은 모양으로 `GameManager` 중계를 놓는다 (§5)
+남은 결정은 하나뿐이다 — **`BattleSequencer`를 `ActionManager` 안에 둘지, 별도 매니저로 뺄지.**
+별도로 빼면 `MoveReceipt`와 같은 모양으로 `GameManager` 중계를 놓아야 한다 (§5).
+
+함께 올릴 것 — **`ActionManager` → `BattleManager` 개명 제안.** 플레이어와 적 양쪽 실행을 다 맡는데
+이름이 "플레이어 액션"으로 읽힌다. GDD §2.3·§4.5가 `ActionManager`를 명시하고 있어 **기획자 승인이 필요하다**(§2).
+
+**`UIManager`의 범위도 이때 좁힌다.** HP바는 `ActorView` 소속이므로 `UIManager`에는 전역 UI만 남는다
+(일시정지·배속·결과 화면). 이들은 게임 진행을 게이팅하지 않으므로 **FSM 통제 밖**에 둔다 —
+일시정지 버튼이 `GamePuzzleActionState` 중에 안 먹으면 안 된다.
 
 ---
 
