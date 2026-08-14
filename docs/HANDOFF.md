@@ -34,9 +34,9 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
 ```
 
 - 덱 3인 + 적 1마리가 `Battlefield`에 서고, 버블 색이 `CharacterSO.mainColor`에서 나온다
-- 퍼즐이 터진 덩어리를 영수증에 적고 → `ActionManager`가 스킬로 해석 → 수치 적용 → `BattleReceipt` 작성
+- 퍼즐이 터진 덩어리를 영수증에 적고 → `BattleManager`가 스킬로 해석 → 수치 적용 → `BattleReceipt` 작성
 - `ActionTarget` 7종 전부 동작. 위협도 적립도 돈다
-- `EnemyController`가 주기를 세고 `ActionManager`가 실행한다. 적 데미지는 `value` 고정
+- `EnemyController`가 주기를 세고 `BattleManager`가 실행한다. 적 데미지는 `value` 고정
 - `Battlefield.GameTime`이 Wait 구간에서만 흐른다 → Time Freeze가 구조로 성립
 - 사망이 `GameManager`에 승패를 **예약**하고, 연출이 끝나는 지점에서 `GameEndState`로 전이
 
@@ -139,9 +139,9 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
 [6]과 [9]는 서로를 막지 않는다. **[9]를 먼저 권한다** — 지금 전투가 전부 로그로만 보이기 때문에,
 연출이 붙기 전까지는 [6]의 추첨 비율이 맞는지도 눈으로 확인하기 어렵다.
 
-> **[6] 착수 시 주의** — `Actor.OnDeath`는 이제 `ActionManager.HandleActorDeath`가 구독하고 있지만
+> **[6] 착수 시 주의** — `Actor.OnDeath`는 이제 `BattleManager.HandleActorDeath`가 구독하고 있지만
 > 그건 승패 판정용이다. `PuzzleManager`는 여전히 `Actor`를 모르므로(GDD §2.3),
-> 재정규화 신호는 `ActionManager` → `GameManager` → `PuzzleManager` 경로를 새로 놓아야 한다.
+> 재정규화 신호는 `BattleManager` → `GameManager` → `PuzzleManager` 경로를 새로 놓아야 한다.
 > `OnCharacterDied` 재발행이 그 자리다.
 
 ### 확정된 전투 구조 — 퍼즐과 같은 네 층
@@ -152,7 +152,7 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
                     GameManager
                     FSM · 영수증 중계 · Wait 틱 · 승패 예약
                    ┌──────┴──────┐
-            PuzzleManager    ActionManager
+            PuzzleManager    BattleManager
                  │                │
    결정      PuzzleFactory    EnemyController
    모델      PuzzleModel      Battlefield
@@ -167,8 +167,8 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
 
 | 층 | 책임 | 하지 않는 것 |
 |---|---|---|
-| `ActionManager` | 전투 모델 소유, 스킬 해석·실행, 위협도, 영수증 작성 | **뷰를 판단하지 않는다** |
-| `EnemyController` | 주기를 세어 "지금 공격한다"만 결정 | 실행하지 않는다. `ActionManager`의 기존 경로를 탄다 |
+| `BattleManager` | 전투 모델 소유, 스킬 해석·실행, 위협도, 영수증 작성 | **뷰를 판단하지 않는다** |
+| `EnemyController` | 주기를 세어 "지금 공격한다"만 결정 | 실행하지 않는다. `BattleManager`의 기존 경로를 탄다 |
 | `ActorView` | 캐릭터 하나의 모션·HP바·실드 게이지 | **언제 보여줄지 모른다** |
 | `BattleSequencer` | `BattleReceipt`를 읽어 시퀀스 조립, `ActorView` 호출 | 수치를 계산하지 않는다 |
 
@@ -187,24 +187,24 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
 둘 다 하위 매니저가 `GameManager`를 거치며, 매니저끼리 직접 닿지 않는다.
 
 **① Wait 전용 틱 (아래로)** — `GameWaitState`는 적 `Actor`에 닿을 수 없다.
-`Battlefield`는 `ActionManager`가 소유하고 `GameManager`는 하위 매니저 참조를 들지 않으며,
+`Battlefield`는 `BattleManager`가 소유하고 `GameManager`는 하위 매니저 참조를 들지 않으며,
 기존 배선은 상태 진입 시 1회 브로드캐스트뿐이었다. 그래서 틱을 하나 열었다.
 
 ```
 GameWaitState.OnUpdate() → GameManager.TickWait(deltaTime) → OnWaitTick
                                                                  ↓
-                          ActionManager.HandleWaitTick: GameTime 전진 → EnemyController.Tick()
+                          BattleManager.HandleWaitTick: GameTime 전진 → EnemyController.Tick()
 ```
 
 발동 지점이 `GameWaitState.OnUpdate()`라 **GDD §4.2 문안 그대로**이고,
 **Wait 이외의 상태에서는 아무도 틱을 열지 않으므로 Time Freeze가 구조로 보장된다.**
 플래그로 껐다 켰다 하지 않는다는 것이 요점이다. 플래그면 켜고 끄는 지점이 상태 수만큼 늘어난다.
 
-**② 승패 예약 (위로)** — 판정은 전장을 소유한 `ActionManager`가 하지만 **전이는 하지 않는다.**
+**② 승패 예약 (위로)** — 판정은 전장을 소유한 `BattleManager`가 하지만 **전이는 하지 않는다.**
 사망 즉시 전이하면 재생 중인 시퀀스가 남고 뷰가 누수된다 (GDD §4.4, `AGENT.md` §9).
 
 ```
-Actor.OnDeath → ActionManager.HandleActorDeath → GameManager.RequestGameEnd(EGameResult)
+Actor.OnDeath → BattleManager.HandleActorDeath → GameManager.RequestGameEnd(EGameResult)
                                                           ↓ (예약만 됨)
         연출이 끝나는 지점이 확인하고 전이 ── GameActionState.OnAllTasksComplete()
                                         └─ GameWaitState.OnUpdate() (적 공격으로 죽은 경우)
@@ -238,11 +238,11 @@ Actor.OnDeath → ActionManager.HandleActorDeath → GameManager.RequestGameEnd(
 연출의 **내용**(모션, 시간, 데미지 숫자 스타일, 캐릭터 스프라이트)은 아직 기획이 없다.
 **구조는 위에서 확정됐으므로 내용이 없어도 막히지 않는다.** 수치는 이미 다 끝나 있고 재생만 하면 된다.
 
-남은 결정은 하나뿐이다 — **`BattleSequencer`를 `ActionManager` 안에 둘지, 별도 매니저로 뺄지.**
+남은 결정은 하나뿐이다 — **`BattleSequencer`를 `BattleManager` 안에 둘지, 별도 매니저로 뺄지.**
 별도로 빼면 `MoveReceipt`와 같은 모양으로 `GameManager` 중계를 놓아야 한다 (§5).
 
-함께 올릴 것 — **`ActionManager` → `BattleManager` 개명 제안.** 플레이어와 적 양쪽 실행을 다 맡는데
-이름이 "플레이어 액션"으로 읽힌다. GDD §2.3·§4.5가 `ActionManager`를 명시하고 있어 **기획자 승인이 필요하다**(§2).
+함께 올릴 것 — **`BattleManager` → `BattleManager` 개명 제안.** 플레이어와 적 양쪽 실행을 다 맡는데
+이름이 "플레이어 액션"으로 읽힌다. GDD §2.3·§4.5가 `BattleManager`를 명시하고 있어 **기획자 승인이 필요하다**(§2).
 
 **`UIManager`의 범위도 이때 좁힌다.** HP바는 `ActorView` 소속이므로 `UIManager`에는 전역 UI만 남는다
 (일시정지·배속·결과 화면). 이들은 게임 진행을 게이팅하지 않으므로 **FSM 통제 밖**에 둔다 —
@@ -289,14 +289,14 @@ Actor.OnDeath → ActionManager.HandleActorDeath → GameManager.RequestGameEnd(
 실행 장부(`Consumed`)까지 들고 있었는데, **버블을 터뜨리는 층이 전투 개념을 아는 구조**였다.
 
 - 퍼즐 → `MatchGroup { Spec, Cells }`. "무슨 버블이 몇 차에 몇 개 터졌나"까지
-- 전투 → `ActionManager`가 스킬로 해석. 덩어리 1개 = 스킬 1건, 차수·개수 계산, 선배치 정렬, 실행
+- 전투 → `BattleManager`가 스킬로 해석. 덩어리 1개 = 스킬 1건, 차수·개수 계산, 선배치 정렬, 실행
 - **매치 그룹 경계가 곧 스킬 경계다.** 평면으로 세면 보드 양쪽의 무관한 3매치가 6개짜리 하나로 뭉쳐 데미지가 두 배가 된다
 
 `matchCount`와 `chainIndex`는 매치 그룹 구조에서 파생되는 값이라, 퍼즐이 따로 적으면 같은 사실의 기록이 두 벌이 된다.
 
 ### 실행 경로는 하나뿐이어야 한다
 스킬은 멱등이 아니다. `BubbleSO.Execute()`를 지운 이유가 이것이다 —
-`ActionManager`와 별개로 스킬을 실행할 수 있는 함수가 남아 있으면 그중 하나가 이중 적용이 된다.
+`BattleManager`와 별개로 스킬을 실행할 수 있는 함수가 남아 있으면 그중 하나가 이중 적용이 된다.
 
 같은 이유로 **전투 영수증의 소비자도 하나여야 한다.** 연출 담당과 UI가 각각 꺼내가면
 "꺼내면 비워진다"가 깨져 한쪽이 빈손이 된다. GDD §4.1대로 **연출이 타임라인을 만들고 HP바는 거기 얹힌다.**
@@ -331,7 +331,7 @@ Actor.OnDeath → ActionManager.HandleActorDeath → GameManager.RequestGameEnd(
 
 ### 계층
 - 뷰는 게임 규칙을 판단하지 않는다. 연출만 하고 스킬 발동에 관여하지 않는다
-- `PuzzleManager`는 `Actor`를 직접 참조하지 않는다. 사망은 `ActionManager`가 `OnCharacterDied`로 재발행 (GDD §2.3, §3.2.1)
+- `PuzzleManager`는 `Actor`를 직접 참조하지 않는다. 사망은 `BattleManager`가 `OnCharacterDied`로 재발행 (GDD §2.3, §3.2.1)
 - **하위 매니저끼리 직접 소통하지 않는다.** `GameManager`를 거친다.
   단, **소비자가 하나뿐이면 중계를 놓지 않는다** — 전투 영수증이 `GameManager`를 안 거치는 이유다 (`AGENT.md` §10)
 
@@ -341,7 +341,7 @@ Actor.OnDeath → ActionManager.HandleActorDeath → GameManager.RequestGameEnd(
 `EnemyController`도 같은 이유로 `Time.deltaTime`을 스스로 읽지 않고 델타를 인자로 받는다 —
 프레임 시간을 직접 읽는 순간 Time Freeze 구간에서도 타이머가 돌아 GDD §4.2가 깨진다.
 
-**`GameTime`을 전진시키는 곳은 `ActionManager.HandleWaitTick` 하나뿐이다.** 늘리지 않는다.
+**`GameTime`을 전진시키는 곳은 `BattleManager.HandleWaitTick` 하나뿐이다.** 늘리지 않는다.
 
 ---
 
@@ -356,7 +356,7 @@ Actor.OnDeath → ActionManager.HandleActorDeath → GameManager.RequestGameEnd(
 - [x] 부팅 로그 — `GameManager 5개` / `PuzzleManager 3개` / `전장 구성 완료. 아군 3인, 적 1마리`
       (`GameEndState를 찾지 못했습니다` 경고는 **이제 뜨면 안 된다.** 뜬다면 클래스명이 어긋난 것이다)
 - [x] 스왑 → 연쇄 → 셔플 무회귀
-- [x] `[ActionManager] 전투 N건` 로그에 수치가 기대값과 맞는지
+- [x] `[BattleManager] 전투 N건` 로그에 수치가 기대값과 맞는지
 - [x] 부팅 시 스킬 배선 경고가 없는지 (`ValidateSkill`)
 
 **[7]·[8] 확인 항목**
@@ -380,20 +380,20 @@ Actor.OnDeath → ActionManager.HandleActorDeath → GameManager.RequestGameEnd(
 
 ### 임시 로그가 유일한 검증 수단이다
 
-전투 결과를 볼 화면이 아직 없다. `ActionManager.ReportBattleReceipt`가 그 자리를 대신한다.
+전투 결과를 볼 화면이 아직 없다. `BattleManager.ReportBattleReceipt`가 그 자리를 대신한다.
 
 ```
-[ActionManager] 전투 2건
+[BattleManager] 전투 2건
   A -T_A_1-> Enemy Damage 60(요청 60) HP 2880/3000 실드 0
   B -T_B_3-> Enemy Damage 30(요청 30) HP 2850/3000 실드 0
 ```
 
-전투 시계와 적 공격도 마찬가지다. `ActionManager`의 `logBattleTick`(인스펙터 토글)이 아래를 찍는다.
+전투 시계와 적 공격도 마찬가지다. `BattleManager`의 `logBattleTick`(인스펙터 토글)이 아래를 찍는다.
 
 ```
-[ActionManager] GameTime 3.0s          ← 1초에 한 줄. 연출 중에는 줄이 끊긴다
-[ActionManager] 적 공격 발동 (GameTime 3.0s, 주기 3s)
-[ActionManager] 전투 1건
+[BattleManager] GameTime 3.0s          ← 1초에 한 줄. 연출 중에는 줄이 끊긴다
+[BattleManager] 적 공격 발동 (GameTime 3.0s, 주기 3s)
+[BattleManager] 전투 1건
   Enemy -EnemySkill-> C Damage 50(요청 50) HP 300/350 실드 0
 ```
 
@@ -413,7 +413,7 @@ Actor.OnDeath → ActionManager.HandleActorDeath → GameManager.RequestGameEnd(
 - **`T_O` 색은 노랑**(목업). 소속 캐릭터가 없어 `mainColor`를 물려받지 못해 `PuzzleManager`가 폴백으로 답한다
 - **스킬 실행은 전용 상태(`GameActionState`)에서 일괄** — 기획자 승인. GDD §4.4/§4.5 반영 완료
 - **`BattleReceipt` 신설** — 기획자 승인. GDD §4.5 반영 완료
-- **스킬 레시피 작성 주체는 `ActionManager`** — GDD §4.5 반영 완료
+- **스킬 레시피 작성 주체는 `BattleManager`** — GDD §4.5 반영 완료
 - **`EGameResult`(None/Victory/Defeat) 신설** — FSM 상태를 승/패로 쪼개지 않는다.
   쪼개면 "전투가 끝났다"는 같은 사실에 출구가 둘이 되고 등록할 클래스도 둘이 된다.
   GDD가 명시한 타입이 아니라 순수 구현 산물이라 기획 영향 없음
@@ -428,7 +428,7 @@ Actor.OnDeath → ActionManager.HandleActorDeath → GameManager.RequestGameEnd(
 
 - **실드·힐의 상한 초과분도 위협도에 포함**한다 (실제 적용량이 아니라 부여량 기준). 탱커가 방어 행위를 계속하는 한 어그로를 유지하는 게 의도에 맞다고 판단.
   **동작은 관측 완료** — 만피 대상에게 간 `Heal 0(요청 36)`이 위협도 36으로 잡혔다 (§1). 남은 것은 기획자 확정뿐이다
-- **`T_O` 증폭 리셋 트리거**는 GDD가 `PuzzleWaitState` 복귀로 적었지만, 증폭은 전투 수치라 소유자가 `ActionManager`다. **`GameActionState` 퇴장 시점**으로 구현할 계획
+- **`T_O` 증폭 리셋 트리거**는 GDD가 `PuzzleWaitState` 복귀로 적었지만, 증폭은 전투 수치라 소유자가 `BattleManager`다. **`GameActionState` 퇴장 시점**으로 구현할 계획
 
 **미결 (GDD §D)** — 스테이지·웨이브·리트라이, 승패 후 결과 화면/씬 전환, 가챠·육성(MVP 외), 배속 UI
 
@@ -477,7 +477,7 @@ GDD §2.4의 카탈로그도 마찬가지다. GDD-TODO가 "결정 완료"로 닫
 - 완수 보고를 받지 않는 상태에 보고가 들어옴 (그 보고는 버려지고 누군가는 기다리다 멈춘다)
 - 완수 보고 초과
 - 소비되지 않은 영수증이 남은 채 `GameActionState` 퇴장
-- 같은 버블이 두 캐릭터에 배정됨 (`PuzzleManager`·`ActionManager` 양쪽)
+- 같은 버블이 두 캐릭터에 배정됨 (`PuzzleManager`·`BattleManager` 양쪽)
 - 덱/공용 버블 미배정
 - 승패가 예약되지 않은 채 `GameEndState` 진입
 - 적 스킬 미배정 (부팅 시 1회. 매 발동마다 찍으면 주기마다 반복된다)

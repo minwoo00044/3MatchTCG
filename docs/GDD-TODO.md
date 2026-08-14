@@ -11,7 +11,7 @@
   - `CharacterSO.mainColor`를 단일 원천으로 확정하고 `BubbleSO.bubbleColor` 필드는 완전 제거.
 - **A-2. 역참조 매핑 소유자 (AGENT.md §1 준수)**:
   - 정적 파이프(`DeckSO` ↔ `BubbleSO`) 및 비율 계산은 `PuzzleManager`가 전담.
-  - 런타임 역참조 매핑(`CharacterSO` ↔ `Actor`)은 `ActionManager`가 소유하고, `PuzzleManager`는 `Actor`를 직접 참조하지 않고 `BubbleSO` 스냅샷만 레시피로 전달.
+  - 런타임 역참조 매핑(`CharacterSO` ↔ `Actor`)은 `BattleManager`가 소유하고, `PuzzleManager`는 `Actor`를 직접 참조하지 않고 `BubbleSO` 스냅샷만 레시피로 전달.
 
 ### B. 적 전투 규격 (Category B)
 - **B-1. 적 NPC 기본 규격**:

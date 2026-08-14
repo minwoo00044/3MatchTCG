@@ -3,7 +3,7 @@ using System.Collections.Generic;
 // 한 번에 터진 버블 덩어리 하나. 직선으로 연결된 3개 이상입니다.
 //
 // 퍼즐이 적는 것은 "무슨 버블이 어느 칸에서 터졌나"까지입니다.
-// 이것이 전투에서 무슨 의미인지(스킬 1건, 시전자, 수치)는 ActionManager가 해석합니다.
+// 이것이 전투에서 무슨 의미인지(스킬 1건, 시전자, 수치)는 BattleManager가 해석합니다.
 public class MatchGroup
 {
     // [중요] 버블이 아니라 스펙을 잡아둡니다.

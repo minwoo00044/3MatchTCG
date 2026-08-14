@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     // ===================== 전투 덱 =====================
     //
     // 덱은 전투 전체의 데이터이고 소비자가 둘입니다.
-    // PuzzleManager(버블 색 매핑, 스포닝 비율)와 ActionManager(Actor 3인 생성).
+    // PuzzleManager(버블 색 매핑, 스포닝 비율)와 BattleManager(Actor 3인 생성).
     // 각자 [SerializeField]로 들면 배선이 두 벌이 되고, 어긋나면 화면의 버블 색과
     // 실제 필드에 선 캐릭터가 다른 덱을 가리키게 됩니다. (AGENT.md §5)
     //
@@ -56,11 +56,11 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     // ===================== 퍼즐 영수증 중계 =====================
     //
     // 하위 매니저끼리 직접 소통하지 않습니다. PuzzleManager는 연출을 마친 영수증을 위로
-    // 제출하고, ActionManager는 GameActionState의 브로드캐스트를 받은 뒤 여기서 꺼내 갑니다.
+    // 제출하고, BattleManager는 GameActionState의 브로드캐스트를 받은 뒤 여기서 꺼내 갑니다.
     // 두 매니저는 서로를 모르며 흐름은 GameManager가 쥡니다.
     //
     // 영수증은 "무슨 버블이 몇 차에 몇 개 터졌나"까지만 담고 있습니다.
-    // 스킬 해석은 꺼내 가는 쪽(ActionManager)의 몫입니다.
+    // 스킬 해석은 꺼내 가는 쪽(BattleManager)의 몫입니다.
     private MoveReceipt pendingReceipt;
 
     public void SubmitMoveReceipt(MoveReceipt receipt)
@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     // ===================== Wait 구간 틱 =====================
     //
     // 적 공격 타이머와 GameTime을 굴리려면 매 프레임 신호가 하위 매니저까지 내려가야 합니다.
-    // 그런데 GameWaitState는 적 Actor에 닿을 수 없습니다. Battlefield는 ActionManager가 소유하고
+    // 그런데 GameWaitState는 적 Actor에 닿을 수 없습니다. Battlefield는 BattleManager가 소유하고
     // GameManager는 하위 매니저 참조를 들지 않기 때문입니다. 기존 배선은 상태 진입 시 1회
     // 브로드캐스트뿐이라 매 프레임을 실어 나를 길이 없었습니다.
     //
@@ -104,7 +104,7 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
 
     // ===================== 승패 예약 =====================
     //
-    // 승패 판정은 전장을 소유한 ActionManager가 하지만, 전이 시점은 다릅니다.
+    // 승패 판정은 전장을 소유한 BattleManager가 하지만, 전이 시점은 다릅니다.
     // 수치와 사망은 즉시 확정하되 상태 전이는 진행 중인 연출이 완주한 뒤로 미룹니다.
     // 즉시 전이하면 재생 중이던 시퀀스가 남고 ReturnToPool()이 안 불린 뷰가
     // dataViewDict에 남아 불변식이 깨집니다. (GDD §4.4, AGENT.md §9)
@@ -128,8 +128,8 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
 
     // 전투 영수증(BattleReceipt)은 여기를 거치지 않습니다.
     //
-    // MoveReceipt가 중계를 타는 건 생산자(PuzzleManager)와 소비자(ActionManager)가 다른
-    // 매니저이기 때문입니다. 전투 영수증은 ActionManager가 만들고 아직 소비자가 없어
+    // MoveReceipt가 중계를 타는 건 생산자(PuzzleManager)와 소비자(BattleManager)가 다른
+    // 매니저이기 때문입니다. 전투 영수증은 BattleManager가 만들고 아직 소비자가 없어
     // 중계할 이유가 없습니다. 연출 담당이 별도 매니저로 생기면 그때 같은 모양으로 놓습니다. (AGENT.md §10)
 
     // 4. 특정 상태를 기다리는 구독자(하위 매니저) 수 반환

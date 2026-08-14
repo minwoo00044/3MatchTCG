@@ -1,7 +1,7 @@
 // 적 NPC. (GDD §4.2)
 //
 // 1차 MVP는 1마리입니다.
-// 공격 주기를 세는 것은 EnemyController, 실행은 ActionManager입니다. 이 클래스는 스탯만 듭니다.
+// 공격 주기를 세는 것은 EnemyController, 실행은 BattleManager입니다. 이 클래스는 스탯만 듭니다.
 public class EnemyActor : Actor
 {
     private readonly string displayName;

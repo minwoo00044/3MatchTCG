@@ -16,7 +16,7 @@ using UnityEngine;
 // 이어지면 조용히 틀어집니다. 그래서 층을 타입으로 갈랐습니다. (AGENT.md §6, §10)
 //
 // 이제 타입 경계가 곧 "퍼즐 개념이 끝나는 지점"입니다.
-// ActionManager.ExecuteSkill이 SkillSO를 받는 것은, 그 함수부터는 연쇄도 매치 개수도
+// BattleManager.ExecuteSkill이 SkillSO를 받는 것은, 그 함수부터는 연쇄도 매치 개수도
 // 이미 수치에 녹아 끝났다는 뜻입니다.
 [CreateAssetMenu(fileName = "EmptySkillData", menuName = "ScriptableObject/SkillData")]
 public class SkillSO : ScriptableObject
@@ -35,6 +35,6 @@ public class SkillSO : ScriptableObject
   public float threatMultiplier = 1f;
 
   // 여기서 스킬을 실행하는 함수는 두지 않습니다.
-  // 실행 경로는 ActionManager 하나뿐이어야 합니다. 스킬은 멱등이 아니라
+  // 실행 경로는 BattleManager 하나뿐이어야 합니다. 스킬은 멱등이 아니라
   // 경로가 둘이면 그중 하나가 이중 적용이 됩니다. (AGENT.md §5)
 }

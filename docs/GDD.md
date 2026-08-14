@@ -42,7 +42,7 @@
   - `CharacterSO` 3개 리스트로 1개의 플레이어 전투 덱을 편성한다.
 - **계층 분리 및 시전자(`caster`) 역참조 규칙 (AGENT.md §1 준수)**:
   - `PuzzleManager`는 정적 파이프(`DeckSO` ↔ `BubbleSO`)와 스포닝 비율만 다루며, `Actor` 인스턴스를 직접 참조하지 않는다.
-  - `ActionManager`가 전투 시작 시 `CharacterSO` ↔ `Actor` 런타임 매핑을 소유하고, 스킬 레시피 실행 시 `BubbleSO` 스냅샷을 바탕으로 시전자 `PlayerActor`를 역추적하여 `FindTarget(caster)`에 전달한다.
+  - `BattleManager`가 전투 시작 시 `CharacterSO` ↔ `Actor` 런타임 매핑을 소유하고, 스킬 레시피 실행 시 `BubbleSO` 스냅샷을 바탕으로 시전자 `PlayerActor`를 역추적하여 `FindTarget(caster)`에 전달한다.
 
 ### 2.4 캐릭터 3인 기본 스탯 및 9종 스킬 밸런스 카탈로그
 - **캐릭터 A (딜러 - Red)**:
@@ -81,7 +81,7 @@
   - 특수 버블(`T_O`) 10% 지분 고정.
   - 캐릭터 1인 사망 시, 남은 생존 캐릭터 2인 각 45% + 특수 버블 10% = 100% 비율로 재정규화하며, 45% 내에서는 해당 생존 캐릭터의 3개 스킬 `spawnWeight` 비율로 최종 추첨한다.
   - **적용 시점**: 사망 발생 후 **다음 스왑(Swap) 조작부터 적용**된다 (현재 조작으로 진행 중인 연쇄의 리필 버블은 이미 불변 영수증으로 확정된 상태임 - AGENT.md §3 준수).
-  - **아키텍처 규칙 (AGENT.md §1 계층 분리 준수)**: `ActionManager`가 `Actor` 사망 이벤트를 처리하여 `CharacterSO` 단위 사망 이벤트(`OnCharacterDied`)를 재발행하고, `PuzzleManager`가 이를 구독하여 갱신된 비율을 순수 클래스인 `PuzzleFactory`에 주입한다.
+  - **아키텍처 규칙 (AGENT.md §1 계층 분리 준수)**: `BattleManager`가 `Actor` 사망 이벤트를 처리하여 `CharacterSO` 단위 사망 이벤트(`OnCharacterDied`)를 재발행하고, `PuzzleManager`가 이를 구독하여 갱신된 비율을 순수 클래스인 `PuzzleFactory`에 주입한다.
 - **보드 잔여 버블 처리 & 사망 무효화 판정**: 
   - 이미 보드에 배치되어 있던 사망 캐릭터의 버블은 3매치 조작 및 연쇄 팝(터짐)은 가능하지만, **스킬 효과는 발동하지 않고 단순 파괴 연출만 수행**한다.
   - **사망 스킬 무효화 판정 시점**: 레시피 작성 시점이 아닌 **스킬 실행 시점(시퀀스 콜백 발화 시점)**에 판단하여, 연쇄 진행 중 중간 사망 발생 시에도 안전하게 무효화한다.
@@ -131,7 +131,7 @@
 - **시전자 상대 기준 통일**: 모든 타겟팅 로직은 **시전자(Caster) 상대 기준**으로 적용된다 (`ActionTarget.FindTarget(Actor caster)`).
   - **아군 (`caster.Team` 동일)**: 플레이어 스킬 기준 플레이어 캐릭터 3인, 적 NPC 스킬 기준 적 NPC 팀.
   - **적군 (`caster.Team` 반대)**: 플레이어 스킬 기준 적 NPC 팀, 적 NPC 스킬 기준 플레이어 캐릭터 3인.
-- **계층 분리 (AGENT.md §1)**: 뷰(`PuzzleMatrixView`)는 콜백 시 ChainStep 인덱스만 전달하고, 스킬 해석 및 타깃 연산은 `PuzzleManager`와 `ActionManager`가 담당한다.
+- **계층 분리 (AGENT.md §1)**: 뷰(`PuzzleMatrixView`)는 콜백 시 ChainStep 인덱스만 전달하고, 스킬 해석 및 타깃 연산은 `PuzzleManager`와 `BattleManager`가 담당한다.
 - **`ActionTarget` 에셋 및 클래스 목록 (7종 확정)**:
   - `HighestThreatEnemy`: 위협도가 가장 높은 적 대상 (적 NPC 공격의 기본 타겟팅 규칙)
   - `LowestHPAlly`: 체력 비율이 가장 낮은 아군 대상
@@ -154,15 +154,15 @@
 - **생성 시점 및 단품 정의**:
   - `PuzzleModel.Swap()` 시점에 전체 연출 영수증(`MoveReceipt`)을 생성할 때, 각 연쇄 단계(`ChainStep`)별로 터진 **매치 그룹(`MatchGroup`)**을 기록하고 그 버블의 `BubbleSO` 스펙을 스냅샷으로 확보한다.
   - **스킬 레시피 1건의 정의**: 1개의 연결된 **매치 그룹(Match Group - 직선 연결 덩어리)**을 스킬 레시피 1건으로 산정한다.
-  - **작성 주체 (계층 분리)**: 퍼즐은 "무슨 버블이 몇 차 연쇄에 몇 개 터졌는가"라는 **보드 사실만** 기록하며, 스킬·시전자·수치 같은 전투 개념을 알지 않는다. 매치 그룹을 스킬 레시피로 해석하는 것은 `ActionManager`의 책임이다.
+  - **작성 주체 (계층 분리)**: 퍼즐은 "무슨 버블이 몇 차 연쇄에 몇 개 터졌는가"라는 **보드 사실만** 기록하며, 스킬·시전자·수치 같은 전투 개념을 알지 않는다. 매치 그룹을 스킬 레시피로 해석하는 것은 `BattleManager`의 책임이다.
     - **근거**: `matchCount`와 `chainIndex`는 매치 그룹 구조에서 파생되는 값이라 퍼즐이 따로 적으면 같은 사실에 대한 기록이 두 벌이 된다(AGENT.md §5). 퍼즐이 반드시 잡아야 하는 것은 풀 반납으로 소멸하는 `BubbleSO` 스펙 하나뿐이다.
 - **실행 시점 규칙 (전용 FSM 상태)**:
   - 스킬 실행은 퍼즐 연쇄 연출이 **전부 끝난 뒤** 전용 상태(`EGameState.Action` / `GameActionState`)에서 일괄 수행한다.
   - 전체 흐름: `GameWaitState` → (유저 스왑) → `GamePuzzleActionState`(연쇄 연출 완주) → **`GameActionState`(스킬 실행)** → `GameWaitState`
-  - 뷰(`PuzzleMatrixView`)는 연출만 담당하며 스킬 발동에 관여하지 않는다. 연출 완주 시 `PuzzleManager`가 `MoveReceipt`를 `GameManager`에 제출하고, `GameActionState`의 브로드캐스트를 받은 `ActionManager`가 이를 꺼내어 **연쇄 차수 순서대로** 스킬 레시피로 해석해 실행한다.
+  - 뷰(`PuzzleMatrixView`)는 연출만 담당하며 스킬 발동에 관여하지 않는다. 연출 완주 시 `PuzzleManager`가 `MoveReceipt`를 `GameManager`에 제출하고, `GameActionState`의 브로드캐스트를 받은 `BattleManager`가 이를 꺼내어 **연쇄 차수 순서대로** 스킬 레시피로 해석해 실행한다.
   - **근거**: 스킬 실행이 DOTween 시퀀스 내부에서 일어나면 `GameManager`가 전투 흐름의 주도권을 갖지 못하고, 캐릭터 공격 모션·데미지 표시 등 스킬 연출을 놓을 시간축이 퍼즐 낙하 연출과 겹친다. 또한 §4.4의 "상태 전이는 연출 완주 후" 규칙과 자연히 일치한다.
   - Time Freeze는 `GamePuzzleActionState`와 `GameActionState` **두 구간 모두**에서 유지된다.
-- **선(先)배치 실행 규칙**: 하나의 연쇄 차수 안에 이후 스킬에 영향을 주는 효과(증폭/버프 등)가 포함된 경우, **`ActionManager`가 스킬 레시피로 해석할 때 그 차수 목록의 가장 앞(0번 인덱스)에 우선 배치하여 선발동**하도록 보장한다. 정렬 범위는 해당 차수 내부로 한정하며, 앞선 차수로 소급하지 않는다. 선발동 여부는 버블이 아니라 액션의 성질이므로 `GameAction.IsPreemptive`가 답한다.
+- **선(先)배치 실행 규칙**: 하나의 연쇄 차수 안에 이후 스킬에 영향을 주는 효과(증폭/버프 등)가 포함된 경우, **`BattleManager`가 스킬 레시피로 해석할 때 그 차수 목록의 가장 앞(0번 인덱스)에 우선 배치하여 선발동**하도록 보장한다. 정렬 범위는 해당 차수 내부로 한정하며, 앞선 차수로 소급하지 않는다. 선발동 여부는 버블이 아니라 액션의 성질이므로 `GameAction.IsPreemptive`가 답한다.
 - **기록 데이터 항목 (Null Safety)**:
   - 퍼즐(`MatchGroup`): `BubbleSO` 스펙 참조 (스냅샷 복사: 풀 반납 후 `_spec` null 방지 - AGENT.md §3 준수), 터진 칸 목록
   - 전투(`SkillRecipe`): `BubbleSO` 스펙, `matchCount`(해당 매치 그룹으로 터진 버블 개수), `chainIndex`(발생한 체인 순서, 1-based index)

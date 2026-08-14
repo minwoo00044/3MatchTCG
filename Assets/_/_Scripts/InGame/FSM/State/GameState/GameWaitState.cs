@@ -36,7 +36,7 @@ public class GameWaitState : BaseState<EGameState, GameManager>, IReportableStat
             return;
         }
 
-        // 유효 전투 시간을 흘려보냅니다. 구독자(ActionManager)가 GameTime을 전진시키고
+        // 유효 전투 시간을 흘려보냅니다. 구독자(BattleManager)가 GameTime을 전진시키고
         // 적 공격 타이머를 굴립니다. 이 상태는 누가 무엇을 하는지 알지 않습니다.
         owner.TickWait(Time.deltaTime);
 

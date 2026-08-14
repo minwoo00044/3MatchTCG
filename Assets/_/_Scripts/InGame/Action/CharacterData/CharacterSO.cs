@@ -2,7 +2,7 @@ using UnityEngine;
 
 // 캐릭터 1인의 정적 데이터입니다. (GDD §2.3)
 //
-// 런타임 Actor 인스턴스와의 매핑(CharacterSO <-> Actor)은 ActionManager가 소유합니다.
+// 런타임 Actor 인스턴스와의 매핑(CharacterSO <-> Actor)은 BattleManager가 소유합니다.
 // PuzzleManager는 이 SO를 정적 파이프(스포닝 비율, 버블 색)로만 읽고 Actor를 참조하지 않습니다.
 // (GDD §2.3, GDD-TODO A-2)
 [CreateAssetMenu(fileName = "EmptyCharacterData", menuName = "ScriptableObject/CharacterData")]

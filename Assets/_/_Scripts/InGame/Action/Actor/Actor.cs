@@ -13,7 +13,7 @@ public abstract class Actor
     // 위협도 누적 윈도우. (GDD §4.1 - 최근 10초 유효 전투 시간)
     //
     // MonoBehaviour가 아니라 [SerializeField]로 뺄 수 없어 const로 둡니다. (AGENT.md §10 예외)
-    // 튜닝 대상이 되면 ActionManager가 주입하는 형태로 옮깁니다.
+    // 튜닝 대상이 되면 BattleManager가 주입하는 형태로 옮깁니다.
     private const float ThreatWindow = 10f;
 
     // 자기가 선 전장. ActionTarget이 시전자만 받고도 명단에 닿는 통로입니다. (GDD §4.3)
@@ -130,7 +130,7 @@ public abstract class Actor
 
     // ===================== 위협도 =====================
 
-    // amount는 threatMultiplier가 이미 곱해진 값입니다. 배수 곱셈은 ActionManager 책임입니다.
+    // amount는 threatMultiplier가 이미 곱해진 값입니다. 배수 곱셈은 BattleManager 책임입니다.
     //
     // 또한 "실제 적용량"이 아니라 "부여량" 기준입니다. 상한을 넘겨 버려진 힐/실드도 위협도로 칩니다.
     // 탱커가 방어 행위를 계속하는 한 어그로를 유지하는 것이 의도에 맞다고 판단했습니다.

@@ -32,7 +32,7 @@ public class GameActionState : BaseState<EGameState, GameManager>, IBroadcastabl
         var owner = machine.Owner;
         totalTargetCount = owner != null ? owner.GetSubscriberCount(EGameState.Action) : 0;
 
-        // 구독자(ActionManager)는 이 브로드캐스트를 받고 GameManager에서 영수증을 꺼내 갑니다.
+        // 구독자(BattleManager)는 이 브로드캐스트를 받고 GameManager에서 영수증을 꺼내 갑니다.
         _cachedBroadCastAction?.Invoke();
 
         if (totalTargetCount == 0)

@@ -8,7 +8,7 @@ using UnityEngine;
 // CharacterSO <-> Actor 런타임 매핑을 여기서만 들고, PuzzleManager는 Actor를 모릅니다.
 // 스킬 레시피는 GameActionState의 브로드캐스트를 받은 뒤 GameManager에서 꺼내 옵니다.
 // PuzzleManager와 직접 주고받지 않습니다.
-public class ActionManager : BaseManager
+public class BattleManager : BaseManager
 {
     [Header("ENEMY")]
     [Tooltip("적 NPC 표시 이름")]
@@ -91,7 +91,7 @@ public class ActionManager : BaseManager
         IReadOnlyList<CharacterSO> characters = gameManager != null ? gameManager.Characters : null;
         if (characters == null)
         {
-            Debug.LogWarning("[ActionManager] 덱이 배정되지 않아 플레이어 캐릭터를 세우지 못했습니다.");
+            Debug.LogWarning("[BattleManager] 덱이 배정되지 않아 플레이어 캐릭터를 세우지 못했습니다.");
         }
         else
         {
@@ -116,7 +116,7 @@ public class ActionManager : BaseManager
         ValidateSkill(enemySkill, "적 스킬");
         foreach (var skill in skillCasters.Keys) ValidateSkill(skill, "버블 스킬");
 
-        Debug.Log($"[ActionManager] 전장 구성 완료. 아군 {playerActors.Count}인, 적 1마리");
+        Debug.Log($"[BattleManager] 전장 구성 완료. 아군 {playerActors.Count}인, 적 1마리");
     }
 
     // 배선이 덜 된 스킬은 실행 시점에 아무 일도 일으키지 않고 조용히 지나갑니다.
@@ -129,7 +129,7 @@ public class ActionManager : BaseManager
     {
         if (skill == null)
         {
-            Debug.LogWarning($"[ActionManager] {label}이(가) 배정되지 않았습니다.");
+            Debug.LogWarning($"[BattleManager] {label}이(가) 배정되지 않았습니다.");
             return;
         }
 
@@ -142,7 +142,7 @@ public class ActionManager : BaseManager
 
         if (missing.Count == 0) return;
 
-        Debug.LogWarning($"[ActionManager] {label} {name}: {string.Join(", ", missing)} 미배정. " +
+        Debug.LogWarning($"[BattleManager] {label} {name}: {string.Join(", ", missing)} 미배정. " +
                          "실행돼도 아무 일도 일어나지 않습니다.");
     }
 
@@ -157,7 +157,7 @@ public class ActionManager : BaseManager
             // 한 버블이 두 캐릭터에 걸려 있으면 시전자가 뽑기 나름이 됩니다.
             if (skillCasters.ContainsKey(skill))
             {
-                Debug.LogWarning($"[ActionManager] {skill.SOName}이(가) 캐릭터 둘 이상에 배정돼 있습니다.");
+                Debug.LogWarning($"[BattleManager] {skill.SOName}이(가) 캐릭터 둘 이상에 배정돼 있습니다.");
                 continue;
             }
             skillCasters.Add(skill, actor);
@@ -295,7 +295,7 @@ public class ActionManager : BaseManager
 
         if (spec.action == null || spec.target == null)
         {
-            Debug.LogWarning($"[ActionManager] {spec.SOName}에 액션 또는 타깃이 배정되지 않았습니다.");
+            Debug.LogWarning($"[BattleManager] {spec.SOName}에 액션 또는 타깃이 배정되지 않았습니다.");
             return;
         }
 
@@ -337,7 +337,7 @@ public class ActionManager : BaseManager
         if (battlefield.GameTime - lastTickLogTime < 1f) return;
 
         lastTickLogTime = battlefield.GameTime;
-        Debug.Log($"[ActionManager] GameTime {battlefield.GameTime:F1}s");
+        Debug.Log($"[BattleManager] GameTime {battlefield.GameTime:F1}s");
     }
 
     private void ExecuteEnemyAttack()
@@ -375,7 +375,7 @@ public class ActionManager : BaseManager
         if (!logBattleTick) return;
 
         StringBuilder sb = new StringBuilder();
-        sb.Append($"[ActionManager] 적 공격 발동 (GameTime {battlefield.GameTime:F1}s, 주기 {enemyAttackInterval}s) 위협도");
+        sb.Append($"[BattleManager] 적 공격 발동 (GameTime {battlefield.GameTime:F1}s, 주기 {enemyAttackInterval}s) 위협도");
 
         // 적 기준의 "적군"이 곧 아군 진영입니다. 상대 판정은 반드시 이 경로로 합니다. (AGENT.md §5)
         foreach (var actor in battlefield.EnemiesOf(enemyActor))
@@ -440,7 +440,7 @@ public class ActionManager : BaseManager
         if (battle.Steps.Count == 0) return;
 
         StringBuilder sb = new StringBuilder();
-        sb.Append($"[ActionManager] 전투 {battle.Steps.Count}건");
+        sb.Append($"[BattleManager] 전투 {battle.Steps.Count}건");
         foreach (var step in battle.Steps)
         {
             sb.Append($"\n  {step.Caster} -{step.Spec.SOName}-> {step.Target} " +

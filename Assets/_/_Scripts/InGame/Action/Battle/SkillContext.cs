@@ -1,6 +1,6 @@
 // 스킬 1건을 실행하는 데 필요한 것 묶음.
 //
-// GameAction은 수치를 계산하지 않습니다. 계산은 ActionManager가 끝내고
+// GameAction은 수치를 계산하지 않습니다. 계산은 BattleManager가 끝내고
 // 여기 담아 넘기며, 액션은 "그 수치를 어떻게 쓰는가"(깎는다/회복한다/막는다)만 압니다.
 public class SkillContext
 {

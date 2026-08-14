@@ -9,7 +9,7 @@ public class ChainStep
     // (보드 양쪽에서 무관한 3매치가 동시에 성립하면 평면 목록에서는 6개로 뭉쳐 보입니다)
     //
     // 여기까지가 퍼즐이 아는 전부입니다. 이 덩어리가 어떤 스킬이 되고 누가 시전하는지는
-    // ActionManager가 해석합니다.
+    // BattleManager가 해석합니다.
     public List<MatchGroup> MatchGroups { get; set; } = new List<MatchGroup>();
 
     // 2. 이번 콤보/연쇄 단계에서 중력으로 떨어진 이동들
