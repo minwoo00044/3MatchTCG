@@ -21,12 +21,17 @@ public class ActionManager : BaseManager
     [Tooltip("적의 기본 위협도. 아군을 위협도로 고르는 스킬이 없어 현재는 쓰이지 않습니다")]
     [SerializeField]
     private float enemyBaseThreat = 0f;
-    [Tooltip("적 스킬. MVP는 BubbleSO 컨테이너를 재사용합니다 (GDD §4.2)")]
+    [Tooltip("적 스킬. 보드에 없는 스킬이므로 SkillSO입니다 (GDD §4.2)")]
     [SerializeField]
-    private BubbleSO enemySkill;
+    private SkillSO enemySkill;
     [Tooltip("적 공격 주기(초). 유효 전투 시간 기준이며 연출 중에는 흐르지 않습니다 (GDD §4.2)")]
     [SerializeField]
     private float enemyAttackInterval = 3f;
+
+    [Header("DEBUG")]
+    [Tooltip("전투 시계와 적 공격을 로그로 확인합니다. 화면이 생기면 제거할 임시 수단입니다")]
+    [SerializeField]
+    private bool logBattleTick = true;
 
     private Battlefield battlefield;
     private readonly List<PlayerActor> playerActors = new List<PlayerActor>();
@@ -34,6 +39,9 @@ public class ActionManager : BaseManager
 
     // 적의 공격 주기를 세는 쪽. 실행은 이 매니저가 합니다.
     private EnemyController enemyController;
+
+    // 시계 로그를 마지막으로 찍은 GameTime. 매 프레임 찍으면 로그가 흐름을 덮습니다. (AGENT.md §9)
+    private float lastTickLogTime;
 
     // 버블 -> 시전자 역추적. (GDD §2.3)
     //
@@ -103,14 +111,39 @@ public class ActionManager : BaseManager
 
         enemyController = new EnemyController(enemyAttackInterval);
 
-        // 스킬이 없으면 적은 영원히 아무것도 하지 않습니다. 매 발동 시점에 찍으면 주기마다 반복되므로
-        // 배선을 확인할 수 있는 이 시점에 한 번만 알립니다. (AGENT.md §9)
-        if (enemySkill == null)
-        {
-            Debug.LogWarning("[ActionManager] 적 스킬이 배정되지 않아 적이 공격하지 않습니다.");
-        }
+        // 스킬 배선 검사는 부팅 시 한 번만 합니다. 실행 시점에 찍으면 적은 주기마다,
+        // 버블은 터질 때마다 반복됩니다. (AGENT.md §9)
+        ValidateSkill(enemySkill, "적 스킬");
+        foreach (var skill in skillCasters.Keys) ValidateSkill(skill, "버블 스킬");
 
         Debug.Log($"[ActionManager] 전장 구성 완료. 아군 {playerActors.Count}인, 적 1마리");
+    }
+
+    // 배선이 덜 된 스킬은 실행 시점에 아무 일도 일으키지 않고 조용히 지나갑니다.
+    // ExecuteSkill이 amount <= 0에서 먼저 return하므로 액션·타깃 미배정 경고에도 닿지 못합니다.
+    // 실제로 적 스킬(E_0)이 전부 빈 채로 오래 지나갔고, 발동 로그를 붙이고서야 드러났습니다.
+    //
+    // 그래서 "무엇이 비었나"를 부팅 시점에 한 줄로 말하게 합니다. 값을 나열하는 로그가 아니라
+    // "이 스킬은 실행돼도 아무 일이 없다"는 불변식 위반을 찍는 것입니다. (AGENT.md §9)
+    private void ValidateSkill(SkillSO skill, string label)
+    {
+        if (skill == null)
+        {
+            Debug.LogWarning($"[ActionManager] {label}이(가) 배정되지 않았습니다.");
+            return;
+        }
+
+        string name = string.IsNullOrEmpty(skill.SOName) ? skill.name : skill.SOName;
+        List<string> missing = new List<string>();
+
+        if (skill.action == null) missing.Add("action");
+        if (skill.target == null) missing.Add("target");
+        if (skill.value <= 0f) missing.Add("value");
+
+        if (missing.Count == 0) return;
+
+        Debug.LogWarning($"[ActionManager] {label} {name}: {string.Join(", ", missing)} 미배정. " +
+                         "실행돼도 아무 일도 일어나지 않습니다.");
     }
 
     private void RegisterSkills(CharacterSO character, PlayerActor actor)
@@ -252,7 +285,11 @@ public class ActionManager : BaseManager
     // 플레이어와 적이 갈라지는 것은 여기까지 오는 길(시전자를 어떻게 찾는가, 수치를 어떻게 세는가)
     // 뿐이고, 타깃 검색·적용·기록·위협도는 완전히 같습니다. 적 공격용 실행 함수를 따로 만들면
     // 경로가 둘이 되고, 이후 규칙이 하나만 고쳐질 때 한쪽이 조용히 틀려집니다. (AGENT.md §5)
-    private void ExecuteSkill(Actor caster, BubbleSO spec, int amount, BattleReceipt battle)
+    //
+    // 인자가 BubbleSO가 아니라 SkillSO인 것이 이 경계의 선언입니다.
+    // **여기부터는 퍼즐 개념이 없습니다.** 연쇄 차수도 매치 개수도 이미 amount에 녹아 끝났고,
+    // 이 아래에서 다시 꺼내 쓸 수 없어야 합니다.
+    private void ExecuteSkill(Actor caster, SkillSO spec, int amount, BattleReceipt battle)
     {
         if (caster == null || spec == null || amount <= 0) return;
 
@@ -282,22 +319,41 @@ public class ActionManager : BaseManager
         // 유효 전투 시간을 전진시키는 유일한 지점입니다. 적 타이머와 위협도 10초 윈도우가
         // 같은 시계를 봐야 "연출로 번 시간"이 양쪽에 똑같이 적용됩니다. (GDD §4.2)
         battlefield.GameTime += delta;
+        LogGameTime();
 
         if (!enemyController.Tick(delta)) return;
 
         ExecuteEnemyAttack();
     }
 
+    // 시계가 흐르는지, 그리고 연출 중에 멈추는지를 눈으로 보기 위한 임시 로그입니다.
+    // 화면에 전투가 보이기 시작하면 제거합니다. (AGENT.md §9)
+    //
+    // 1초에 한 줄로 묶습니다. 매 프레임 찍으면 초당 수십 줄이라 다른 로그가 묻히고,
+    // 무엇보다 "연출 중 멈춤"을 확인하려면 줄 간격이 곧 신호인데 그게 안 보입니다.
+    private void LogGameTime()
+    {
+        if (!logBattleTick) return;
+        if (battlefield.GameTime - lastTickLogTime < 1f) return;
+
+        lastTickLogTime = battlefield.GameTime;
+        Debug.Log($"[ActionManager] GameTime {battlefield.GameTime:F1}s");
+    }
+
     private void ExecuteEnemyAttack()
     {
         if (enemyActor == null || enemyActor.IsDead) return;
 
-        BubbleSO skill = enemyActor.Skill;
+        SkillSO skill = enemyActor.Skill;
         if (skill == null) return; // 배선 경고는 BuildBattlefield에서 한 번만 찍습니다.
 
         // 적 공격은 버블 매치가 없으므로 최종 데미지 = value 고정입니다.
         // matchCount와 chainWeight를 곱하지 않습니다. (GDD §4.2)
         int amount = Mathf.RoundToInt(skill.value);
+
+        // 발동 자체를 먼저 찍습니다. 아래 영수증 로그는 대상이 없거나 빗나가면 아무것도 남기지 않아,
+        // "적이 안 때린 것"과 "때렸는데 대상이 없던 것"을 구별할 수 없습니다. (AGENT.md §9)
+        LogEnemyAttack();
 
         // 발동 시점에 수치를 영수증으로 선확정하고, 연출은 나중에 그 기록을 재생합니다. (GDD §4.2)
         // 플레이어 배치와 섞이지 않도록 이 공격 한 건만 담은 영수증을 만듭니다.
@@ -309,6 +365,24 @@ public class ActionManager : BaseManager
         // 여기서 상태를 전이시키지 않습니다. GameWaitState에서 나가는 길은 플레이어 스왑이며,
         // 적 공격은 연출로도 흐름을 끊지 않습니다. 승패만 예외인데 그 전이는
         // HandleActorDeath가 예약하고 GameWaitState가 확인합니다. (GDD §4.2, §4.4)
+    }
+
+    // 적이 누구를 때리는지만 봐서는 HighestThreatEnemy가 정렬을 하는지, 그냥 명단 첫 번째를
+    // 집는지 구별할 수 없습니다. 탱커가 계속 맞으면 두 경우의 결과가 같기 때문입니다.
+    // 그래서 후보 전원의 총 위협도를 함께 찍습니다. 화면이 생기면 제거합니다. (AGENT.md §9)
+    private void LogEnemyAttack()
+    {
+        if (!logBattleTick) return;
+
+        StringBuilder sb = new StringBuilder();
+        sb.Append($"[ActionManager] 적 공격 발동 (GameTime {battlefield.GameTime:F1}s, 주기 {enemyAttackInterval}s) 위협도");
+
+        // 적 기준의 "적군"이 곧 아군 진영입니다. 상대 판정은 반드시 이 경로로 합니다. (AGENT.md §5)
+        foreach (var actor in battlefield.EnemiesOf(enemyActor))
+        {
+            sb.Append($" {actor}={actor.GetTotalThreat(battlefield.GameTime):F0}");
+        }
+        Debug.Log(sb.ToString());
     }
 
     // ===================== 승패 판정 =====================
@@ -348,7 +422,7 @@ public class ActionManager : BaseManager
     //
     // 대상 수만큼 합산합니다. 광역 힐은 1인 힐보다 총량이 크므로 어그로도 그만큼 끌립니다. (GDD §4.1)
     // 방금 적힌 기록에서 요청량을 걷어오므로, 액션이 무엇을 했든 셈이 어긋나지 않습니다.
-    private void AccumulateThreat(Actor caster, BubbleSO spec, BattleReceipt battle, int fromIndex)
+    private void AccumulateThreat(Actor caster, SkillSO spec, BattleReceipt battle, int fromIndex)
     {
         int requested = 0;
         for (int i = fromIndex; i < battle.Steps.Count; i++)

@@ -148,6 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe8ed249dd6cb7d45b1b08f42ffb04a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deck: {fileID: 11400000, guid: 426ffe598f1719a4aace92f9f6c2aad1, type: 2}
 --- !u!4 &803944019
 Transform:
   m_ObjectHideFlags: 0
@@ -425,9 +426,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07b01126db99fb48abdbe9c7257c32d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  swapDuration: 0.15
+  matchDuration: 0.15
   fallSecondsPerCell: 0.07
   fallMinDuration: 0.12
-  enableAnimLog: 1
+  shuffleDuration: 0.45
 --- !u!4 &1339909935
 Transform:
   m_ObjectHideFlags: 0
@@ -438,6 +441,58 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1974427796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1974427798}
+  - component: {fileID: 1974427797}
+  m_Layer: 0
+  m_Name: ActionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1974427797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1974427796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 428e707558bc64d4f9a1c146e71fcd71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManager: {fileID: 803944018}
+  enemyName: Enemy
+  enemyMaxHP: 3000
+  enemyMaxShield: 0
+  enemyBaseThreat: 0
+  enemySkill: {fileID: 11400000, guid: 4616b08a8418a2240b1dd7bb13f5e815, type: 2}
+  enemyAttackInterval: 3
+  logBattleTick: 1
+--- !u!4 &1974427798
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1974427796}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.11566, y: 1.04904, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -473,17 +528,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 803944018}
-  testTable:
-  - {fileID: 11400000, guid: 06bed0ff0c4da00498f315651e61945c, type: 2}
-  - {fileID: 11400000, guid: dcfbdb810ba5ee846a546a814e88979e, type: 2}
-  - {fileID: 11400000, guid: 020291b03272a3f4daa41bd05817552c, type: 2}
-  - {fileID: 11400000, guid: c40d66159e9494d4ebbeeec374e4e23d, type: 2}
-  - {fileID: 11400000, guid: 83d1782ca1b0e8447879abb8245165f8, type: 2}
-  - {fileID: 11400000, guid: 83876f4f975e5744b91fcbddd4306a9c, type: 2}
-  - {fileID: 11400000, guid: ff913e3e80d2c2643b8b63efc96895ae, type: 2}
-  - {fileID: 11400000, guid: 5805393bd9a1a174f8489a4fb18715ab, type: 2}
-  - {fileID: 11400000, guid: 8ea53f99d38c65b4d9ec770783a79fa0, type: 2}
+  commonBubbles:
   - {fileID: 11400000, guid: febefedad1a89734888960b83130ae46, type: 2}
+  commonBubbleColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   size: 8
   viewPrefab: {fileID: -1897470619763223486, guid: 3e98186be4e77414789331cd349738db, type: 3}
   puzzleMatrixView: {fileID: 1339909934}
@@ -513,3 +560,4 @@ SceneRoots:
   - {fileID: 2011066237}
   - {fileID: 1339909935}
   - {fileID: 979398958}
+  - {fileID: 1974427798}
