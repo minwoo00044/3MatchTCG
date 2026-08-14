@@ -32,11 +32,28 @@ public class BattleManager : BaseManager
     [Tooltip("전투 영수증을 재생하는 타임라인 소유자. 없으면 수치만 돌고 화면은 조용합니다")]
     [SerializeField]
     private BattleSequencer sequencer;
-    [Tooltip("덱 순서와 같은 순서로 배치합니다. 씬에 미리 놓인 뷰를 물립니다")]
+    // 뷰는 씬에 미리 놓지 않고 덱을 돌며 만듭니다.
+    //
+    // 미리 놓고 배열 순서로 물리면 덱과 뷰 목록이 **순서로만** 묶여, 어느 한쪽 순서가 바뀌면
+    // A가 맞았는데 B가 흔들립니다. 수치도 로그도 승패도 정상이라 연출 버그처럼 보이고
+    // 배선 버그로 안 보입니다. 짝을 생성 시점에 성립시키면 어긋날 방법이 없습니다.
+    // PuzzlePool이 PuzzleView를 뽑아 그 자리에서 RegistBubble로 묶는 것과 같은 모양입니다.
+    [Tooltip("아군 뷰 프리팹. 덱 인원수만큼 생성됩니다")]
     [SerializeField]
-    private ActorView[] playerViews;
+    private ActorView allyViewPrefab;
     [SerializeField]
-    private ActorView enemyView;
+    private ActorView enemyViewPrefab;
+    [Tooltip("아군 뷰가 생성될 부모. 자식으로 가로 배치됩니다")]
+    [SerializeField]
+    private Transform allyRoot;
+    [SerializeField]
+    private Transform enemyRoot;
+    [Tooltip("아군 뷰 사이 간격(로컬 X)")]
+    [SerializeField]
+    private float allySpacing = 2f;
+    [Tooltip("적 뷰 색. 목업입니다")]
+    [SerializeField]
+    private Color enemyColor = Color.white;
 
     [Header("DEBUG")]
     [Tooltip("전투 시계와 적 공격을 로그로 확인합니다. 화면이 생기면 제거할 임시 수단입니다")]
@@ -49,6 +66,9 @@ public class BattleManager : BaseManager
 
     // 적의 공격 주기를 세는 쪽. 실행은 이 매니저가 합니다.
     private EnemyController enemyController;
+
+    // 이 매니저가 만든 뷰. 전장을 다시 세울 때 걷어내는 주체가 하나여야 합니다. (AGENT.md §4)
+    private readonly List<ActorView> spawnedViews = new List<ActorView>();
 
     // 시계 로그를 마지막으로 찍은 GameTime. 매 프레임 찍으면 로그가 흐름을 덮습니다. (AGENT.md §9)
     private float lastTickLogTime;
@@ -96,7 +116,7 @@ public class BattleManager : BaseManager
         battlefield = new Battlefield();
         playerActors.Clear();
         skillCasters.Clear();
-        if (sequencer != null) sequencer.ClearBinds();
+        ClearBattleViews();
 
         // 덱의 소유자는 GameManager입니다. 읽는 시점은 Init 브로드캐스트 안으로 한정합니다.
         IReadOnlyList<CharacterSO> characters = gameManager != null ? gameManager.Characters : null;
@@ -115,14 +135,15 @@ public class BattleManager : BaseManager
                 RegisterSkills(character, actor);
                 actor.OnDeath += HandleActorDeath;
 
-                // 뷰는 덱 순서로 물립니다. Actor는 자기 뷰를 모르고, 짝은 시퀀서가 듭니다.
-                BindView(actor, ViewAt(playerActors.Count - 1), character.characterName, character.mainColor, true);
+                // 만든 자리에서 바로 묶습니다. Actor는 자기 뷰를 모르고, 짝은 시퀀서가 듭니다.
+                AttachView(actor, allyViewPrefab, allyRoot, playerActors.Count - 1,
+                           character.characterName, character.mainColor, true);
             }
         }
 
         enemyActor = new EnemyActor(battlefield, enemyName, enemyMaxHP, enemyMaxShield, enemyBaseThreat, enemySkill);
         enemyActor.OnDeath += HandleActorDeath;
-        BindView(enemyActor, enemyView, enemyName, Color.white, false);
+        AttachView(enemyActor, enemyViewPrefab, enemyRoot, 0, enemyName, enemyColor, false);
 
         enemyController = new EnemyController(enemyAttackInterval);
 
@@ -134,25 +155,43 @@ public class BattleManager : BaseManager
         Debug.Log($"[BattleManager] 전장 구성 완료. 아군 {playerActors.Count}인, 적 1마리");
     }
 
-    private ActorView ViewAt(int index)
+    private void ClearBattleViews()
     {
-        if (playerViews == null || index < 0 || index >= playerViews.Length) return null;
-        return playerViews[index];
+        foreach (var view in spawnedViews)
+        {
+            if (view != null) Destroy(view.gameObject);
+        }
+        spawnedViews.Clear();
+
+        if (sequencer != null) sequencer.ClearBinds();
     }
 
+    // Actor 하나에 뷰 하나를 만들어 붙입니다.
+    //
     // 뷰가 없어도 전투는 그대로 돕니다. 수치와 영수증은 뷰를 모르기 때문입니다.
     // 다만 조용히 넘어가면 "왜 화면이 안 움직이지"를 코드에서 찾게 되므로 한 번 알립니다. (AGENT.md §9)
-    private void BindView(Actor actor, ActorView view, string displayName, Color color, bool facingRight)
+    private void AttachView(Actor actor, ActorView prefab, Transform root, int seat,
+                            string displayName, Color color, bool facingRight)
     {
         if (sequencer == null || actor == null) return;
 
-        if (view == null)
+        if (prefab == null || root == null)
         {
-            Debug.LogWarning($"[BattleManager] {displayName}의 ActorView가 배정되지 않아 연출이 나오지 않습니다.");
+            Debug.LogWarning($"[BattleManager] {displayName}의 뷰 프리팹 또는 부모가 배정되지 않아 연출이 나오지 않습니다.");
             return;
         }
 
+        ActorView view = Instantiate(prefab, root);
+
+        // 자리는 인덱스로 정합니다. 신원과 달리 **자리는 틀려도 즉시 눈에 보이고 수치에 영향이 없습니다.**
+        // 순서 결합이 남아도 되는 곳과 안 되는 곳을 가른 결과입니다.
+        view.transform.localPosition = new Vector3(seat * allySpacing, 0f, 0f);
+
+        // 위치를 확정한 **뒤에** Init을 부릅니다. Init이 시전 모션의 복귀 지점(homePos)을
+        // 캡처하므로, 순서가 뒤집히면 캐릭터가 프리팹 원점으로 돌아갑니다. (AGENT.md §3, §7)
         view.Init(displayName, color, facingRight);
+
+        spawnedViews.Add(view);
         sequencer.Bind(actor, view);
     }
 
