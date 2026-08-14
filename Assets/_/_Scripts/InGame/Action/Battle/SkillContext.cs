@@ -5,7 +5,9 @@
 public class SkillContext
 {
     public Actor Caster { get; }
-    public BubbleSO Spec { get; }
+    // SkillSO입니다. 여기까지 오면 matchCount와 chainWeight는 이미 Amount에 녹아 끝났고,
+    // 액션은 이 스킬이 버블에서 왔는지 적에게서 왔는지 알 필요가 없습니다.
+    public SkillSO Spec { get; }
     public Actor[] Targets { get; }
 
     // 대상 1명당 적용할 최종 수치. value * matchCount * chainWeight까지 반영된 값입니다. (GDD §4.6)
@@ -14,7 +16,7 @@ public class SkillContext
     // 실행 결과를 적을 곳. 액션이 대상마다 한 줄씩 남깁니다.
     public BattleReceipt Receipt { get; }
 
-    public SkillContext(Actor caster, BubbleSO spec, Actor[] targets, int amount, BattleReceipt receipt)
+    public SkillContext(Actor caster, SkillSO spec, Actor[] targets, int amount, BattleReceipt receipt)
     {
         Caster = caster;
         Spec = spec;

@@ -5,7 +5,10 @@
 public class BattleStep
 {
     public Actor Caster { get; }
-    public BubbleSO Spec { get; }
+    // 이 기록의 소비자는 연출입니다. 버블 스킬과 적 스킬이 같은 타임라인에 얹히므로
+    // 여기도 SkillSO입니다. 버블 고유 정보가 필요하면 그때 캐스팅할 것이 아니라,
+    // 필요한 값을 SkillSO로 올릴지부터 다시 봅니다.
+    public SkillSO Spec { get; }
     public Actor Target { get; }
     public EBattleEffect Effect { get; }
 
@@ -22,7 +25,7 @@ public class BattleStep
     // 이 타격으로 죽었는가. 이미 죽어 있던 대상은 false입니다.
     public bool Died { get; }
 
-    public BattleStep(Actor caster, BubbleSO spec, Actor target, EBattleEffect effect,
+    public BattleStep(Actor caster, SkillSO spec, Actor target, EBattleEffect effect,
                       int requested, int applied, int hpAfter, int shieldAfter, bool died)
     {
         Caster = caster;

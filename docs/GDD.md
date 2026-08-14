@@ -28,6 +28,12 @@
   - `BubbleSO.threatMultiplier` 필드(기본값 1.0)를 통해 스킬별 위협도 누적 가중치를 부여한다.
 
 ### 2.3 캐릭터 및 덱 데이터 구조 명세 (Character & Deck SO)
+- **스킬 데이터 계층 (`SkillSO` / `BubbleSO`)**:
+  - `SkillSO`: 전투가 실행할 수 있는 스킬 1건. `SOName`, `action`, `target`, `value`, `threatMultiplier`.
+  - `BubbleSO : SkillSO`: **보드에서 뽑히고 터지는** 스킬. 위에 더해 `bubbleImage`(시각), `spawnWeight`(스포닝), `chainWeights`(연쇄 배율)를 갖는다.
+  - 적 NPC 스킬은 보드에 존재하지 않으므로 `SkillSO`를 직접 사용한다 (§4.2).
+  - **근거**: 적 스킬이 `BubbleSO`이면 `chainWeights`를 들고 있게 되는데, §4.2는 적 데미지에 `chainWeight`를 곱하지 않는다고 규정한다. 에셋과 규칙이 서로 다른 말을 하는 상태가 되어 이후 잘못 연결될 여지를 남긴다 (AGENT.md §6).
+  - 전투 실행 경로(`SkillContext`, `BattleStep`)는 `SkillSO`를 받는다. 타입 경계가 곧 "퍼즐 개념이 끝나는 지점"이며, 그 아래에서는 `matchCount`·`chainIndex`를 다시 꺼낼 수 없다.
 - **`CharacterSO` 데이터 구조**:
   - `characterName`, `characterImage`, `mainColor` (시각 및 메타 정보)
   - `MaxHP`, `MaxShield`, `BaseThreat` (캐릭터 고유 기본 스탯)
@@ -114,7 +120,7 @@
   - `MaxHP`: 3,000 / `MaxShield`: 0 / 공격 주기: 3.0초
   - 기본 스킬: `AttackAction` / `HighestThreatEnemy` / value: 50
   - **적 데미지 계산**: 적 공격은 버블 매치가 없으므로 `최종 데미지 = skillValue` (50) 고정 수치를 적용한다.
-  - MVP 적 스킬 정의는 당분간 `BubbleSO` 컨테이너를 재사용한다.
+  - 적 스킬은 `SkillSO`로 정의한다. 보드에 존재하지 않는 스킬이므로 `spawnWeight`·`chainWeights`·`bubbleImage`를 갖지 않는다 (§2.3).
 - **Wait 상태 적 타이머 공격**: 게임 상태가 `GameWaitState`일 때, `GameWaitState.OnUpdate()`에서 시간 기반(타이머)으로 적 NPC 공격이 발동한다. 적 NPC의 스킬 연출에 의한 시간 정지(Time Freeze)는 발생하지 않는다.
 - **조작/액션 일시정지 (Time Freeze)**: 플레이어의 퍼즐 스왑 ➡️ 연쇄 연출(`GamePuzzleActionState`) 진행 동안에는 적 NPC의 공격 타이머가 완전 정지한다.
 - **적 데미지 확정 시점 (모델 선확정 영수증 패턴)**: 적 스킬 발동(연출 시작) 시점에 모델에서 데미지 및 피격 결과를 영수증으로 선확정하며, 연출은 그 결과를 표현한다.
@@ -162,7 +168,7 @@
   - 전투(`SkillRecipe`): `BubbleSO` 스펙, `matchCount`(해당 매치 그룹으로 터진 버블 개수), `chainIndex`(발생한 체인 순서, 1-based index)
 - **전투 영수증(`BattleReceipt`) - 실행 결과 기록**:
   - `GameActionState`에서 스킬을 전부 실행하며 **대상 1명당 1건**씩 결과를 순서대로 기록한다. 담긴 순서가 곧 실행 순서이자 연출 순서다.
-  - 기록 항목: 시전자 / `BubbleSO` 스펙 / 대상 / 효과 종류(피해·회복·실드) / **요청량**(위협도 산정 기준) / **실제 적용량**(화면 표시 기준) / 적용 직후 HP·실드 / 이 타격으로 사망했는지
+  - 기록 항목: 시전자 / `SkillSO` 스펙(버블 스킬과 적 스킬이 같은 타임라인에 얹힌다) / 대상 / 효과 종류(피해·회복·실드) / **요청량**(위협도 산정 기준) / **실제 적용량**(화면 표시 기준) / 적용 직후 HP·실드 / 이 타격으로 사망했는지
   - **연출은 이 기록을 재생하며, 재생 시점에 모델을 다시 조회하지 않는다.** 스킬 1건당 연출 1건으로 순차 재생하는 것은 이 기록 위에서 자유롭게 구성한다.
   - **근거**: 스킬 레시피만으로는 실행 결과를 재계산할 수 없다. 타겟팅이 의존하는 상태(체력 순위, 위협도, 생존 여부)를 같은 배치의 스킬들이 바꾸고, `RandomActor`는 다시 뽑으면 다른 대상이 나오며, 실드 흡수 분해와 오버킬 초과분은 애초에 재계산으로 얻을 수 없다. 퍼즐이 `MoveReceipt`를 쓰는 것과 같은 이유이며 같은 구조다 (AGENT.md §3).
 
