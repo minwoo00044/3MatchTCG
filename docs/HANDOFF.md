@@ -43,8 +43,8 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
 ### 비어 있는 것
 | 대상 | 상태 |
 |---|---|
-| `UIManager.cs` | **0바이트 빈 파일** |
-| 전투 연출 | 없다. `BattleReceipt`를 소비하는 쪽이 아직 없어 로그만 찍는다 |
+| `UIManager.cs` | **0바이트 빈 파일.** 전역 UI(일시정지·배속·결과 화면)만 들어갈 자리 |
+| 전투 연출 **내용** | 구조는 섰다. 모션·타이밍·스프라이트가 기획 미결이라 **최소 뷰**로 서 있다 |
 | 결과 화면 | `GameEndState`는 승패를 로그로만 알린다. 화면·리트라이·씬 전환은 GDD §D 미결 |
 | `PuzzleFactory` | 후보는 덱에서 오지만 **균등 추첨.** 3:3:3:1 2단계 추첨 미구현 |
 | `T_O` 증폭 | 회복(50×matchCount)만 구현. 1.2배 증폭 액션이 없다 (`IsPreemptive` 이음매만 있음) |
@@ -158,9 +158,11 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
    모델      PuzzleModel      Battlefield
              Bubble           Actor
    영수증    MoveReceipt      BattleReceipt
-   뷰        PuzzleMatrixView BattleSequencer      ← [9] 없음
-             PuzzleView       ActorView            ← [9] 없음
+   뷰        PuzzleMatrixView BattleSequencer
+             PuzzleView       ActorView
 ```
+
+**네 층이 양쪽 다 찼다.** 남은 것은 뷰의 *내용*(모션·스프라이트)이고 구조가 아니다.
 
 세로선은 **소유 관계**이지 실행 순서가 아니다.
 가로로 읽으면 **모델과 영수증은 양쪽 다 서 있고, 비어 있는 건 전투의 결정과 뷰 둘뿐이다.**
@@ -180,6 +182,36 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
 `Actor`를 통해 씬 객체에 닿는다. 짝 관리는 `BattleSequencer`가 한다 — `PuzzleMatrixView.dataViewDict`와 같다.
 
 **타임라인 소유자는 하나다.** `ActorView`들이 각자 재생하면 영수증이 정한 순서가 사라진다.
+
+### [9]가 어떻게 붙어 있나
+
+```
+배치   HandleOnAction     → 실행 → sequencer.Play(battle, onComplete: 완수 보고)
+적공격 ExecuteEnemyAttack → 실행 → sequencer.Play(battle, onComplete: 없음)
+```
+
+**완수 보고가 연출 완주 뒤로 갔다.** 부수 효과 둘이 다 원하던 것이다.
+
+- `GameActionState`가 연출이 끝날 때까지 머문다 → **Time Freeze가 스킬 연출 구간까지 유지**된다 (GDD §4.5의 "두 구간 모두")
+- 승패 전이가 진짜로 연출 뒤가 된다. 그전까지는 동기 실행이라 우연히 지켜지고 있었다 (GDD §4.4)
+
+**끊을 땐 `Kill()`이 아니라 `Complete()`다.** `Kill()`은 `OnComplete`를 부르지 않아 완수 보고가
+증발하고 `GameActionState`가 영원히 멈춘다 (`AGENT.md` §8). `Complete()`는 최종 상태까지 밀어내므로
+화면이 모델과 어긋난 채 남지도 않는다. 영수증은 이미 확정된 사실이라 스냅해도 수치가 안 어긋난다.
+
+실제로 끊기는 것은 **적 공격 연출뿐**이다. 배치 재생 중에는 `GameActionState`에 머물러
+Wait 틱이 안 돌아 적 공격이 들어올 수 없다.
+
+**같은 시전자 · 같은 스킬의 연속 구간은 한 박자로 묶는다.** 영수증은 대상 1명당 1건이라
+그대로 순차 재생하면 광역 힐 한 방이 세 박자로 늘어진다. GDD §4.5가 "스킬 1건당 연출 1건"이라
+적어두고 구성은 자유롭게 두었다.
+
+**빈 영수증도 나가는 길이 있다.** `Steps.Count == 0`이면 `Play`가 즉시 완주 콜백을 부른다.
+`sequencer`가 아예 없으면 `BattleManager`가 그 자리에서 보고한다.
+
+**최소 뷰다.** 사각 스프라이트 + HP·실드 게이지 + 뜨는 숫자뿐이고, 시간은 전부 `[SerializeField]`다.
+`TMP` 대신 레거시 `UI.Text`를 쓴 것도 TMP Essentials 임포트 절차를 끼워넣지 않으려는 것이다.
+전부 코스메틱이라 기획이 오면 `ActorView` 안만 갈아끼우면 된다.
 
 ### [7]·[8]이 어떻게 붙어 있나 — 신호 두 갈래
 

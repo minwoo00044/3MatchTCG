@@ -28,6 +28,16 @@ public class BattleManager : BaseManager
     [SerializeField]
     private float enemyAttackInterval = 3f;
 
+    [Header("VIEW")]
+    [Tooltip("전투 영수증을 재생하는 타임라인 소유자. 없으면 수치만 돌고 화면은 조용합니다")]
+    [SerializeField]
+    private BattleSequencer sequencer;
+    [Tooltip("덱 순서와 같은 순서로 배치합니다. 씬에 미리 놓인 뷰를 물립니다")]
+    [SerializeField]
+    private ActorView[] playerViews;
+    [SerializeField]
+    private ActorView enemyView;
+
     [Header("DEBUG")]
     [Tooltip("전투 시계와 적 공격을 로그로 확인합니다. 화면이 생기면 제거할 임시 수단입니다")]
     [SerializeField]
@@ -86,6 +96,7 @@ public class BattleManager : BaseManager
         battlefield = new Battlefield();
         playerActors.Clear();
         skillCasters.Clear();
+        if (sequencer != null) sequencer.ClearBinds();
 
         // 덱의 소유자는 GameManager입니다. 읽는 시점은 Init 브로드캐스트 안으로 한정합니다.
         IReadOnlyList<CharacterSO> characters = gameManager != null ? gameManager.Characters : null;
@@ -103,11 +114,15 @@ public class BattleManager : BaseManager
                 playerActors.Add(actor);
                 RegisterSkills(character, actor);
                 actor.OnDeath += HandleActorDeath;
+
+                // 뷰는 덱 순서로 물립니다. Actor는 자기 뷰를 모르고, 짝은 시퀀서가 듭니다.
+                BindView(actor, ViewAt(playerActors.Count - 1), character.characterName, character.mainColor, true);
             }
         }
 
         enemyActor = new EnemyActor(battlefield, enemyName, enemyMaxHP, enemyMaxShield, enemyBaseThreat, enemySkill);
         enemyActor.OnDeath += HandleActorDeath;
+        BindView(enemyActor, enemyView, enemyName, Color.white, false);
 
         enemyController = new EnemyController(enemyAttackInterval);
 
@@ -117,6 +132,28 @@ public class BattleManager : BaseManager
         foreach (var skill in skillCasters.Keys) ValidateSkill(skill, "버블 스킬");
 
         Debug.Log($"[BattleManager] 전장 구성 완료. 아군 {playerActors.Count}인, 적 1마리");
+    }
+
+    private ActorView ViewAt(int index)
+    {
+        if (playerViews == null || index < 0 || index >= playerViews.Length) return null;
+        return playerViews[index];
+    }
+
+    // 뷰가 없어도 전투는 그대로 돕니다. 수치와 영수증은 뷰를 모르기 때문입니다.
+    // 다만 조용히 넘어가면 "왜 화면이 안 움직이지"를 코드에서 찾게 되므로 한 번 알립니다. (AGENT.md §9)
+    private void BindView(Actor actor, ActorView view, string displayName, Color color, bool facingRight)
+    {
+        if (sequencer == null || actor == null) return;
+
+        if (view == null)
+        {
+            Debug.LogWarning($"[BattleManager] {displayName}의 ActorView가 배정되지 않아 연출이 나오지 않습니다.");
+            return;
+        }
+
+        view.Init(displayName, color, facingRight);
+        sequencer.Bind(actor, view);
     }
 
     // 배선이 덜 된 스킬은 실행 시점에 아무 일도 일으키지 않고 조용히 지나갑니다.
@@ -217,10 +254,22 @@ public class BattleManager : BaseManager
             ExecuteRecipe(recipe, battle);
         }
 
-        // 연출 담당이 생기면 이 영수증을 재생합니다. 지금은 소비자가 없어 내역만 찍습니다.
         ReportBattleReceipt(battle);
 
-        gameManager.ReceiveCompleteSignal();
+        // 완수 보고를 연출 완주 뒤로 미룹니다. 부수 효과 둘 다 원하던 것입니다.
+        //
+        //  - GameActionState가 연출이 끝날 때까지 머물러 Time Freeze가 스킬 연출 구간까지
+        //    유지됩니다. GDD §4.5가 "두 구간 모두"라고 적어둔 그대로입니다.
+        //  - 승패 전이가 진짜로 연출 뒤가 됩니다. 지금까지는 동기 실행이라 우연히 지켜졌습니다. (GDD §4.4)
+        //
+        // 시퀀서가 없으면 아무도 이 상태를 끝내주지 않으므로 즉시 보고합니다. (AGENT.md §8)
+        if (sequencer == null)
+        {
+            gameManager.ReceiveCompleteSignal();
+            return;
+        }
+
+        sequencer.Play(battle, () => gameManager.ReceiveCompleteSignal());
     }
 
     // 퍼즐 영수증을 실행 순서대로 늘어놓은 스킬 목록으로 옮깁니다. (GDD §4.5)
@@ -362,6 +411,10 @@ public class BattleManager : BaseManager
         ExecuteSkill(enemyActor, skill, amount, battle);
         ReportBattleReceipt(battle);
 
+        // 기다리는 상태가 없으므로 완주 콜백이 없습니다. 두 경로의 유일한 차이입니다.
+        // 적 연출은 Time Freeze를 만들지 않으므로(GDD §4.2) 재생 중에도 시계가 계속 갑니다.
+        if (sequencer != null) sequencer.Play(battle, null);
+
         // 여기서 상태를 전이시키지 않습니다. GameWaitState에서 나가는 길은 플레이어 스왑이며,
         // 적 공격은 연출로도 흐름을 끊지 않습니다. 승패만 예외인데 그 전이는
         // HandleActorDeath가 예약하고 GameWaitState가 확인합니다. (GDD §4.2, §4.4)
@@ -434,9 +487,14 @@ public class BattleManager : BaseManager
         caster.AddThreat(requested * spec.threatMultiplier, battlefield.GameTime);
     }
 
-    // 전투 결과 확인용 임시 로그입니다. 연출이 이 영수증을 소비하기 시작하면 제거합니다. (AGENT.md §9)
+    // 전투 결과 확인용 임시 로그입니다.
+    //
+    // 연출이 붙었으니 원래는 여기서 제거할 자리인데(AGENT.md §9), HANDOFF §6에 남은 확인 2건 중
+    // "죽은 캐릭터 버블의 스킬 무효화"가 **이 로그에 안 나오는 것**을 통과 기준으로 삼고 있습니다.
+    // 그 검증을 마치면 이 함수와 logBattleTick을 함께 걷어냅니다.
     private void ReportBattleReceipt(BattleReceipt battle)
     {
+        if (!logBattleTick) return;
         if (battle.Steps.Count == 0) return;
 
         StringBuilder sb = new StringBuilder();
