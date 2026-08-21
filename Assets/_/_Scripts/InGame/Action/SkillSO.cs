@@ -13,7 +13,7 @@ using UnityEngine;
 // GDD §4.2는 적 데미지에 matchCount와 chainWeight를 곱하지 말라고 못박았는데,
 // 에셋에는 그 값이 버젓이 있는 상태가 됩니다. **에셋이 코드와 다른 말을 하게 됩니다.**
 // 지금은 ExecuteEnemyAttack이 곱하지 않아 무해하지만, 나중에 "값이 있는데 왜 안 쓰지"로
-// 이어지면 조용히 틀어집니다. 그래서 층을 타입으로 갈랐습니다. (AGENT.md §6, §10)
+// 이어지면 조용히 틀어집니다. 그래서 층을 타입으로 갈랐습니다. (AGENTS.md §6, §10)
 //
 // 이제 타입 경계가 곧 "퍼즐 개념이 끝나는 지점"입니다.
 // BattleManager.ExecuteSkill이 SkillSO를 받는 것은, 그 함수부터는 연쇄도 매치 개수도
@@ -36,5 +36,5 @@ public class SkillSO : ScriptableObject
 
   // 여기서 스킬을 실행하는 함수는 두지 않습니다.
   // 실행 경로는 BattleManager 하나뿐이어야 합니다. 스킬은 멱등이 아니라
-  // 경로가 둘이면 그중 하나가 이중 적용이 됩니다. (AGENT.md §5)
+  // 경로가 둘이면 그중 하나가 이중 적용이 됩니다. (AGENTS.md §5)
 }

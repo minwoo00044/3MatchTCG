@@ -16,7 +16,7 @@ public class BubbleSO : SkillSO
   [Header("View Sector")]
   public Sprite bubbleImage;
   // 색은 여기 없습니다. 소속 캐릭터의 CharacterSO.mainColor가 단일 원천입니다. (GDD §2.2)
-  // 겉모습과 판정 키가 두 벌이 되면 게임이 거짓말을 하므로 버블이 색을 스스로 들지 않습니다. (AGENT.md §6)
+  // 겉모습과 판정 키가 두 벌이 되면 게임이 거짓말을 하므로 버블이 색을 스스로 들지 않습니다. (AGENTS.md §6)
   // 소속 캐릭터가 없는 공용 버블(T_O)의 색은 PuzzleManager가 폴백으로 답합니다.
   //연출효과 등등
   [Header("Spawn Sector")]
@@ -26,7 +26,7 @@ public class BubbleSO : SkillSO
   [Tooltip("연쇄 차수별 배율. index 0 = 1차 연쇄. 비어 있거나 범위를 넘으면 1.0 (마지막 값 유지)")]
   public float[] chainWeights;
 
-  // 연쇄 배율을 묻는 곳이 여러 군데 생기므로 답하는 함수는 여기 하나만 둡니다. (AGENT.md §5)
+  // 연쇄 배율을 묻는 곳이 여러 군데 생기므로 답하는 함수는 여기 하나만 둡니다. (AGENTS.md §5)
   // chainIndex는 1-based입니다.
   //
   // SkillSO에 두지 않은 이유: 연쇄는 보드에서만 일어납니다. 적 스킬이 이 함수를 가지면

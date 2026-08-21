@@ -54,7 +54,7 @@ public class BattleSequencer : MonoBehaviour
     // 영수증 한 장을 재생합니다. 완주하면 onComplete가 불립니다.
     //
     // onComplete는 GameActionState의 완수 보고가 걸리는 자리입니다.
-    // 여기가 안 불리면 그 상태에서 나가는 길이 사라집니다. (AGENT.md §8)
+    // 여기가 안 불리면 그 상태에서 나가는 길이 사라집니다. (AGENTS.md §8)
     // 그래서 아래 두 경우 모두 반드시 부릅니다 - 재생할 것이 없을 때, 그리고 중간에 끊길 때.
     public void Play(BattleReceipt receipt, Action onComplete)
     {
@@ -93,7 +93,7 @@ public class BattleSequencer : MonoBehaviour
         }
 
         // 연출이 끝나면 모델 기준으로 스냅합니다. 프레임 스파이크로 게이지 트윈이 통째로
-        // 스킵돼도 화면과 모델이 어긋난 채 남지 않습니다. (AGENT.md §7, §9의 불변식)
+        // 스킵돼도 화면과 모델이 어긋난 채 남지 않습니다. (AGENTS.md §7, §9의 불변식)
         seq.OnComplete(() =>
         {
             running = null;
@@ -142,7 +142,7 @@ public class BattleSequencer : MonoBehaviour
         // 게이지는 영수증에 적힌 "적용 직후" 값으로 갑니다. 모델을 다시 읽지 않습니다.
         //
         // MaxHP/MaxShield는 조회합니다. 전투 중 변하지 않는 값이라 시점 문제가 없습니다.
-        // 변하는 값(CurrentHP, Shield)만 영수증에 실려 옵니다. (AGENT.md §3)
+        // 변하는 값(CurrentHP, Shield)만 영수증에 실려 옵니다. (AGENTS.md §3)
         int maxHP = step.Target.MaxHP;
         int maxShield = step.Target.MaxShield;
 
@@ -163,7 +163,7 @@ public class BattleSequencer : MonoBehaviour
         return viewDict.TryGetValue(actor, out ActorView view) ? view : null;
     }
 
-    // 재생이 끝난 뒤에는 모델이 진실입니다. 이 시점 조회는 안전합니다. (AGENT.md §7)
+    // 재생이 끝난 뒤에는 모델이 진실입니다. 이 시점 조회는 안전합니다. (AGENTS.md §7)
     private void ReconcileGauges()
     {
         foreach (var pair in viewDict)

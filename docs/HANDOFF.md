@@ -11,12 +11,12 @@
 ## 0. 읽는 순서
 
 1. `CLAUDE.md` — 프로젝트 규칙 진입점
-2. `docs/AGENT.md` — **반드시 읽는다.** 이 저장소에서 실제로 터진 버그에서 나온 규칙들이다
+2. `AGENTS.md` — **반드시 읽는다.** 이 저장소에서 실제로 터진 버그에서 나온 규칙들이다
 3. `docs/GDD.md` — 게임 기획서. 전투 규칙의 단일 원천
 4. `docs/GDD-TODO.md` — 기획 결정 이력과 남은 논의 항목
 5. 이 문서
 
-`AGENT.md`를 건너뛰면 같은 버그를 다시 만든다. 특히 §3(영수증), §5(판정 단일화), §7(DOTween), §9(불변식).
+`AGENTS.md`를 건너뛰면 같은 버그를 다시 만든다. 특히 §3(영수증), §5(판정 단일화), §7(DOTween), §9(불변식).
 
 ---
 
@@ -102,7 +102,7 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
 3. **추천 하나** — 근거와 함께. 나열만 하면 결정이 되돌아온다
 4. **영향 범위** — 에셋 몇 개, 코드 어디
 
-`docs/AGENT.md`(개발 컨벤션)도 마찬가지다. `CLAUDE.md`가 명시하듯 **임의 추가하지 말고 사용자에게 제안한다.**
+`AGENTS.md`(개발 컨벤션)도 마찬가지다. `CLAUDE.md`가 명시하듯 **임의 추가하지 말고 사용자에게 제안한다.**
 
 ---
 
@@ -112,7 +112,7 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
 - **초안 → 평가 → 수정 루프를 선호한다.** 결과물을 던지고 "평가"를 반복 요청한다. 비판은 구체적이고 근거 있게, 잘된 부분도 명시적으로
 - **결정을 물으면 추천을 원한다.** 선택지만 나열하면 다시 물어본다. 추천 하나 + 근거 + 대가를 함께
 - **스코프를 임의로 넓히지 않는다.** "선행작업 5개 진행"처럼 단위를 명시해 승인한다. 그 밖의 것은 발견해서 보고하되 손대지 않는다
-- **규칙에는 "왜"를 요구한다.** `AGENT.md` §0대로, 규칙을 어길 땐 먼저 말하고 주석에 이유를 남긴다
+- **규칙에는 "왜"를 요구한다.** `AGENTS.md` §0대로, 규칙을 어길 땐 먼저 말하고 주석에 이유를 남긴다
 - **검증 못 한 것은 못 했다고 말해야 한다.** 특히 컴파일 (아래 §6)
 - 커밋 메시지는 **한국어, 제목 한 줄 + 빈 줄 + 본문에 왜.** 버그 수정은 증상이 아니라 원인을 적는다
 
@@ -200,7 +200,7 @@ GameWaitState  ──(스왑)──→ GamePuzzleActionState ──→ GameActio
 - 승패 전이가 진짜로 연출 뒤가 된다. 그전까지는 동기 실행이라 우연히 지켜지고 있었다 (GDD §4.4)
 
 **끊을 땐 `Kill()`이 아니라 `Complete()`다.** `Kill()`은 `OnComplete`를 부르지 않아 완수 보고가
-증발하고 `GameActionState`가 영원히 멈춘다 (`AGENT.md` §8). `Complete()`는 최종 상태까지 밀어내므로
+증발하고 `GameActionState`가 영원히 멈춘다 (`AGENTS.md` §8). `Complete()`는 최종 상태까지 밀어내므로
 화면이 모델과 어긋난 채 남지도 않는다. 영수증은 이미 확정된 사실이라 스냅해도 수치가 안 어긋난다.
 
 실제로 끊기는 것은 **적 공격 연출뿐**이다. 배치 재생 중에는 `GameActionState`에 머물러
@@ -223,7 +223,7 @@ Wait 틱이 안 돌아 적 공격이 들어올 수 없다.
 인덱스는 **자리**에만 남아 있는데, 자리는 틀려도 즉시 눈에 보이고 수치에 영향이 없다.
 
 > `AttachView`는 위치를 확정한 **뒤에** `Init`을 부른다. `Init`이 시전 모션의 복귀 지점을
-> 캡처하기 때문이다. 순서가 뒤집히면 캐릭터가 프리팹 원점으로 돌아간다 (`AGENT.md` §3·§7).
+> 캡처하기 때문이다. 순서가 뒤집히면 캐릭터가 프리팹 원점으로 돌아간다 (`AGENTS.md` §3·§7).
 
 **최소 뷰다.** 사각 스프라이트 + HP·실드 게이지 + 뜨는 숫자뿐이고, 시간은 전부 `[SerializeField]`다.
 `TMP` 대신 레거시 `UI.Text`를 쓴 것도 TMP Essentials 임포트 절차를 끼워넣지 않으려는 것이다.
@@ -249,7 +249,7 @@ GameWaitState.OnUpdate() → GameManager.TickWait(deltaTime) → OnWaitTick
 플래그로 껐다 켰다 하지 않는다는 것이 요점이다. 플래그면 켜고 끄는 지점이 상태 수만큼 늘어난다.
 
 **② 승패 예약 (위로)** — 판정은 전장을 소유한 `BattleManager`가 하지만 **전이는 하지 않는다.**
-사망 즉시 전이하면 재생 중인 시퀀스가 남고 뷰가 누수된다 (GDD §4.4, `AGENT.md` §9).
+사망 즉시 전이하면 재생 중인 시퀀스가 남고 뷰가 누수된다 (GDD §4.4, `AGENTS.md` §9).
 
 ```
 Actor.OnDeath → BattleManager.HandleActorDeath → GameManager.RequestGameEnd(EGameResult)
@@ -312,9 +312,9 @@ Actor.OnDeath → BattleManager.HandleActorDeath → GameManager.RequestGameEnd(
 (스킬 1건당 연출 1건). 차이는 모델이 언제 바뀌느냐뿐이고, 번갈아 하면 이렇게 된다.
 
 - **연출이 끊기면 데미지가 사라진다.** 프레임 스파이크로 트윈이 스킵되면 그 스킬은 실행 자체가 안 된다.
-  `AGENT.md` §7이 적어둔 사고와 같은 원인인데, 결과가 "안 보임"이 아니라 "수치 증발"이라 재현도 안 된다
+  `AGENTS.md` §7이 적어둔 사고와 같은 원인인데, 결과가 "안 보임"이 아니라 "수치 증발"이라 재현도 안 된다
 - **배속이 밸런스를 건드린다.** GDD §4.7이 배속을 허용한 근거가 "연출 속도가 수치에 영향을 주지 않는다"인데 그게 깨진다
-- **정지 지점이 스킬 수만큼 는다** (`AGENT.md` §8)
+- **정지 지점이 스킬 수만큼 는다** (`AGENTS.md` §8)
 
 ### 레시피로 결과를 재계산할 수 없다
 "어차피 레시피에 다 있으니 연출 시점에 다시 계산하면 되지 않나"가 틀리는 이유다.
@@ -360,7 +360,7 @@ Actor.OnDeath → BattleManager.HandleActorDeath → GameManager.RequestGameEnd(
 
 ### 오버킬 시 연출을 끊지 마라
 적 HP 0에서 즉시 전이하면 진행 중인 시퀀스가 남고, `ReturnToPool()`이 안 불린 뷰가 `dataViewDict`에 남는다.
-`AGENT.md` §9의 불변식 `dataViewDict.Count == Size * Size`가 깨진다.
+`AGENTS.md` §9의 불변식 `dataViewDict.Count == Size * Size`가 깨진다.
 **수치는 즉시, 상태 전이는 `OnComplete` 이후.** (GDD §4.4)
 
 ### FSM 상태 클래스 이름
@@ -371,7 +371,7 @@ Actor.OnDeath → BattleManager.HandleActorDeath → GameManager.RequestGameEnd(
 ### 매니저를 새로 만들면 완수 보고를 잊지 마라
 **이번에 걸릴 뻔했다.** `BaseManager`를 상속하는 순간 `EGameState.Init` 구독자 수가 늘어나는데,
 `GameInitState`는 그 수만큼 완수 보고를 기다린다. `OnInit`에서 보고하지 않으면 `1/2`에서 멈추고
-**보드는 뜨는데 입력이 안 먹는다.** (`AGENT.md` §8)
+**보드는 뜨는데 입력이 안 먹는다.** (`AGENTS.md` §8)
 
 ### 영수증은 불변, 그 사이 세계는 변한다
 - **재정규화는 다음 스왑부터** — `Swap()`이 리필까지 다 뽑아둔 뒤라 이번 무브엔 반영 못 한다 (GDD §3.2.1)
@@ -381,7 +381,7 @@ Actor.OnDeath → BattleManager.HandleActorDeath → GameManager.RequestGameEnd(
 - 뷰는 게임 규칙을 판단하지 않는다. 연출만 하고 스킬 발동에 관여하지 않는다
 - `PuzzleManager`는 `Actor`를 직접 참조하지 않는다. 사망은 `BattleManager`가 `OnCharacterDied`로 재발행 (GDD §2.3, §3.2.1)
 - **하위 매니저끼리 직접 소통하지 않는다.** `GameManager`를 거친다.
-  단, **소비자가 하나뿐이면 중계를 놓지 않는다** — 전투 영수증이 `GameManager`를 안 거치는 이유다 (`AGENT.md` §10)
+  단, **소비자가 하나뿐이면 중계를 놓지 않는다** — 전투 영수증이 `GameManager`를 안 거치는 이유다 (`AGENTS.md` §10)
 
 ### 시계가 둘이다
 `GameTime`(프리즈 제외 유효 전투 시간, 적 타이머·위협도 윈도우)과 `Time.time`(DOTween 연출)은 **다른 시계다.**
@@ -457,7 +457,7 @@ Actor.OnDeath → BattleManager.HandleActorDeath → GameManager.RequestGameEnd(
 이어지면 Time Freeze가 도는 것이다. 발동 로그를 영수증과 따로 찍는 이유는, 영수증은 대상이
 없으면 아무것도 남기지 않아 **"적이 안 때렸다"와 "때렸는데 대상이 없었다"를 구별할 수 없기** 때문이다.
 
-**[9] 연출이 이 영수증을 소비하기 시작하면 셋 다 제거한다.** (`AGENT.md` §9 — 조사용 로그는 원인을 잡은 뒤 제거)
+**[9] 연출이 이 영수증을 소비하기 시작하면 셋 다 제거한다.** (`AGENTS.md` §9 — 조사용 로그는 원인을 잡은 뒤 제거)
 
 ---
 
@@ -508,13 +508,13 @@ GDD §2.4의 카탈로그도 마찬가지다. GDD-TODO가 "결정 완료"로 닫
 
 ## 8. 새 규칙을 만들게 되거든
 
-구현하다 보면 컨벤션으로 굳힐 만한 판단이 나온다. **`AGENT.md`에 임의로 추가하지 말고 제안한다.**
+구현하다 보면 컨벤션으로 굳힐 만한 판단이 나온다. **`AGENTS.md`에 임의로 추가하지 말고 제안한다.**
 
 **GDD도 마찬가지인데, 판단 기준이 "코드만 바뀌는가"가 아니라 "GDD 문장이 틀리게 되는가"다.**
 스킬 레시피 작성 주체를 옮긴 건 순수 리팩터링처럼 보였지만 GDD §4.5 문안을 무효화했고,
 사전 승인 없이 진행해 지적받았다. 착수 전에 GDD를 검색해 해당 문장이 있는지부터 본다.
 
-아래는 전투가 붙으면서 새로 생긴 불변식 후보다 (`AGENT.md` §9 확장 제안 대상).
+아래는 전투가 붙으면서 새로 생긴 불변식 후보다 (`AGENTS.md` §9 확장 제안 대상).
 
 - 살아있는 `Actor`의 `CurrentHP > 0`, 죽은 `Actor`는 어떤 타깃 목록에도 없다
 - 총 위협도 `>= BaseThreat` (실시간 누적은 음수가 되지 않는다)

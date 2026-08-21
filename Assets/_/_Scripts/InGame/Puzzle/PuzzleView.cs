@@ -80,7 +80,7 @@ public class PuzzleView : MonoBehaviour,
         if (highlightRing != null) baseRingOrder = highlightRing.sortingOrder;
     }
     // shellColor는 뷰가 스스로 판단하지 않습니다. 버블 색의 원천은 CharacterSO.mainColor이고
-    // 그 매핑은 PuzzleManager가 소유하므로 여기서는 받은 색을 칠하기만 합니다. (GDD §2.2, AGENT.md §1)
+    // 그 매핑은 PuzzleManager가 소유하므로 여기서는 받은 색을 칠하기만 합니다. (GDD §2.2, AGENTS.md §1)
     public void Injection(Bubble data, Color shellColor, Action<Bubble> down, Action<Bubble> up, Action<Bubble, bool> hover)
     {
         _data = data;

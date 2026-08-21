@@ -67,10 +67,10 @@ public class BattleManager : BaseManager
     // 적의 공격 주기를 세는 쪽. 실행은 이 매니저가 합니다.
     private EnemyController enemyController;
 
-    // 이 매니저가 만든 뷰. 전장을 다시 세울 때 걷어내는 주체가 하나여야 합니다. (AGENT.md §4)
+    // 이 매니저가 만든 뷰. 전장을 다시 세울 때 걷어내는 주체가 하나여야 합니다. (AGENTS.md §4)
     private readonly List<ActorView> spawnedViews = new List<ActorView>();
 
-    // 시계 로그를 마지막으로 찍은 GameTime. 매 프레임 찍으면 로그가 흐름을 덮습니다. (AGENT.md §9)
+    // 시계 로그를 마지막으로 찍은 GameTime. 매 프레임 찍으면 로그가 흐름을 덮습니다. (AGENTS.md §9)
     private float lastTickLogTime;
 
     // 버블 -> 시전자 역추적. (GDD §2.3)
@@ -105,7 +105,7 @@ public class BattleManager : BaseManager
         BuildBattlefield();
 
         // GameInitState는 Init 구독자 수만큼 완료 보고를 기다립니다.
-        // 여기서 보고하지 않으면 readyCount가 1/2에서 멈춰 게임이 Wait로 넘어가지 못합니다. (AGENT.md §8)
+        // 여기서 보고하지 않으면 readyCount가 1/2에서 멈춰 게임이 Wait로 넘어가지 못합니다. (AGENTS.md §8)
         gameManager.ReceiveCompleteSignal();
     }
 
@@ -148,7 +148,7 @@ public class BattleManager : BaseManager
         enemyController = new EnemyController(enemyAttackInterval);
 
         // 스킬 배선 검사는 부팅 시 한 번만 합니다. 실행 시점에 찍으면 적은 주기마다,
-        // 버블은 터질 때마다 반복됩니다. (AGENT.md §9)
+        // 버블은 터질 때마다 반복됩니다. (AGENTS.md §9)
         ValidateSkill(enemySkill, "적 스킬");
         foreach (var skill in skillCasters.Keys) ValidateSkill(skill, "버블 스킬");
 
@@ -169,7 +169,7 @@ public class BattleManager : BaseManager
     // Actor 하나에 뷰 하나를 만들어 붙입니다.
     //
     // 뷰가 없어도 전투는 그대로 돕니다. 수치와 영수증은 뷰를 모르기 때문입니다.
-    // 다만 조용히 넘어가면 "왜 화면이 안 움직이지"를 코드에서 찾게 되므로 한 번 알립니다. (AGENT.md §9)
+    // 다만 조용히 넘어가면 "왜 화면이 안 움직이지"를 코드에서 찾게 되므로 한 번 알립니다. (AGENTS.md §9)
     private void AttachView(Actor actor, ActorView prefab, Transform root, int seat,
                             string displayName, Color color, bool facingRight)
     {
@@ -188,7 +188,7 @@ public class BattleManager : BaseManager
         view.transform.localPosition = new Vector3(seat * allySpacing, 0f, 0f);
 
         // 위치를 확정한 **뒤에** Init을 부릅니다. Init이 시전 모션의 복귀 지점(homePos)을
-        // 캡처하므로, 순서가 뒤집히면 캐릭터가 프리팹 원점으로 돌아갑니다. (AGENT.md §3, §7)
+        // 캡처하므로, 순서가 뒤집히면 캐릭터가 프리팹 원점으로 돌아갑니다. (AGENTS.md §3, §7)
         view.Init(displayName, color, facingRight);
 
         spawnedViews.Add(view);
@@ -200,7 +200,7 @@ public class BattleManager : BaseManager
     // 실제로 적 스킬(E_0)이 전부 빈 채로 오래 지나갔고, 발동 로그를 붙이고서야 드러났습니다.
     //
     // 그래서 "무엇이 비었나"를 부팅 시점에 한 줄로 말하게 합니다. 값을 나열하는 로그가 아니라
-    // "이 스킬은 실행돼도 아무 일이 없다"는 불변식 위반을 찍는 것입니다. (AGENT.md §9)
+    // "이 스킬은 실행돼도 아무 일이 없다"는 불변식 위반을 찍는 것입니다. (AGENTS.md §9)
     private void ValidateSkill(SkillSO skill, string label)
     {
         if (skill == null)
@@ -301,7 +301,7 @@ public class BattleManager : BaseManager
         //    유지됩니다. GDD §4.5가 "두 구간 모두"라고 적어둔 그대로입니다.
         //  - 승패 전이가 진짜로 연출 뒤가 됩니다. 지금까지는 동기 실행이라 우연히 지켜졌습니다. (GDD §4.4)
         //
-        // 시퀀서가 없으면 아무도 이 상태를 끝내주지 않으므로 즉시 보고합니다. (AGENT.md §8)
+        // 시퀀서가 없으면 아무도 이 상태를 끝내주지 않으므로 즉시 보고합니다. (AGENTS.md §8)
         if (sequencer == null)
         {
             gameManager.ReceiveCompleteSignal();
@@ -372,7 +372,7 @@ public class BattleManager : BaseManager
     //
     // 플레이어와 적이 갈라지는 것은 여기까지 오는 길(시전자를 어떻게 찾는가, 수치를 어떻게 세는가)
     // 뿐이고, 타깃 검색·적용·기록·위협도는 완전히 같습니다. 적 공격용 실행 함수를 따로 만들면
-    // 경로가 둘이 되고, 이후 규칙이 하나만 고쳐질 때 한쪽이 조용히 틀려집니다. (AGENT.md §5)
+    // 경로가 둘이 되고, 이후 규칙이 하나만 고쳐질 때 한쪽이 조용히 틀려집니다. (AGENTS.md §5)
     //
     // 인자가 BubbleSO가 아니라 SkillSO인 것이 이 경계의 선언입니다.
     // **여기부터는 퍼즐 개념이 없습니다.** 연쇄 차수도 매치 개수도 이미 amount에 녹아 끝났고,
@@ -415,7 +415,7 @@ public class BattleManager : BaseManager
     }
 
     // 시계가 흐르는지, 그리고 연출 중에 멈추는지를 눈으로 보기 위한 임시 로그입니다.
-    // 화면에 전투가 보이기 시작하면 제거합니다. (AGENT.md §9)
+    // 화면에 전투가 보이기 시작하면 제거합니다. (AGENTS.md §9)
     //
     // 1초에 한 줄로 묶습니다. 매 프레임 찍으면 초당 수십 줄이라 다른 로그가 묻히고,
     // 무엇보다 "연출 중 멈춤"을 확인하려면 줄 간격이 곧 신호인데 그게 안 보입니다.
@@ -440,7 +440,7 @@ public class BattleManager : BaseManager
         int amount = Mathf.RoundToInt(skill.value);
 
         // 발동 자체를 먼저 찍습니다. 아래 영수증 로그는 대상이 없거나 빗나가면 아무것도 남기지 않아,
-        // "적이 안 때린 것"과 "때렸는데 대상이 없던 것"을 구별할 수 없습니다. (AGENT.md §9)
+        // "적이 안 때린 것"과 "때렸는데 대상이 없던 것"을 구별할 수 없습니다. (AGENTS.md §9)
         LogEnemyAttack();
 
         // 발동 시점에 수치를 영수증으로 선확정하고, 연출은 나중에 그 기록을 재생합니다. (GDD §4.2)
@@ -461,7 +461,7 @@ public class BattleManager : BaseManager
 
     // 적이 누구를 때리는지만 봐서는 HighestThreatEnemy가 정렬을 하는지, 그냥 명단 첫 번째를
     // 집는지 구별할 수 없습니다. 탱커가 계속 맞으면 두 경우의 결과가 같기 때문입니다.
-    // 그래서 후보 전원의 총 위협도를 함께 찍습니다. 화면이 생기면 제거합니다. (AGENT.md §9)
+    // 그래서 후보 전원의 총 위협도를 함께 찍습니다. 화면이 생기면 제거합니다. (AGENTS.md §9)
     private void LogEnemyAttack()
     {
         if (!logBattleTick) return;
@@ -469,7 +469,7 @@ public class BattleManager : BaseManager
         StringBuilder sb = new StringBuilder();
         sb.Append($"[BattleManager] 적 공격 발동 (GameTime {battlefield.GameTime:F1}s, 주기 {enemyAttackInterval}s) 위협도");
 
-        // 적 기준의 "적군"이 곧 아군 진영입니다. 상대 판정은 반드시 이 경로로 합니다. (AGENT.md §5)
+        // 적 기준의 "적군"이 곧 아군 진영입니다. 상대 판정은 반드시 이 경로로 합니다. (AGENTS.md §5)
         foreach (var actor in battlefield.EnemiesOf(enemyActor))
         {
             sb.Append($" {actor}={actor.GetTotalThreat(battlefield.GameTime):F0}");
@@ -480,7 +480,7 @@ public class BattleManager : BaseManager
     // ===================== 승패 판정 =====================
 
     // 전장을 소유한 쪽이 판정합니다. 다만 전이는 하지 않고 예약만 합니다 —
-    // 사망 시점에 곧바로 전이하면 진행 중인 연출 시퀀스가 남고 뷰가 누수됩니다. (GDD §4.4, AGENT.md §9)
+    // 사망 시점에 곧바로 전이하면 진행 중인 연출 시퀀스가 남고 뷰가 누수됩니다. (GDD §4.4, AGENTS.md §9)
     private void HandleActorDeath(Actor actor)
     {
         if (actor == null || gameManager == null) return;
@@ -535,7 +535,7 @@ public class BattleManager : BaseManager
 
     // 전투 결과 확인용 임시 로그입니다.
     //
-    // 연출이 붙었으니 원래는 여기서 제거할 자리인데(AGENT.md §9), HANDOFF §6에 남은 확인 2건 중
+    // 연출이 붙었으니 원래는 여기서 제거할 자리인데(AGENTS.md §9), HANDOFF §6에 남은 확인 2건 중
     // "죽은 캐릭터 버블의 스킬 무효화"가 **이 로그에 안 나오는 것**을 통과 기준으로 삼고 있습니다.
     // 그 검증을 마치면 이 함수와 logBattleTick을 함께 걷어냅니다.
     private void ReportBattleReceipt(BattleReceipt battle)

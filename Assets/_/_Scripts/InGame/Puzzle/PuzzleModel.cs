@@ -248,7 +248,7 @@ public class PuzzleModel
                     if (targetBubble == null) continue;
 
                     // [중요] 스펙은 지금 확보합니다. 연출 중에는 Bubble.Spec이 이미 null입니다.
-                    // 같은 덩어리는 매치 규칙상 SOName이 모두 같으므로 하나만 잡으면 됩니다. (AGENT.md §3)
+                    // 같은 덩어리는 매치 규칙상 SOName이 모두 같으므로 하나만 잡으면 됩니다. (AGENTS.md §3)
                     if (groupSpec == null) groupSpec = targetBubble.Spec;
 
                     cells.Add(new MoveStep(targetBubble, pos, pos));
@@ -274,7 +274,7 @@ public class PuzzleModel
     // 보드 전체에서 성립 중인 매치를 "그룹 단위"로 수집합니다.
     //
     // 예전에는 여기서 가로/세로 런을 따로 스캔했는데, 그건 GetLineMatchGroup과
-    // 같은 질문("무엇이 매치인가")에 답하는 두 번째 구현이었습니다. (AGENT.md §5)
+    // 같은 질문("무엇이 매치인가")에 답하는 두 번째 구현이었습니다. (AGENTS.md §5)
     // 지금은 GetLineMatchGroup 하나만 쓰고, 덤으로 그룹 경계가 보존됩니다.
     private List<HashSet<Vector2Int>> GetAllMatchGroups()
     {

@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     // 덱은 전투 전체의 데이터이고 소비자가 둘입니다.
     // PuzzleManager(버블 색 매핑, 스포닝 비율)와 BattleManager(Actor 3인 생성).
     // 각자 [SerializeField]로 들면 배선이 두 벌이 되고, 어긋나면 화면의 버블 색과
-    // 실제 필드에 선 캐릭터가 다른 덱을 가리키게 됩니다. (AGENT.md §5)
+    // 실제 필드에 선 캐릭터가 다른 덱을 가리키게 됩니다. (AGENTS.md §5)
     //
     // 소유는 여기, 파생(BubbleSO -> CharacterSO 매핑 등)은 각 매니저가 만듭니다. (GDD §2.3)
     // 하위 매니저는 아무 때나 읽지 않고 Init 브로드캐스트를 받은 OnInit 안에서만 읽습니다.
@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     }
 
     // 꺼내 가면 보관소는 비워집니다. 스킬은 멱등이 아니라 두 번 꺼내면 두 번 맞습니다.
-    // 소비 지점을 여기 하나로 두는 이유입니다. (AGENT.md §4의 반납 주체 규칙과 같은 이유)
+    // 소비 지점을 여기 하나로 두는 이유입니다. (AGENTS.md §4의 반납 주체 규칙과 같은 이유)
     public MoveReceipt ConsumeMoveReceipt()
     {
         MoveReceipt ret = pendingReceipt;
@@ -119,7 +119,7 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     // 승패 판정은 전장을 소유한 BattleManager가 하지만, 전이 시점은 다릅니다.
     // 수치와 사망은 즉시 확정하되 상태 전이는 진행 중인 연출이 완주한 뒤로 미룹니다.
     // 즉시 전이하면 재생 중이던 시퀀스가 남고 ReturnToPool()이 안 불린 뷰가
-    // dataViewDict에 남아 불변식이 깨집니다. (GDD §4.4, AGENT.md §9)
+    // dataViewDict에 남아 불변식이 깨집니다. (GDD §4.4, AGENTS.md §9)
     //
     // 그래서 판정하는 쪽은 여기에 결과를 적어두기만 하고,
     // 연출이 끝나는 지점(GameActionState의 완수, GameWaitState의 틱)이 확인해 전이합니다.
@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     //
     // MoveReceipt가 중계를 타는 건 생산자(PuzzleManager)와 소비자(BattleManager)가 다른
     // 매니저이기 때문입니다. 전투 영수증은 BattleManager가 만들고 아직 소비자가 없어
-    // 중계할 이유가 없습니다. 연출 담당이 별도 매니저로 생기면 그때 같은 모양으로 놓습니다. (AGENT.md §10)
+    // 중계할 이유가 없습니다. 연출 담당이 별도 매니저로 생기면 그때 같은 모양으로 놓습니다. (AGENTS.md §10)
 
     // 4. 특정 상태를 기다리는 구독자(하위 매니저) 수 반환
     public int GetSubscriberCount(EGameState state)

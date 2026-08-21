@@ -57,7 +57,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
     // 바로 그 지점에서 조용히 풀려 게임 오버 후에도 스왑이 됩니다.
     private bool isGameOver;
 
-    // 입력을 받아도 되는가. 묻는 곳이 넷이므로 답하는 곳은 여기 하나만 둡니다. (AGENT.md §5)
+    // 입력을 받아도 되는가. 묻는 곳이 넷이므로 답하는 곳은 여기 하나만 둡니다. (AGENTS.md §5)
     private bool CanAcceptInput => !IsFreeze && !isGameOver;
 
     protected override void Awake()
@@ -88,7 +88,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
     // 전투가 끝나면 보드는 더 이상 입력을 받지 않습니다. (GDD §4.4)
     //
     // GameEndState는 완수 보고를 세지 않으므로 여기서 보고하지 않습니다.
-    // 보고하면 "완수 보고를 받지 않는 상태"라는 경고만 남습니다. (AGENT.md §8)
+    // 보고하면 "완수 보고를 받지 않는 상태"라는 경고만 남습니다. (AGENTS.md §8)
     private void HandleOnGameEnd()
     {
         isGameOver = true;
@@ -125,7 +125,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
     }
     // ===================== 버블 색 =====================
     //
-    // 색을 묻는 곳이 여럿 생기므로 답하는 함수는 여기 하나만 둡니다. (AGENT.md §5)
+    // 색을 묻는 곳이 여럿 생기므로 답하는 함수는 여기 하나만 둡니다. (AGENTS.md §5)
     private void BuildSkillOwnerMap()
     {
         skillOwners.Clear();
@@ -201,7 +201,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         if (!aliveCharacters.Remove(character)) return;
 
         // 현재 스왑의 리필은 MoveReceipt에 이미 확정돼 있습니다. 전투 실행 중 들어온 이 갱신은
-        // 다음 스왑이 새 버블을 요청할 때부터 적용됩니다. (GDD §3.2.1, AGENT.md §3)
+        // 다음 스왑이 새 버블을 요청할 때부터 적용됩니다. (GDD §3.2.1, AGENTS.md §3)
         RefreshSpawnCandidates();
     }
 

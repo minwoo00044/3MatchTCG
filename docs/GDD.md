@@ -14,7 +14,7 @@
 ### 2.1 덱 편성
 - **덱 구성**: 총 **3명의 캐릭터 카드**로 1개의 전투 덱을 편성한다.
 
-### 2.2 캐릭터 스킬 및 시각 매핑 규칙 (AGENT.md §6 준수)
+### 2.2 캐릭터 스킬 및 시각 매핑 규칙 (AGENTS.md §6 준수)
 - **캐릭터별 스킬 수**: 캐릭터 1명당 **3개의 전용 스킬**을 보유한다. (덱 전체 총 9개 스킬)
 - **1 스킬 ↔ 1 버블 매핑**: 캐릭터의 각 스킬은 인게임의 **전용 버블 1종류와 1:1로 대응**한다.
 - **시각 매핑 규칙 (Single Source of Truth)**:
@@ -25,14 +25,15 @@
   - **스킬 3종**: 캐릭터 색상 바탕 위 고유 문양/아이콘(Icon 1, 2, 3)으로 구별.
 - **스킬(버블) 가중치 및 위협도 배수**: 
   - `BubbleSO.spawnWeight` 필드를 통해 버블 생성 가중치를 부여한다.
-  - `BubbleSO.threatMultiplier` 필드(기본값 1.0)를 통해 스킬별 위협도 누적 가중치를 부여한다.
+  - 각 `SkillEffect.threatMultiplier` 필드(기본값 1.0)를 통해 효과별 위협도 누적 가중치를 부여한다.
 
 ### 2.3 캐릭터 및 덱 데이터 구조 명세 (Character & Deck SO)
 - **스킬 데이터 계층 (`SkillSO` / `BubbleSO`)**:
-  - `SkillSO`: 전투가 실행할 수 있는 스킬 1건. `SOName`, `action`, `target`, `value`, `threatMultiplier`.
+  - `SkillSO`: 전투가 실행할 수 있는 스킬 1건. `SOName`과 1개 이상의 `SkillEffect` 모듈 목록을 갖는다.
+  - `SkillEffect`: 하나의 독립 효과. `action`, `target`, `value`, `threatMultiplier`를 갖는다. 한 스킬이 회복·증폭처럼 여러 효과를 조합할 수 있지만, 각 효과를 결합한 전용 액션 클래스를 만들지 않는다.
   - `BubbleSO : SkillSO`: **보드에서 뽑히고 터지는** 스킬. 위에 더해 `bubbleImage`(시각), `spawnWeight`(스포닝), `chainWeights`(연쇄 배율)를 갖는다.
   - 적 NPC 스킬은 보드에 존재하지 않으므로 `SkillSO`를 직접 사용한다 (§4.2).
-  - **근거**: 적 스킬이 `BubbleSO`이면 `chainWeights`를 들고 있게 되는데, §4.2는 적 데미지에 `chainWeight`를 곱하지 않는다고 규정한다. 에셋과 규칙이 서로 다른 말을 하는 상태가 되어 이후 잘못 연결될 여지를 남긴다 (AGENT.md §6).
+  - **근거**: 적 스킬이 `BubbleSO`이면 `chainWeights`를 들고 있게 되는데, §4.2는 적 데미지에 `chainWeight`를 곱하지 않는다고 규정한다. 에셋과 규칙이 서로 다른 말을 하는 상태가 되어 이후 잘못 연결될 여지를 남긴다 (AGENTS.md §6).
   - 전투 실행 경로(`SkillContext`, `BattleStep`)는 `SkillSO`를 받는다. 타입 경계가 곧 "퍼즐 개념이 끝나는 지점"이며, 그 아래에서는 `matchCount`·`chainIndex`를 다시 꺼낼 수 없다.
 - **`CharacterSO` 데이터 구조**:
   - `characterName`, `characterImage`, `mainColor` (시각 및 메타 정보)
@@ -40,7 +41,7 @@
   - `skills`: 해당 캐릭터의 전용 `BubbleSO` 3개 배열
 - **덱(`DeckSO`) 데이터 구조**:
   - `CharacterSO` 3개 리스트로 1개의 플레이어 전투 덱을 편성한다.
-- **계층 분리 및 시전자(`caster`) 역참조 규칙 (AGENT.md §1 준수)**:
+- **계층 분리 및 시전자(`caster`) 역참조 규칙 (AGENTS.md §1 준수)**:
   - `PuzzleManager`는 정적 파이프(`DeckSO` ↔ `BubbleSO`)와 스포닝 비율만 다루며, `Actor` 인스턴스를 직접 참조하지 않는다.
   - `BattleManager`가 전투 시작 시 `CharacterSO` ↔ `Actor` 런타임 매핑을 소유하고, 스킬 레시피 실행 시 `BubbleSO` 스냅샷을 바탕으로 시전자 `PlayerActor`를 역추적하여 `FindTarget(caster)`에 전달한다.
 
@@ -80,8 +81,8 @@
 - **스포닝 제외 및 재정규화**: 
   - 특수 버블(`T_O`) 10% 지분 고정.
   - 캐릭터 1인 사망 시, 남은 생존 캐릭터 2인 각 45% + 특수 버블 10% = 100% 비율로 재정규화하며, 45% 내에서는 해당 생존 캐릭터의 3개 스킬 `spawnWeight` 비율로 최종 추첨한다.
-  - **적용 시점**: 사망 발생 후 **다음 스왑(Swap) 조작부터 적용**된다 (현재 조작으로 진행 중인 연쇄의 리필 버블은 이미 불변 영수증으로 확정된 상태임 - AGENT.md §3 준수).
-  - **아키텍처 규칙 (AGENT.md §1 계층 분리 준수)**: `BattleManager`가 `Actor` 사망 이벤트를 처리하여 `CharacterSO` 단위 사망 이벤트(`OnCharacterDied`)를 재발행하고, `PuzzleManager`가 이를 구독하여 갱신된 비율을 순수 클래스인 `PuzzleFactory`에 주입한다.
+  - **적용 시점**: 사망 발생 후 **다음 스왑(Swap) 조작부터 적용**된다 (현재 조작으로 진행 중인 연쇄의 리필 버블은 이미 불변 영수증으로 확정된 상태임 - AGENTS.md §3 준수).
+  - **아키텍처 규칙 (AGENTS.md §1 계층 분리 준수)**: `BattleManager`가 `Actor` 사망 이벤트를 처리하여 `CharacterSO` 단위 사망 이벤트(`OnCharacterDied`)를 재발행하고, `PuzzleManager`가 이를 구독하여 갱신된 비율을 순수 클래스인 `PuzzleFactory`에 주입한다.
 - **보드 잔여 버블 처리 & 사망 무효화 판정**: 
   - 이미 보드에 배치되어 있던 사망 캐릭터의 버블은 3매치 조작 및 연쇄 팝(터짐)은 가능하지만, **스킬 효과는 발동하지 않고 단순 파괴 연출만 수행**한다.
   - **사망 스킬 무효화 판정 시점**: 레시피 작성 시점이 아닌 **스킬 실행 시점(시퀀스 콜백 발화 시점)**에 판단하여, 연쇄 진행 중 중간 사망 발생 시에도 안전하게 무효화한다.
@@ -90,9 +91,11 @@
 
 ### 3.3 공용 특수 버블 (`T_O`) 규칙
 - **설정 방식 & 슬롯**: T_O 특수 버블은 **전용 1개 슬롯** (10% 스포닝 지분)을 사용한다.
+- **복합 효과 구성**: T_O는 공용 버블 전용 결합 액션을 사용하지 않고, 재사용 가능한 독립 모듈인 `AmplifyAction`과 `HealAction`을 조합한다. 공용 버블과 캐릭터 버블은 할당 가능한 액션 종류에 원칙적인 차이를 두지 않는다.
 - **T_O 스킬 효과 및 수치 연산 공식**:
-  - **증폭 배율**: 개수와 무관하게 고정 **1.2배 증폭** (동일 스왑 퍼즐 연쇄 조작 구간 내 2개 이상 파괴 시 합연산 1.4배, 최대 상한 2.0배).
-  - **회복량**: `50 × matchCount` (1버블당 50 기본 수치 공식을 따름). 체력 비율이 가장 낮은 아군 1인 회복.
+  - **증폭 중첩 단위**: 연결된 T_O **매치 그룹 1건(스킬 레시피 1건)당 +0.2배**를 합연산한다. 한 그룹이 3매치인지 5매치인지는 증폭량에 영향을 주지 않는다.
+  - **증폭 배율**: 1회 발동 시 1.2배, 동일 스왑 안의 2번째 T_O 매치 그룹 발동 시 1.4배, 3번째는 1.6배로 증가하며 최대 상한은 2.0배다.
+  - **회복량**: 기본 수치는 `50 × matchCount × chainWeight(chainIndex)`이며, 선배치된 증폭 효과를 **T_O 자신의 회복에도 즉시 적용**한다. 체력 비율이 가장 낮은 아군 1인을 회복한다.
 - **지속 범위**: 증폭 효과는 플레이어가 퍼즐을 조작하여 발생한 **해당 1회 스왑(MoveReceipt 전체) 퍼즐 연쇄 조작 구간** 동안 유지된다 (`PuzzleWaitState` 복귀 시 리셋).
 - **시전자(Caster) 자동 지정**: T_O 버블 발동 시 타겟팅 연산을 위한 시전자(`caster`)는 **현재 생존 아군 캐릭터 중 `BaseThreat`가 가장 높은 캐릭터**로 자동 지정된다.
 
@@ -111,9 +114,9 @@
   - **총 위협도 (Total Threat) 산출 공식**: `총 위협도 = BaseThreat + 실시간 누적 Threat`
     - 이를 통해 탱커 B는 기본 Baseline(`BaseThreat: 300`)과 쉴드부여/도발 스킬(`threatMultiplier: 1.5~5.0`)을 통해 딜러 A(`BaseThreat: 100`, 평균 위협도) 대비 상시 및 전투 진행 중 우위의 어그로를 안정적으로 유지한다.
 - **타겟팅 생존자 전용 필터**: 사망한 대상(`IsDead == true`)은 모든 타겟팅 룰의 기본 대상 검색에서 즉시 제외된다.
-- **모델 진실 및 이벤트 수치 적용 (AGENT.md §3 준수)**: 
+- **모델 진실 및 이벤트 수치 적용 (AGENTS.md §3 준수)**:
   - 모델의 스탯(`CurrentHP`, `IsDead`) 및 이벤트(`OnHPChanged`, `OnDeath`)는 계산 및 영수증 작성 시점에 **즉시 변경 및 발화**한다.
-  - UI(HP바)는 모델을 조급하게 직접 읽지 않고 영수증 타임라인(DOTween `InsertCallback`)을 순차적으로 소비하여 연출 타격 시점에 맞춰 체력바 감소를 시각화한다 (AGENT.md §3 준수).
+  - UI(HP바)는 모델을 조급하게 직접 읽지 않고 영수증 타임라인(DOTween `InsertCallback`)을 순차적으로 소비하여 연출 타격 시점에 맞춰 체력바 감소를 시각화한다 (AGENTS.md §3 준수).
 
 ### 4.2 적 NPC 규격 및 실시간 적 공격 제어
 - **적 NPC 기본 스탯 및 수치 연산**:
@@ -127,11 +130,11 @@
 - **유효 전투 시간 시계 (`GameTime`)**: 적 공격 타이머 및 위협도 10초 윈도우 시계는 Time Freeze 구간을 제외한 **실제 유효 전투 시간(`GameTime`)**을 공용 시계로 사용한다.
 
 ### 4.3 ScriptableObject 기반 자동 타겟팅 (ActionTarget System)
-- **원칙 (AGENT.md §1, §5 준수)**: 타겟팅 로직은 기존 `ActionTarget` ScriptableObject 계층 구조를 단일 원천(Single Source of Truth)으로 유지한다.
+- **원칙 (AGENTS.md §1, §5 준수)**: 타겟팅 로직은 기존 `ActionTarget` ScriptableObject 계층 구조를 단일 원천(Single Source of Truth)으로 유지한다.
 - **시전자 상대 기준 통일**: 모든 타겟팅 로직은 **시전자(Caster) 상대 기준**으로 적용된다 (`ActionTarget.FindTarget(Actor caster)`).
   - **아군 (`caster.Team` 동일)**: 플레이어 스킬 기준 플레이어 캐릭터 3인, 적 NPC 스킬 기준 적 NPC 팀.
   - **적군 (`caster.Team` 반대)**: 플레이어 스킬 기준 적 NPC 팀, 적 NPC 스킬 기준 플레이어 캐릭터 3인.
-- **계층 분리 (AGENT.md §1)**: 뷰(`PuzzleMatrixView`)는 콜백 시 ChainStep 인덱스만 전달하고, 스킬 해석 및 타깃 연산은 `PuzzleManager`와 `BattleManager`가 담당한다.
+- **계층 분리 (AGENTS.md §1)**: 뷰(`PuzzleMatrixView`)는 콜백 시 ChainStep 인덱스만 전달하고, 스킬 해석 및 타깃 연산은 `PuzzleManager`와 `BattleManager`가 담당한다.
 - **`ActionTarget` 에셋 및 클래스 목록 (7종 확정)**:
   - `HighestThreatEnemy`: 위협도가 가장 높은 적 대상 (적 NPC 공격의 기본 타겟팅 규칙)
   - `LowestHPAlly`: 체력 비율이 가장 낮은 아군 대상
@@ -144,40 +147,48 @@
 ### 4.4 승패 조건 및 FSM 상태 네이밍 (Win / Loss Conditions & FSM Naming)
 - **승리 조건**: 적 NPC HP <= 0 ➡️ 스테이지 클리어 (`GameEndState`)
 - **패배 조건**: 플레이어 캐릭터 3인 중 **2명 사망** (생존자 1명 이하) ➡️ 게임 오버 (`GameEndState`)
-- **FSM 상태 자동 등록 규칙 준수 (AGENT.md §2)**: 
+- **FSM 상태 자동 등록 규칙 준수 (AGENTS.md §2)**:
   - enum 값을 `EGameState.End`로 명시하여 `GameManager`(owner = "Game")와 결합 시 상태 클래스명이 **`GameEndState`**로 정확히 일치하도록 등록한다.
   - 스킬 실행 전용 상태는 enum 값 `EGameState.Action` / 클래스 `GameActionState`로 등록한다 (§4.5).
   - 미사용 `EGameState.CharacterAction` 상태는 1차 MVP 스코프에서 완전 삭제.
-- **연출 완주 및 전이 연기 (Overkill 방지)**: 오버킬 또는 사망 상황이 발생하더라도 수치 및 영수증은 즉시 반영하되, **승패 상태 전이는 진행 중인 퍼즐 연출 시퀀스가 완전히 종료(완주)된 뒤에 수행**한다 (뷰/오브젝트 풀 누수 및 불변식 깨짐 방지 - AGENT.md §9 준수).
+- **연출 완주 및 전이 연기 (Overkill 방지)**: 오버킬 또는 사망 상황이 발생하더라도 수치 및 영수증은 즉시 반영하되, **승패 상태 전이는 진행 중인 퍼즐 연출 시퀀스가 완전히 종료(완주)된 뒤에 수행**한다 (뷰/오브젝트 풀 누수 및 불변식 깨짐 방지 - AGENTS.md §9 준수).
 
 ### 4.5 영수증(Skill Recipe) 생성 및 전용 상태 실행 규칙
 - **생성 시점 및 단품 정의**:
   - `PuzzleModel.Swap()` 시점에 전체 연출 영수증(`MoveReceipt`)을 생성할 때, 각 연쇄 단계(`ChainStep`)별로 터진 **매치 그룹(`MatchGroup`)**을 기록하고 그 버블의 `BubbleSO` 스펙을 스냅샷으로 확보한다.
   - **스킬 레시피 1건의 정의**: 1개의 연결된 **매치 그룹(Match Group - 직선 연결 덩어리)**을 스킬 레시피 1건으로 산정한다.
   - **작성 주체 (계층 분리)**: 퍼즐은 "무슨 버블이 몇 차 연쇄에 몇 개 터졌는가"라는 **보드 사실만** 기록하며, 스킬·시전자·수치 같은 전투 개념을 알지 않는다. 매치 그룹을 스킬 레시피로 해석하는 것은 `BattleManager`의 책임이다.
-    - **근거**: `matchCount`와 `chainIndex`는 매치 그룹 구조에서 파생되는 값이라 퍼즐이 따로 적으면 같은 사실에 대한 기록이 두 벌이 된다(AGENT.md §5). 퍼즐이 반드시 잡아야 하는 것은 풀 반납으로 소멸하는 `BubbleSO` 스펙 하나뿐이다.
+    - **근거**: `matchCount`와 `chainIndex`는 매치 그룹 구조에서 파생되는 값이라 퍼즐이 따로 적으면 같은 사실에 대한 기록이 두 벌이 된다(AGENTS.md §5). 퍼즐이 반드시 잡아야 하는 것은 풀 반납으로 소멸하는 `BubbleSO` 스펙 하나뿐이다.
 - **실행 시점 규칙 (전용 FSM 상태)**:
   - 스킬 실행은 퍼즐 연쇄 연출이 **전부 끝난 뒤** 전용 상태(`EGameState.Action` / `GameActionState`)에서 일괄 수행한다.
   - 전체 흐름: `GameWaitState` → (유저 스왑) → `GamePuzzleActionState`(연쇄 연출 완주) → **`GameActionState`(스킬 실행)** → `GameWaitState`
   - 뷰(`PuzzleMatrixView`)는 연출만 담당하며 스킬 발동에 관여하지 않는다. 연출 완주 시 `PuzzleManager`가 `MoveReceipt`를 `GameManager`에 제출하고, `GameActionState`의 브로드캐스트를 받은 `BattleManager`가 이를 꺼내어 **연쇄 차수 순서대로** 스킬 레시피로 해석해 실행한다.
   - **근거**: 스킬 실행이 DOTween 시퀀스 내부에서 일어나면 `GameManager`가 전투 흐름의 주도권을 갖지 못하고, 캐릭터 공격 모션·데미지 표시 등 스킬 연출을 놓을 시간축이 퍼즐 낙하 연출과 겹친다. 또한 §4.4의 "상태 전이는 연출 완주 후" 규칙과 자연히 일치한다.
   - Time Freeze는 `GamePuzzleActionState`와 `GameActionState` **두 구간 모두**에서 유지된다.
-- **선(先)배치 실행 규칙**: 하나의 연쇄 차수 안에 이후 스킬에 영향을 주는 효과(증폭/버프 등)가 포함된 경우, **`BattleManager`가 스킬 레시피로 해석할 때 그 차수 목록의 가장 앞(0번 인덱스)에 우선 배치하여 선발동**하도록 보장한다. 정렬 범위는 해당 차수 내부로 한정하며, 앞선 차수로 소급하지 않는다. 선발동 여부는 버블이 아니라 액션의 성질이므로 `GameAction.IsPreemptive`가 답한다.
+- **복합 효과 실행 규칙**: `SkillSO`의 한 스킬 레시피는 1개 이상의 `SkillEffect`를 목록 순서대로 실행한다. 각 효과는 독립된 `action`, `target`, `value`, `threatMultiplier`를 사용하지만, 퍼즐 기본 파워는 레시피 단위로 한 번만 계산해 공유한다.
+- **선(先)배치 실행 규칙**:
+  - 하나의 연쇄 차수 안에 이후 스킬에 영향을 주는 효과(증폭/버프 등)가 포함된 경우, **`BattleManager`가 스킬 레시피로 해석할 때 그 차수 목록의 가장 앞(0번 인덱스)에 우선 배치하여 선발동**하도록 보장한다.
+  - 복합 스킬 내부에서도 `GameAction.IsPreemptive`인 효과를 일반 효과보다 먼저 실행한다. 따라서 T_O는 증폭을 먼저 등록한 뒤 자신의 회복을 실행하며, 해당 회복부터 증폭 배율을 적용받는다.
+  - 정렬 범위는 해당 차수 내부로 한정하며 앞선 차수로 소급하지 않는다. 앞선 차수에서 이미 등록된 증폭은 같은 `MoveReceipt`의 후속 차수까지 유지된다.
+  - 선발동 여부는 버블 종류가 아니라 액션의 성질이므로 `GameAction.IsPreemptive`가 단일 원천으로 답한다. 나머지 레시피와 효과의 상대 순서는 안정 정렬로 보존한다.
 - **기록 데이터 항목 (Null Safety)**:
-  - 퍼즐(`MatchGroup`): `BubbleSO` 스펙 참조 (스냅샷 복사: 풀 반납 후 `_spec` null 방지 - AGENT.md §3 준수), 터진 칸 목록
+  - 퍼즐(`MatchGroup`): `BubbleSO` 스펙 참조 (스냅샷 복사: 풀 반납 후 `_spec` null 방지 - AGENTS.md §3 준수), 터진 칸 목록
   - 전투(`SkillRecipe`): `BubbleSO` 스펙, `matchCount`(해당 매치 그룹으로 터진 버블 개수), `chainIndex`(발생한 체인 순서, 1-based index)
 - **전투 영수증(`BattleReceipt`) - 실행 결과 기록**:
   - `GameActionState`에서 스킬을 전부 실행하며 **대상 1명당 1건**씩 결과를 순서대로 기록한다. 담긴 순서가 곧 실행 순서이자 연출 순서다.
   - 기록 항목: 시전자 / `SkillSO` 스펙(버블 스킬과 적 스킬이 같은 타임라인에 얹힌다) / 대상 / 효과 종류(피해·회복·실드) / **요청량**(위협도 산정 기준) / **실제 적용량**(화면 표시 기준) / 적용 직후 HP·실드 / 이 타격으로 사망했는지
   - **연출은 이 기록을 재생하며, 재생 시점에 모델을 다시 조회하지 않는다.** 스킬 1건당 연출 1건으로 순차 재생하는 것은 이 기록 위에서 자유롭게 구성한다.
-  - **근거**: 스킬 레시피만으로는 실행 결과를 재계산할 수 없다. 타겟팅이 의존하는 상태(체력 순위, 위협도, 생존 여부)를 같은 배치의 스킬들이 바꾸고, `RandomActor`는 다시 뽑으면 다른 대상이 나오며, 실드 흡수 분해와 오버킬 초과분은 애초에 재계산으로 얻을 수 없다. 퍼즐이 `MoveReceipt`를 쓰는 것과 같은 이유이며 같은 구조다 (AGENT.md §3).
+  - **근거**: 스킬 레시피만으로는 실행 결과를 재계산할 수 없다. 타겟팅이 의존하는 상태(체력 순위, 위협도, 생존 여부)를 같은 배치의 스킬들이 바꾸고, `RandomActor`는 다시 뽑으면 다른 대상이 나오며, 실드 흡수 분해와 오버킬 초과분은 애초에 재계산으로 얻을 수 없다. 퍼즐이 `MoveReceipt`를 쓰는 것과 같은 이유이며 같은 구조다 (AGENTS.md §3).
 
 ### 4.6 스킬 수치 계산 공식
-- **최종 수치 공식**: `최종 수치 = value × matchCount × chainWeight(chainIndex)`
-  - `value`: 1버블당 기본 수치 (`addPerBubble` 필드는 제거)
+- **스킬 기본 파워**: `skillPower = matchCount × chainWeight(chainIndex)`. 한 매치 그룹에서 한 번만 계산하며 그 레시피의 모든 효과가 공유한다.
+- **일반 수치 효과의 최종 공식**: `최종 수치 = SkillEffect.value × skillPower × 현재 증폭 배율`
+  - `SkillEffect.value`: 해당 효과의 기본 수치 또는 계수
   - `matchCount`: 해당 매치 그룹으로 터진 버블 개수
   - `chainWeight(chainIndex)`: 체인 횟수에 따른 가중치 배율 (기본값 1.0, `BubbleSO` 내 설정)
+- **고정 수치 효과**: 증폭·버프처럼 매치 개수와 무관한 액션은 `skillPower`를 곱하지 않고 `SkillEffect.value`를 고정 수치로 사용한다. 이 여부는 에셋마다 선택하는 플래그가 아니라 `GameAction` 종류의 고정된 의미로 정의하여 같은 액션의 배율 규칙이 에셋별로 달라지지 않게 한다.
+- **T_O 증폭 적용 순서**: `AmplifyAction`이 매치 그룹 1건당 현재 증폭 배율에 `+0.2`를 먼저 합산하고 2.0배로 제한한 뒤, 같은 레시피의 `HealAction`을 포함한 후속 일반 수치 효과가 갱신된 배율을 사용한다.
 
-### 4.7 연출 속도 BM 방어선 및 QoL 배속 구분 (AGENT.md §10 연계)
+### 4.7 연출 속도 BM 방어선 및 QoL 배속 구분 (AGENTS.md §10 연계)
 - **Gameplay 고정 요소**: Time Freeze(연출 중 적 타이머 정지)는 큰 연쇄일수록 데미지와 시간 이득을 동시에 주는 핵심 플레이 보상 메커니즘이다. 따라서 퍼즐/스킬 연출 속도(Animation Speed)는 게임 플레이 밸런스(Gameplay)의 핵심 고정 파라미터이며, 코스메틱 상품(스킨 등)으로 변경될 수 없다.
 - **QoL 게임 배속**: 편의 기능을 위한 게임 전체 배속(1x, 2x 등 QoL)은 적 타이머와 연출 속도를 동등한 비율로 스케일링하므로 전투 밸런스 구조를 해치지 않는 정당한 편의 기능으로 허용된다.

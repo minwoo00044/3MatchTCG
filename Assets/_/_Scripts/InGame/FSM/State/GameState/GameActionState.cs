@@ -10,7 +10,7 @@ using UnityEngine;
 // 다른 하나는 캐릭터 공격 모션 같은 스킬 연출을 놓을 시간축을 확보하기 위함입니다.
 //
 // 클래스 이름 주의: AutoInsertStates()가 "{Owner}{State}State"로 찾습니다.
-// GameManager -> "Game", EGameState.Action -> GameActionState. (AGENT.md §2)
+// GameManager -> "Game", EGameState.Action -> GameActionState. (AGENTS.md §2)
 public class GameActionState : BaseState<EGameState, GameManager>, IBroadcastableState, IReportableState
 {
     private Action _cachedBroadCastAction;
@@ -38,7 +38,7 @@ public class GameActionState : BaseState<EGameState, GameManager>, IBroadcastabl
         if (totalTargetCount == 0)
         {
             // 스킬을 해석할 구독자가 없다는 뜻입니다. 이 턴의 전투가 통째로 사라집니다.
-            // 상태에서 나가는 길은 확보해야 하므로 흘려보내되 조용히 넘기지는 않습니다. (AGENT.md §8)
+            // 상태에서 나가는 길은 확보해야 하므로 흘려보내되 조용히 넘기지는 않습니다. (AGENTS.md §8)
             if (owner != null && owner.HasPendingMoveReceipt)
             {
                 Debug.LogWarning("[GameActionState] 스킬을 해석할 구독자가 없어 이번 턴의 영수증을 버립니다.");
@@ -57,7 +57,7 @@ public class GameActionState : BaseState<EGameState, GameManager>, IBroadcastabl
     {
         // 퍼즐 연쇄와 스킬 실행이 모두 끝난 지점입니다.
         // 사망과 수치는 실행 도중 이미 확정됐지만 승패 전이는 여기까지 미뤄 둔 것입니다.
-        // 오버킬로 즉시 전이하면 재생 중인 시퀀스가 남고 뷰가 누수됩니다. (GDD §4.4, AGENT.md §9)
+        // 오버킬로 즉시 전이하면 재생 중인 시퀀스가 남고 뷰가 누수됩니다. (GDD §4.4, AGENTS.md §9)
         var owner = machine.Owner;
         if (owner != null && owner.HasPendingResult)
         {
@@ -71,7 +71,7 @@ public class GameActionState : BaseState<EGameState, GameManager>, IBroadcastabl
     public override void OnExit()
     {
         // 불변식: 이 상태를 나갈 때 제출된 영수증은 남아 있으면 안 된다.
-        // 남아 있다는 건 구독자가 꺼내 가지 않았다는 뜻이고, 다음 턴 제출과 섞입니다. (AGENT.md §9)
+        // 남아 있다는 건 구독자가 꺼내 가지 않았다는 뜻이고, 다음 턴 제출과 섞입니다. (AGENTS.md §9)
         var owner = machine.Owner;
         if (owner == null || !owner.HasPendingMoveReceipt) return;
 

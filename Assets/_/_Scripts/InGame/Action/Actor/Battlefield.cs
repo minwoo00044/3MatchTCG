@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-// 전장에 선 Actor 명단입니다. MonoBehaviour가 아닌 순수 클래스입니다. (AGENT.md §1)
+// 전장에 선 Actor 명단입니다. MonoBehaviour가 아닌 순수 클래스입니다. (AGENTS.md §1)
 //
 // ActionTarget.FindTarget(Actor caster)는 시전자 하나만 받습니다. (GDD §4.3)
 // AllEnemies나 LowestHPAlly는 전장 전체를 알아야 답할 수 있으므로,
@@ -25,7 +25,7 @@ public class Battlefield
     }
 
     // 사망자 제외 판정은 여기 한 곳에서만 합니다. (GDD §4.1)
-    // 타깃 클래스마다 IsDead를 각자 거르면 같은 질문에 답이 여러 개가 됩니다. (AGENT.md §5)
+    // 타깃 클래스마다 IsDead를 각자 거르면 같은 질문에 답이 여러 개가 됩니다. (AGENTS.md §5)
     public Actor[] AliveActors() => Collect(null);
     public Actor[] AlliesOf(Actor caster) => Collect(a => a.IsAllyOf(caster));
     public Actor[] EnemiesOf(Actor caster) => Collect(a => a.IsEnemyOf(caster));
