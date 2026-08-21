@@ -15,6 +15,8 @@ public enum EBubbleHighlight
 public class PuzzleView : MonoBehaviour,
     IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, IPoolable<PuzzleView>
 {
+    private static readonly int GrayscaleAmountId = Shader.PropertyToID("_GrayscaleAmount");
+
     [SerializeField]
     private SpriteRenderer bubbleShell;
     [SerializeField]
@@ -59,6 +61,7 @@ public class PuzzleView : MonoBehaviour,
     private int baseRingOrder;
     private bool sortingCaptured;
     private EBubbleHighlight highlight = EBubbleHighlight.None;
+    private MaterialPropertyBlock grayscaleProperties;
 
     public Bubble Data { get => _data; set => _data = value; }
 
@@ -85,6 +88,9 @@ public class PuzzleView : MonoBehaviour,
     {
         _data = data;
 
+        // 풀에서 사망 버블에 쓰였던 뷰가 정상 버블로 돌아올 때 회색조가 남지 않게 합니다.
+        SetGrayscale(false);
+
         baseShellColor = shellColor;
         bubbleShell.color = baseShellColor;
         inBubble.sprite = _data.Spec.bubbleImage;
@@ -98,6 +104,21 @@ public class PuzzleView : MonoBehaviour,
 
         // 풀에서 재사용된 뷰가 이전 하이라이트를 물고 오지 않도록 초기화
         ForceClearHighlight();
+    }
+
+    public void SetGrayscale(bool enabled)
+    {
+        if (grayscaleProperties == null) grayscaleProperties = new MaterialPropertyBlock();
+        grayscaleProperties.SetFloat(GrayscaleAmountId, enabled ? 1f : 0f);
+
+        ApplyGrayscale(bubbleShell);
+        ApplyGrayscale(inBubble);
+    }
+
+    private void ApplyGrayscale(SpriteRenderer renderer)
+    {
+        if (renderer == null) return;
+        renderer.SetPropertyBlock(grayscaleProperties);
     }
 
     // ===================== 하이라이트 =====================
@@ -260,6 +281,7 @@ public class PuzzleView : MonoBehaviour,
     {
         // 무한 루프 하이라이트 트윈이 풀에 살아 남으면 재사용된 뷰에서 계속 돕니다.
         ForceClearHighlight();
+        SetGrayscale(false);
         _returnAction?.Invoke(this); // 풀의 반납 로직 실행
     }
 

@@ -200,6 +200,15 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         // Actor.OnDeath는 한 번만 발화하지만 중계가 중복돼도 결과가 달라지지 않게 합니다.
         if (!aliveCharacters.Remove(character)) return;
 
+        HashSet<BubbleSO> deadSpecs = new HashSet<BubbleSO>();
+        foreach (var pair in skillOwners)
+        {
+            if (pair.Value == character) deadSpecs.Add(pair.Key);
+        }
+
+        // 보드에 이미 남은 버블은 파괴 가능 상태로 유지하고 표현만 즉시 회색조로 바꿉니다.
+        puzzleMatrixView.SetGrayscale(deadSpecs);
+
         // 현재 스왑의 리필은 MoveReceipt에 이미 확정돼 있습니다. 전투 실행 중 들어온 이 갱신은
         // 다음 스왑이 새 버블을 요청할 때부터 적용됩니다. (GDD §3.2.1, AGENTS.md §3)
         RefreshSpawnCandidates();

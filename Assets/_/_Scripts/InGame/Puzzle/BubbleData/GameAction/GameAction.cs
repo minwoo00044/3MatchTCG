@@ -9,6 +9,13 @@ public abstract class GameAction:ScriptableObject
 {
     public abstract void OnExecute(SkillContext ctx);
 
+    // 대상이 없는 배치 효과도 같은 모듈 경로를 탑니다. 에셋마다 선택하는 옵션이 아니라
+    // 액션 종류의 의미가 답해야 같은 액션의 규칙이 갈리지 않습니다. (GDD §2.3, §4.6)
+    public virtual bool RequiresTarget => true;
+
+    // 공격/회복/실드는 매치 기본 파워를 쓰고, 증폭처럼 발동 1건당 고정인 액션은 쓰지 않습니다.
+    public virtual bool UsesSkillPower => true;
+
     // 같은 연쇄 차수의 이후 스킬에 영향을 주는 액션인지. (GDD §4.5 선배치 실행 규칙)
     //
     // 증폭/버프는 반드시 먼저 발동해야 뒤따르는 스킬이 증폭된 수치로 계산됩니다.

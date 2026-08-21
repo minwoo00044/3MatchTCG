@@ -2,7 +2,7 @@ using UnityEngine;
 
 // 보드에서 뽑히고 터지는 스킬. (GDD §2.2, §3.2)
 //
-// 전투가 쓰는 부분(SOName, action, target, value, threatMultiplier)은 SkillSO에 있습니다.
+// 전투가 쓰는 부분(SOName, effects)은 SkillSO에 있습니다.
 // 여기 남은 것은 **보드에 존재하기 때문에 생기는 것들**뿐입니다 - 어떻게 보이나,
 // 얼마나 자주 뽑히나, 몇 차 연쇄에 터졌나.
 //

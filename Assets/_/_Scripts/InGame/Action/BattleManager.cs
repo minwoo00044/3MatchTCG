@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -10,6 +9,8 @@ using UnityEngine;
 // PuzzleManager와 직접 주고받지 않습니다.
 public class BattleManager : BaseManager
 {
+    private readonly SkillResolver skillResolver = new SkillResolver();
+
     [Header("ENEMY")]
     [Tooltip("적 NPC 표시 이름")]
     [SerializeField]
@@ -211,10 +212,29 @@ public class BattleManager : BaseManager
 
         string name = string.IsNullOrEmpty(skill.SOName) ? skill.name : skill.SOName;
         List<string> missing = new List<string>();
+        IReadOnlyList<SkillEffect> effects = skill.Effects;
 
-        if (skill.action == null) missing.Add("action");
-        if (skill.target == null) missing.Add("target");
-        if (skill.value <= 0f) missing.Add("value");
+        if (effects == null || effects.Count == 0)
+        {
+            missing.Add("effects");
+        }
+        else
+        {
+            for (int i = 0; i < effects.Count; i++)
+            {
+                SkillEffect effect = effects[i];
+                if (effect == null)
+                {
+                    missing.Add($"effects[{i}]");
+                    continue;
+                }
+
+                if (effect.action == null) missing.Add($"effects[{i}].action");
+                else if (effect.action.RequiresTarget && effect.target == null)
+                    missing.Add($"effects[{i}].target");
+                if (effect.value <= 0f) missing.Add($"effects[{i}].value");
+            }
+        }
 
         if (missing.Count == 0) return;
 
@@ -284,13 +304,14 @@ public class BattleManager : BaseManager
     private void HandleOnAction()
     {
         MoveReceipt receipt = gameManager.ConsumeMoveReceipt();
-        List<SkillRecipe> recipes = BuildSkillRecipes(receipt);
+        List<SkillRecipe> recipes = skillResolver.BuildRecipes(receipt);
+        SkillBatchContext batch = new SkillBatchContext();
 
         // 수치는 여기서 전부 확정됩니다. 연출은 나중에 이 기록을 재생할 뿐입니다. (GDD §4.1, §4.5)
         BattleReceipt battle = new BattleReceipt();
         foreach (var recipe in recipes)
         {
-            ExecuteRecipe(recipe, battle);
+            ExecuteRecipe(recipe, batch, battle);
         }
 
         ReportBattleReceipt(battle);
@@ -311,47 +332,9 @@ public class BattleManager : BaseManager
         sequencer.Play(battle, () => gameManager.ReceiveCompleteSignal());
     }
 
-    // 퍼즐 영수증을 실행 순서대로 늘어놓은 스킬 목록으로 옮깁니다. (GDD §4.5)
-    //
-    // 퍼즐은 "무슨 버블이 몇 차에 몇 개 터졌나"까지만 적습니다.
-    // 덩어리 1개 = 스킬 1건이라는 판정도, 차수와 개수를 세는 것도 여기서 합니다.
-    private List<SkillRecipe> BuildSkillRecipes(MoveReceipt receipt)
-    {
-        List<SkillRecipe> ret = new List<SkillRecipe>();
-        if (receipt == null) return ret;
-
-        for (int i = 0; i < receipt.ChainSteps.Count; i++)
-        {
-            // 연쇄 차수는 1-based입니다.
-            int chainIndex = i + 1;
-            List<SkillRecipe> ofStep = new List<SkillRecipe>();
-
-            foreach (var group in receipt.ChainSteps[i].MatchGroups)
-            {
-                if (group.Spec == null) continue;
-                ofStep.Add(new SkillRecipe(group.Spec, group.Cells.Count, chainIndex));
-            }
-
-            // 선(先)배치 실행 규칙 - 증폭/버프를 이 차수의 가장 앞으로 당깁니다. (GDD §4.5)
-            //
-            // 정렬 범위는 이번 차수뿐입니다. 앞선 차수로 소급되면 이미 발동이 끝난 스킬의
-            // 수치가 뒤늦게 바뀝니다. OrderBy는 안정 정렬이라 나머지 순서는 보존됩니다.
-            if (ofStep.Count > 1)
-            {
-                ofStep = ofStep
-                    .OrderByDescending(r => r.Spec.action != null && r.Spec.action.IsPreemptive)
-                    .ToList();
-            }
-
-            ret.AddRange(ofStep);
-        }
-
-        return ret;
-    }
-
     // ===================== 스킬 실행 =====================
 
-    private void ExecuteRecipe(SkillRecipe recipe, BattleReceipt battle)
+    private void ExecuteRecipe(SkillRecipe recipe, SkillBatchContext batch, BattleReceipt battle)
     {
         if (recipe == null || recipe.Spec == null) return;
         BubbleSO spec = recipe.Spec;
@@ -359,13 +342,12 @@ public class BattleManager : BaseManager
         // 소속 캐릭터가 죽었으면 여기서 걸러집니다. 버블은 이미 터졌고 효과만 없습니다. (GDD §3.2.1)
         if (!TryResolveCaster(spec, out Actor caster)) return;
 
-        // 최종 수치 = value * matchCount * chainWeight (GDD §4.6)
-        //
-        // 여기서 정수로 확정합니다. Actor의 HP/실드가 int인 이유는, float로 두면
-        // "0.0001 남아 안 죽은 적"이 생기고 그 판정이 타깃 필터와 승패까지 번지기 때문입니다.
-        int amount = Mathf.RoundToInt(spec.value * recipe.MatchCount * spec.GetChainWeight(recipe.ChainIndex));
-
-        ExecuteSkill(caster, spec, amount, battle);
+        // 퍼즐 기본 파워는 매치 그룹 1건에서 한 번만 계산하고 모든 효과가 공유합니다. (GDD §4.6)
+        float skillPower = recipe.MatchCount * spec.GetChainWeight(recipe.ChainIndex);
+        foreach (SkillEffect effect in skillResolver.GetOrderedEffects(spec))
+        {
+            ExecuteEffect(caster, spec, effect, skillPower, batch, battle);
+        }
     }
 
     // 스킬 1건이 실제로 발동하는 유일한 지점입니다.
@@ -377,23 +359,33 @@ public class BattleManager : BaseManager
     // 인자가 BubbleSO가 아니라 SkillSO인 것이 이 경계의 선언입니다.
     // **여기부터는 퍼즐 개념이 없습니다.** 연쇄 차수도 매치 개수도 이미 amount에 녹아 끝났고,
     // 이 아래에서 다시 꺼내 쓸 수 없어야 합니다.
-    private void ExecuteSkill(Actor caster, SkillSO spec, int amount, BattleReceipt battle)
+    private void ExecuteEffect(Actor caster, SkillSO spec, SkillEffect effect, float skillPower,
+                               SkillBatchContext batch, BattleReceipt battle)
     {
-        if (caster == null || spec == null || amount <= 0) return;
+        if (caster == null || spec == null || effect == null || effect.value <= 0f) return;
 
-        if (spec.action == null || spec.target == null)
+        GameAction action = effect.action;
+        if (action == null || (action.RequiresTarget && effect.target == null))
         {
-            Debug.LogWarning($"[BattleManager] {spec.SOName}에 액션 또는 타깃이 배정되지 않았습니다.");
+            Debug.LogWarning($"[BattleManager] {spec.SOName} 효과에 액션 또는 필수 타깃이 배정되지 않았습니다.");
             return;
         }
 
-        Actor[] targets = spec.target.FindTarget(caster);
-        if (targets.Length == 0) return;
+        Actor[] targets = action.RequiresTarget
+            ? effect.target.FindTarget(caster)
+            : System.Array.Empty<Actor>();
+        if (action.RequiresTarget && targets.Length == 0) return;
+
+        // 선배치 효과는 먼저 배치 상태를 바꾸므로 같은 레시피의 후속 효과부터 새 배율을 씁니다.
+        float finalValue = action.UsesSkillPower
+            ? effect.value * skillPower * batch.Amplification
+            : effect.value;
+        if (finalValue <= 0f) return;
 
         int before = battle.Steps.Count;
-        spec.action.OnExecute(new SkillContext(caster, spec, targets, amount, battle));
+        action.OnExecute(new SkillContext(caster, spec, targets, finalValue, batch, battle));
 
-        AccumulateThreat(caster, spec, battle, before);
+        AccumulateThreat(caster, effect, battle, before);
     }
 
     // ===================== 적 공격 =====================
@@ -435,10 +427,6 @@ public class BattleManager : BaseManager
         SkillSO skill = enemyActor.Skill;
         if (skill == null) return; // 배선 경고는 BuildBattlefield에서 한 번만 찍습니다.
 
-        // 적 공격은 버블 매치가 없으므로 최종 데미지 = value 고정입니다.
-        // matchCount와 chainWeight를 곱하지 않습니다. (GDD §4.2)
-        int amount = Mathf.RoundToInt(skill.value);
-
         // 발동 자체를 먼저 찍습니다. 아래 영수증 로그는 대상이 없거나 빗나가면 아무것도 남기지 않아,
         // "적이 안 때린 것"과 "때렸는데 대상이 없던 것"을 구별할 수 없습니다. (AGENTS.md §9)
         LogEnemyAttack();
@@ -447,7 +435,12 @@ public class BattleManager : BaseManager
         // 플레이어 배치와 섞이지 않도록 이 공격 한 건만 담은 영수증을 만듭니다.
         // 배치가 다르면 연출 타임라인도 다르므로 한 장에 이어붙이면 순서가 뭉갭니다.
         BattleReceipt battle = new BattleReceipt();
-        ExecuteSkill(enemyActor, skill, amount, battle);
+        SkillBatchContext batch = new SkillBatchContext();
+        foreach (SkillEffect effect in skillResolver.GetOrderedEffects(skill))
+        {
+            // 적 스킬에는 매치가 없으므로 skillPower는 항상 1입니다. (GDD §4.2)
+            ExecuteEffect(enemyActor, skill, effect, 1f, batch, battle);
+        }
         ReportBattleReceipt(battle);
 
         // 기다리는 상태가 없으므로 완주 콜백이 없습니다. 두 경로의 유일한 차이입니다.
@@ -521,7 +514,7 @@ public class BattleManager : BaseManager
     //
     // 대상 수만큼 합산합니다. 광역 힐은 1인 힐보다 총량이 크므로 어그로도 그만큼 끌립니다. (GDD §4.1)
     // 방금 적힌 기록에서 요청량을 걷어오므로, 액션이 무엇을 했든 셈이 어긋나지 않습니다.
-    private void AccumulateThreat(Actor caster, SkillSO spec, BattleReceipt battle, int fromIndex)
+    private void AccumulateThreat(Actor caster, SkillEffect effect, BattleReceipt battle, int fromIndex)
     {
         int requested = 0;
         for (int i = fromIndex; i < battle.Steps.Count; i++)
@@ -530,7 +523,7 @@ public class BattleManager : BaseManager
         }
         if (requested <= 0) return;
 
-        caster.AddThreat(requested * spec.threatMultiplier, battlefield.GameTime);
+        caster.AddThreat(requested * effect.threatMultiplier, battlefield.GameTime);
     }
 
     // 전투 결과 확인용 임시 로그입니다.
