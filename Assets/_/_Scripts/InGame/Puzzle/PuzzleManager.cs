@@ -13,6 +13,8 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
 
     // BubbleSO -> 소속 CharacterSO. 정적 파이프이므로 PuzzleManager가 소유합니다. (GDD §2.3)
     private readonly Dictionary<BubbleSO, CharacterSO> skillOwners = new Dictionary<BubbleSO, CharacterSO>();
+    // 스포닝 재정규화의 기준. Actor를 직접 참조하지 않고 CharacterSO 사망 신호로만 갱신합니다. (GDD §3.2.1)
+    private readonly List<CharacterSO> aliveCharacters = new List<CharacterSO>();
     [SerializeField]
     private int size;
     [SerializeField]
@@ -69,6 +71,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         stateReportHub = new StateReportHub<EPuzzleState, PuzzleManager>(puzzleStateMachine);
         gameManager.Subscribe(EGameState.PuzzleAction, HandleOnPuzzleAction);
         gameManager.Subscribe(EGameState.End, HandleOnGameEnd);
+        gameManager.OnCharacterDied += HandleCharacterDied;
     }
 
     protected override void OnDestroy()
@@ -78,6 +81,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         {
             gameManager.Unsubscribe(EGameState.PuzzleAction, HandleOnPuzzleAction);
             gameManager.Unsubscribe(EGameState.End, HandleOnGameEnd);
+            gameManager.OnCharacterDied -= HandleCharacterDied;
         }
     }
 
@@ -125,6 +129,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
     private void BuildSkillOwnerMap()
     {
         skillOwners.Clear();
+        aliveCharacters.Clear();
 
         // 덱의 소유자는 GameManager입니다. 읽는 시점은 Init 브로드캐스트 안으로 한정합니다.
         IReadOnlyList<CharacterSO> characters = gameManager != null ? gameManager.Characters : null;
@@ -137,6 +142,8 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         foreach (var character in characters)
         {
             if (character == null || character.skills == null) continue;
+
+            aliveCharacters.Add(character);
 
             foreach (var skill in character.skills)
             {
@@ -162,29 +169,40 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         return owner.mainColor;
     }
 
-    // 보드에 뽑힐 후보 목록. 덱 3인의 스킬 9종 + 공용 버블입니다.
-    //
-    // 스폰 원천과 색 원천이 같은 덱 하나로 모입니다. 둘이 갈려 있으면 화면에 있는데
-    // 뽑히지 않거나, 뽑히는데 색이 없는 버블이 생깁니다.
-    private List<BubbleSO> BuildSpawnTable()
+    // 생존 캐릭터별 스킬 후보. skillOwners가 색과 소유 관계의 단일 원천이고,
+    // Factory에는 그룹만 넘겨 Actor/CharacterSO 의존성을 만들지 않습니다. (GDD §2.3, §3.2)
+    private List<List<BubbleSO>> BuildCharacterSpawnGroups()
     {
-        List<BubbleSO> ret = new List<BubbleSO>();
+        List<List<BubbleSO>> ret = new List<List<BubbleSO>>();
 
-        // skillOwners는 BuildSkillOwnerMap이 중복까지 걸러둔 목록입니다.
-        // 여기서 덱을 다시 순회하면 같은 질문에 답하는 코드가 둘이 됩니다. (AGENT.md §5)
-        foreach (var skill in skillOwners.Keys) ret.Add(skill);
-
-        if (commonBubbles != null)
+        foreach (var character in aliveCharacters)
         {
-            foreach (var bubble in commonBubbles)
+            List<BubbleSO> specs = new List<BubbleSO>();
+            foreach (var pair in skillOwners)
             {
-                if (bubble != null) ret.Add(bubble);
+                if (pair.Value == character) specs.Add(pair.Key);
             }
+            ret.Add(specs);
         }
 
-        if (ret.Count == 0) Debug.LogWarning("[PuzzleManager] 스폰 후보가 비어 있습니다. 덱과 공용 버블 배정을 확인하세요.");
-
         return ret;
+    }
+
+    private void RefreshSpawnCandidates()
+    {
+        puzzleFactory.InjectSpawnCandidates(BuildCharacterSpawnGroups(), commonBubbles);
+    }
+
+    private void HandleCharacterDied(CharacterSO character)
+    {
+        if (character == null) return;
+
+        // Actor.OnDeath는 한 번만 발화하지만 중계가 중복돼도 결과가 달라지지 않게 합니다.
+        if (!aliveCharacters.Remove(character)) return;
+
+        // 현재 스왑의 리필은 MoveReceipt에 이미 확정돼 있습니다. 전투 실행 중 들어온 이 갱신은
+        // 다음 스왑이 새 버블을 요청할 때부터 적용됩니다. (GDD §3.2.1, AGENT.md §3)
+        RefreshSpawnCandidates();
     }
 
     public void PuzzleInitialize()
@@ -192,7 +210,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
         // 보드를 채우기 전에 색 매핑이 서 있어야 합니다.
         // 스폰 후보도 이 매핑에서 나오므로 순서가 뒤집히면 보드가 공용 버블로만 채워집니다.
         BuildSkillOwnerMap();
-        puzzleFactory.InjectBubbleSpecs(BuildSpawnTable());
+        RefreshSpawnCandidates();
         puzzleModel.SetBubbles(() =>
         {
             puzzleMatrixView.DrawingAllMatrix();

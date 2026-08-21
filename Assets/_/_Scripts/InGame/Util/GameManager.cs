@@ -53,6 +53,18 @@ public class GameManager : MonoBehaviour, IReceivableMachineManager
     // 바뀌어도 소비하는 쪽 코드는 그대로 둘 수 있습니다.
     public IReadOnlyList<CharacterSO> Characters => deck != null ? deck.characters : null;
 
+    // ===================== 캐릭터 사망 중계 =====================
+    //
+    // BattleManager는 Actor 사망을 CharacterSO 단위 사실로 올리고, PuzzleManager는 이 이벤트로
+    // 스폰 후보를 재정규화합니다. 하위 매니저끼리는 서로를 직접 참조하지 않습니다. (GDD §3.2.1)
+    public event Action<CharacterSO> OnCharacterDied;
+
+    public void ReportCharacterDeath(CharacterSO character)
+    {
+        if (character == null) return;
+        OnCharacterDied?.Invoke(character);
+    }
+
     // ===================== 퍼즐 영수증 중계 =====================
     //
     // 하위 매니저끼리 직접 소통하지 않습니다. PuzzleManager는 연출을 마친 영수증을 위로

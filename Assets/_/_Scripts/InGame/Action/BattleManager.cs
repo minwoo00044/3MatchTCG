@@ -492,6 +492,13 @@ public class BattleManager : BaseManager
             return;
         }
 
+        // 퍼즐은 Actor를 모르므로 CharacterSO 단위의 사망 사실만 GameManager를 통해 전달합니다.
+        // 현재 조작의 리필 영수증은 이미 확정됐고, 갱신된 비율은 다음 스왑부터 쓰입니다. (GDD §3.2.1)
+        if (actor is PlayerActor playerActor)
+        {
+            gameManager.ReportCharacterDeath(playerActor.Origin);
+        }
+
         // 패배 조건은 3인 중 2명 사망, 즉 생존자 1명 이하입니다. (GDD §4.4)
         if (AliveAllyCount() <= 1)
         {
