@@ -13,13 +13,14 @@
   "pivotY": 0.0074211502782931356,
   "fps": 8,
   "loop": true,
-  "scale": 1.0001,
-  "anchorHeight": 544.8,
+  "scale": 1.0,
+  "anchorHeight": 541.2,
   "stance": {
     "method": "standing",
     "vertical": 520,
     "spread": 165.0,
-    "leg": 125
+    "leg": 150,
+    "crotch": 369
   },
   "alignX": "feet",
   "alignY": "ground",

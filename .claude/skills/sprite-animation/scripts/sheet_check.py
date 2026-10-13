@@ -15,12 +15,13 @@
 
 비교·마스크 이미지는 Temp/SpriteAnimationPipeline/ 에 쓴다. 마지막 줄은 RESULT {json}.
 
-체형 지표(모두 '키'에 대한 비율, 스케일 무관)
-  head   정수리~턱 / 키   (1/등신. 머리카락 부피도 포함)
-  hair   머리카락 면적 / 키²
-  skirt  정수리~옷 하단 / 키
-  leg    옷 하단~바닥 / 키
-  boot   발 영역 폭 / 키
+체형 지표(모두 '다리를 편 키'에 대한 비율 — 스케일·보폭 무관. 키는 파이프라인 standing_height와 같다)
+  head   정수리~턱 / 키   (1/등신. 머리카락 부피도 포함)          [판정]
+  hair   머리카락 면적 / 키²                                      [판정]
+  boot   발 영역 폭 / 키                                          [판정]
+  leg    편 다리 길이 / 키 (실루엣 기하, 색 무관)                  [참고]
+         무기가 허벅지 사이를 덮으면 가랑이를 낮게 잡아 짧게 나온다 — 비교 이미지의 분홍 선으로 확인한다.
+옷 길이는 체형이 아니라 디자인이라 수치로 재지 않고 디자인 확인(소품·형태)에서 본다.
 판정은 0번 프레임(서 있는 자세)으로 한다. 활을 머리 위로 들거나 누운 프레임은 '키'가 왜곡되어
 전 프레임 중앙값은 원본·재생성 가릴 것 없이 +10% 안팎으로 부푼다.
 
@@ -56,7 +57,7 @@ THRESHOLDS = {"head": 8.0, "hair": 15.0, "boot": 15.0}
 DESIGN_WARN = {"hue": 12.0, "sat": 0.12, "val": 0.12, "palette": 0.25, "overall_sat": 0.06, "overall_val": 0.06}
 COLOR_FAIL_FACTOR = 1.5  # 재생성 검증: 경고 기준의 1.5배를 넘는 색 차이는 불합격 (합격본 최대치: 색조 5°, 채도 0.07, 명도 0.11, 분포 0.06)
 MOTION_MIN = 0.72
-KEYS = ["head", "hair", "skirt", "leg", "boot"]
+KEYS = ["head", "hair", "boot", "leg"]
 
 
 # ---------------------------------------------------------------- 기준
@@ -128,8 +129,9 @@ def body_metrics(img, palette):
     top, bottom = b[0], b[1]
     H = bottom - top + 1
     _, hbot, hl, hr = hb
+    Hs, stance = C.P.standing_height(img)
 
-    # 턱: 키 상단 40% 안, 머리카락 가로 범위 안의 피부 최하단 (허벅지·손을 얼굴로 잡지 않게)
+    # 턱: 세로 키 상단 40% 안, 머리카락 가로 범위 안의 피부 최하단 (허벅지·손을 얼굴로 잡지 않게)
     face = m["skin"].copy()
     face[top + int(H * 0.40):] = False
     face[:, :hl] = False
@@ -137,19 +139,21 @@ def body_metrics(img, palette):
     rows = np.where(face.sum(1) > 3)[0]
     chin = rows.max() if len(rows) else hbot
 
-    # 옷: 주황 픽셀이 키의 6% 이상인 행만 (부츠 하이라이트·활 장식 제외)
-    coat_rows = np.where(m["coat"].sum(1) > H * 0.06)[0]
-    coat_rows = coat_rows[coat_rows < top + H * 0.8]
-    skirt = coat_rows.max() if len(coat_rows) else None
+    if stance["method"] == "standing":
+        leg = float(np.hypot(stance["leg"], stance["spread"] / 2)) / Hs
+        crotch = stance["crotch"] / H  # 그림용: 세로 키 기준 위치
+    else:
+        leg, crotch = float("nan"), float("nan")
 
     boot_band = m["boot"][bottom - int(H * 0.08):bottom + 1]
     return {
-        "height": int(H),
-        "head": (chin - top) / H,
-        "hair": m["hair"].sum() / H ** 2 * 100,
-        "skirt": (skirt - top) / H if skirt is not None else float("nan"),
-        "leg": (bottom - skirt) / H if skirt is not None else float("nan"),
-        "boot": boot_band.any(0).sum() / H,
+        "height": round(Hs, 1),
+        "head": (chin - top) / Hs,
+        "hair": m["hair"].sum() / Hs ** 2 * 100,
+        "boot": boot_band.any(0).sum() / Hs,
+        "leg": leg,
+        "_chin": (chin - top) / H,
+        "_crotch": crotch,
     }
 
 
@@ -224,7 +228,7 @@ def summarize(frames, palette):
 
 
 def delta(v, ref):
-    return {k: (v[k] / ref[k] - 1) * 100 for k in KEYS}
+    return {k: (v[k] / ref[k] - 1) * 100 if ref[k] and not np.isnan(ref[k]) else float("nan") for k in KEYS}
 
 
 def reference(path, palette):
@@ -256,22 +260,31 @@ def motion_amount(frames):
 
 # ---------------------------------------------------------------- 출력
 
-def compare_image(ref_name, ref_img, ref_f0, items, path):
+def compare_image(ref_name, ref_img, ref_f0, items, path, palette=None):
+    """같은 세로 크기로 나란히. 가로 빨강 = 기준의 턱선, 타일마다 짧은 빨강 = 자기 턱, 분홍 = 자기 가랑이."""
     T, pad = 520, 24
-    tiles = [("기준 " + ref_name, C.crop_frame(ref_img))] + [(n, C.crop_frame(img)) for n, img in items]
-    tiles = [(n, t.resize((round(t.width * T / t.height), T), Image.LANCZOS)) for n, t in tiles]
-    W = sum(t.width for _, t in tiles) + pad * (len(tiles) + 1)
+    tiles = [("REF " + ref_name, ref_img)] + list(items)  # 기본 글꼴에 한글이 없어 그림 안 글자는 영문
+    W = pad
+    prepared = []
+    for n, img in tiles:
+        t = C.crop_frame(img)
+        t = t.resize((round(t.width * T / t.height), T), Image.LANCZOS)
+        m = body_metrics(img, palette or DEFAULT_PALETTE)
+        prepared.append((n, t, m))
+        W += t.width + pad
     out = Image.new("RGB", (W, T + 70), (236, 236, 236))
     d = ImageDraw.Draw(out)
+    y = 25 + ref_f0["_chin"] * T
+    d.line([(0, y), (W, y)], fill=(220, 0, 0), width=1)
     x = pad
-    for n, t in tiles:
+    for n, t, m in prepared:
         out.paste(t, (x, 25), t)
+        if m:
+            d.line([(x, 25 + m["_chin"] * T), (x + t.width, 25 + m["_chin"] * T)], fill=(220, 0, 0), width=3)
+            if not np.isnan(m["_crotch"]):
+                d.line([(x, 25 + m["_crotch"] * T), (x + t.width, 25 + m["_crotch"] * T)], fill=(230, 0, 230), width=3)
         d.text((x, T + 40), n, fill=(0, 0, 0))
         x += t.width + pad
-    for k, col in (("head", (220, 0, 0)), ("skirt", (0, 160, 0))):
-        if not np.isnan(ref_f0[k]):
-            y = 25 + ref_f0[k] * T
-            d.line([(0, y), (W, y)], fill=col, width=2)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     out.save(path)
 
@@ -333,7 +346,7 @@ def cmd_audit(args):
                   if p and os.path.basename(p) != ref_name]
 
     print(f"기준: {ref_name}  {1 / ref_f0['head']:.2f}등신")
-    print("[체형] 기준 대비 %, 0번 프레임으로 판정")
+    print("[체형] 기준 대비 %, 0번 프레임으로 판정 (head·hair·boot). leg는 참고 — 무기가 가랑이를 가리면 짧게 나온다")
     print(header() + "   등신")
     result, items, design_lines = {}, [], []
     for s in sheets:
@@ -360,7 +373,7 @@ def cmd_audit(args):
     print("색으로 안 잡히는 소품·머리 모양 차이는 비교 이미지에서 확인한다.")
 
     img = os.path.join(C.PREVIEW_DIR, f"_audit_{character}.png")
-    compare_image(ref_name, ref_frames[0]["image"], ref_f0, items, img)
+    compare_image(ref_name, ref_frames[0]["image"], ref_f0, items, img, palette)
     print(f"RESULT {json.dumps({'ok': True, 'reference': slash(args.reference), 'compare': slash(img), 'sheets': result}, ensure_ascii=False)}")
 
 
@@ -413,7 +426,7 @@ def cmd_verify(args):
 
     img = os.path.join(C.PREVIEW_DIR, f"_verify_{os.path.splitext(os.path.basename(args.new))[0]}.png")
     compare_image(os.path.basename(args.reference), ref_frames[0]["image"], ref_f0,
-                  [("재생성", new_frames[0]["image"]), ("원본", orig_frames[0]["image"])], img)
+                  [("NEW", new_frames[0]["image"]), ("ORIGINAL", orig_frames[0]["image"])], img, palette)
     print(f"RESULT {json.dumps({'ok': True, 'pass': not fails, 'fails': fails, 'design_warnings': dw, 'f0': d0, 'motion': round(motion, 3), 'compare': slash(img)}, ensure_ascii=False)}")
     sys.exit(0 if not fails else 4)
 

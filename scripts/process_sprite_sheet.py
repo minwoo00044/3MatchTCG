@@ -238,9 +238,13 @@ def standing_height(image):
     다리를 곧게 폈을 때의 키 추정. 세로 키만 쓰면 다리를 넓게 벌린 시트일수록 키가 낮게 재져
     더 크게 확대된다(궁수 시트에서 보폭 +9%~+46% 범위에서 1~3.5% 편향을 확인).
     두 발 중심 간격 d와 가랑이~바닥 높이 L로 다리 길이를 sqrt(L² + (d/2)²)로 바꿔 더한다.
-    가랑이 = 두 발 중심 사이가 60% 이상 채워지는 가장 낮은 행 (사이를 지나가는 가는 활·지팡이는 무시된다).
+
+    가랑이 = 바닥에서 위로 올라가며, 두 발 사이 가운데 절반 폭에서 다리 사이 틈(투명)이 사라진 상태가
+    키의 8% 이상 이어지는 첫 행. 사이를 지나가는 가는 활은 양옆에 틈을 남겨 무시되고, 활 끝 장식처럼
+    짧게 틈을 막는 것도 '이어짐' 조건으로 걸러진다. 다만 무기가 허벅지 사이를 길게 덮으면 가랑이를
+    낮게(다리를 짧게) 잡는다 — 실루엣만으로는 구분할 수 없다. 이때 키 오차는 1% 미만이다.
     발이 하나로 붙어 있거나 가랑이를 못 찾으면 세로 키를 그대로 쓴다.
-    반환: (키, 측정 정보 dict)
+    반환: (키, 측정 정보 dict — leg는 세로 다리 길이, crotch는 위에서부터의 가랑이 행)
     """
     a = np.array(image)[:, :, 3] > 128
     ys, xs = np.where(a)
@@ -254,14 +258,27 @@ def standing_height(image):
     left_c = (runs[0][0] + runs[0][1]) / 2
     right_c = (runs[-1][0] + runs[-1][1]) / 2
     spread = right_c - left_c
-    fill = a[top:bottom + 1, int(left_c):int(right_c) + 1].mean(1)
-    rows = np.where(fill >= 0.6)[0]
-    rows = rows[rows < h * 0.9]
-    if len(rows) == 0:
+    mid, quarter = (left_c + right_c) / 2, spread / 4
+    x0, x1 = int(mid - quarter), int(mid + quarter) + 1
+    min_gap, hold = max(3, int(h * 0.015)), max(3, int(h * 0.08))
+    crotch, closed = None, 0
+    for y in range(bottom, top, -1):
+        gap = ~a[y, x0:x1]
+        dd = np.diff(np.concatenate(([0], gap.astype(np.int8), [0])))
+        widths = np.where(dd == -1)[0] - np.where(dd == 1)[0]
+        if len(widths) and widths.max() >= min_gap:
+            closed = 0
+            continue
+        closed += 1
+        if closed >= hold:
+            crotch = y + hold - 1
+            break
+    if crotch is None or crotch > bottom - h * 0.1:
         return float(h), {"method": "vertical", "reason": "가랑이를 못 찾았다"}
-    leg = h - 1 - rows.max()
+    leg = bottom - crotch
     corrected = (h - leg) + math.sqrt(leg ** 2 + (spread / 2) ** 2)
-    return float(corrected), {"method": "standing", "vertical": int(h), "spread": round(float(spread), 1), "leg": int(leg)}
+    return float(corrected), {"method": "standing", "vertical": int(h), "spread": round(float(spread), 1),
+                              "leg": int(leg), "crotch": int(crotch - top)}
 
 
 # ---------------------------------------------------------------- 배치

@@ -176,6 +176,10 @@ public static class SpriteAnimationPipeline
         importer.filterMode = FilterMode.Bilinear;
         // 기본 2048을 넘는 아틀라스가 조용히 축소되지 않게 한다
         importer.maxTextureSize = Math.Max(2048, Mathf.NextPowerOfTwo(Math.Max(atlasW, atlasH)));
+        // 무압축(RGBA32): 블록 압축은 머리카락 경계·그라데이션에 색 번짐을 만든다. 품질 우선으로 메모리(픽셀당 4바이트)를 쓴다.
+        // 플랫폼별 오버라이드가 있으면 그쪽이 우선하므로 여기서는 기본값만 정한다.
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+        importer.crunchedCompression = false;
 
         var factory = new SpriteDataProviderFactories();
         factory.Init();
