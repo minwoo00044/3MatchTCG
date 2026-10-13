@@ -93,7 +93,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 4096
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -138,11 +138,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 538
-        width: 514
-        height: 538
+        y: 523
+        width: 500
+        height: 523
       alignment: 9
-      pivot: {x: 0.5, y: 0.007434944}
+      pivot: {x: 0.5, y: 0.0076481835}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -159,12 +159,12 @@ TextureImporter:
       name: Archer_Dead_v2_1
       rect:
         serializedVersion: 2
-        x: 514
-        y: 538
-        width: 514
-        height: 538
+        x: 500
+        y: 523
+        width: 500
+        height: 523
       alignment: 9
-      pivot: {x: 0.5, y: 0.007434944}
+      pivot: {x: 0.5, y: 0.0076481835}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -181,12 +181,12 @@ TextureImporter:
       name: Archer_Dead_v2_2
       rect:
         serializedVersion: 2
-        x: 1028
-        y: 538
-        width: 514
-        height: 538
+        x: 1000
+        y: 523
+        width: 500
+        height: 523
       alignment: 9
-      pivot: {x: 0.5, y: 0.007434944}
+      pivot: {x: 0.5, y: 0.0076481835}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -203,12 +203,12 @@ TextureImporter:
       name: Archer_Dead_v2_3
       rect:
         serializedVersion: 2
-        x: 1542
-        y: 538
-        width: 514
-        height: 538
+        x: 1500
+        y: 523
+        width: 500
+        height: 523
       alignment: 9
-      pivot: {x: 0.5, y: 0.007434944}
+      pivot: {x: 0.5, y: 0.0076481835}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -227,10 +227,10 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 514
-        height: 538
+        width: 500
+        height: 523
       alignment: 9
-      pivot: {x: 0.5, y: 0.007434944}
+      pivot: {x: 0.5, y: 0.0076481835}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -247,12 +247,12 @@ TextureImporter:
       name: Archer_Dead_v2_5
       rect:
         serializedVersion: 2
-        x: 514
+        x: 500
         y: 0
-        width: 514
-        height: 538
+        width: 500
+        height: 523
       alignment: 9
-      pivot: {x: 0.5, y: 0.007434944}
+      pivot: {x: 0.5, y: 0.0076481835}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -269,12 +269,12 @@ TextureImporter:
       name: Archer_Dead_v2_6
       rect:
         serializedVersion: 2
-        x: 1028
+        x: 1000
         y: 0
-        width: 514
-        height: 538
+        width: 500
+        height: 523
       alignment: 9
-      pivot: {x: 0.5, y: 0.007434944}
+      pivot: {x: 0.5, y: 0.0076481835}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -291,12 +291,12 @@ TextureImporter:
       name: Archer_Dead_v2_7
       rect:
         serializedVersion: 2
-        x: 1542
+        x: 1500
         y: 0
-        width: 514
-        height: 538
+        width: 500
+        height: 523
       alignment: 9
-      pivot: {x: 0.5, y: 0.007434944}
+      pivot: {x: 0.5, y: 0.0076481835}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []

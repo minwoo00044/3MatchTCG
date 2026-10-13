@@ -1,0 +1,8 @@
+{
+  "skill_name": "sprite-animation",
+  "evals": [
+    {"id": 1, "prompt": "Archer 스프라이트 시트들이 Idle이랑 체형(머리 크기, 머리카락, 부츠 같은 비율)이 맞는지 다시 한번 봐줘. 어떤 시트가 얼마나 벗어났는지 알려줘.", "expected_output": "Idle 기준 0번 프레임 체형 표(Hit 부츠, Skill3 머리카락 경계 이탈 지적), 비교 이미지 확인, 중앙값 왜곡 언급", "files": []},
+    {"id": 2, "prompt": "Downloads에 있는 Archer_atk_v1.png를 Skill1 새 버전으로 넣을까 하는데, 적용하기 전에 어떻게 잘리고 정렬되는지만 확인해줘. 에셋은 아직 건드리지 마.", "expected_output": "이름 Archer_Skill1_v2로 --analyze 실행, 미리보기 3칸을 열어 분할/접지/흔들림 판단, 경고 전달, 에셋 미변경", "files": []},
+    {"id": 3, "prompt": "Archer Hit 시트를 Idle 체형에 맞게 Codex로 다시 그리려고 해. 지금 Hit이 Idle보다 어디가 얼마나 다른지 재고, 그걸 반영한 생성 프롬프트까지만 준비해줘. 실제 생성은 하지 마.", "expected_output": "Hit 체형 측정(부츠 약 +16%), 측정값을 --fix로 넣은 codex_generate --dry-run 프롬프트, 현재 v2를 previous로 활용, 생성 미실행", "files": []}
+  ]
+}

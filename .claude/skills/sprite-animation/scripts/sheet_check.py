@@ -1,0 +1,479 @@
+"""
+스프라이트 시트 체형·디자인·모션 검사. 모든 비교의 기준은 사용자가 지정한 기준 시트(--reference)다.
+
+  set-reference REF
+      REF(Assets/_/Spirte/{캐릭터}/의 처리된 시트)를 캐릭터 기준으로 정한다.
+      {캐릭터}.character.json 의 ref_height(다리를 편 키)를 다시 재서 쓴다. 이후 파이프라인 스케일의 기준.
+  audit  --reference REF [SHEET ...]
+      기준 대비 체형 비율 + 디자인(색) 일관성 표. SHEET 생략 시 같은 캐릭터의 최신 시트 전부.
+  verify --reference REF --new NEW.png (--original ORIG.png | --action Hit)
+      재생성 시트 합격 판정: 체형(0번 프레임) + 색 유지 + 모션 보존 + 분할 경고.
+      색 차이는 경고 기준을 넘으면 경고, 그 1.5배(--color_fail)를 넘으면 불합격.
+      종료 코드 0 합격 / 4 불합격 / 1 오류.
+  masks  SHEET
+      부위 색 마스크 디버그 이미지. 새 캐릭터는 이걸 보고 팔레트를 맞춘다.
+
+비교·마스크 이미지는 Temp/SpriteAnimationPipeline/ 에 쓴다. 마지막 줄은 RESULT {json}.
+
+체형 지표(모두 '키'에 대한 비율, 스케일 무관)
+  head   정수리~턱 / 키   (1/등신. 머리카락 부피도 포함)
+  hair   머리카락 면적 / 키²
+  skirt  정수리~옷 하단 / 키
+  leg    옷 하단~바닥 / 키
+  boot   발 영역 폭 / 키
+판정은 0번 프레임(서 있는 자세)으로 한다. 활을 머리 위로 들거나 누운 프레임은 '키'가 왜곡되어
+전 프레임 중앙값은 원본·재생성 가릴 것 없이 +10% 안팎으로 부푼다.
+
+디자인 지표(0번 프레임)
+  부위별 평균 색: 색조 차(도), 채도 차, 명도 차      — 머리색이 밝아졌다, 옷이 붉어졌다
+  전체 채도/명도: 실루엣 전체 평균 차              — 시트 전체가 밝아지거나 색이 바랬다
+  palette        전체 색 분포 차이 (0=같음, 1=전혀 다름) — 소품 추가·재질 변화가 색으로 드러나는 경우
+색으로 안 잡히는 차이(화살통·벨트 같은 소품 유무, 머리 모양)는 비교 이미지를 보고 판단한다.
+"""
+import argparse
+import json
+import os
+import re
+import sys
+
+import numpy as np
+from PIL import Image, ImageDraw
+
+sys.path.insert(0, os.path.dirname(__file__))
+import common as C  # noqa: E402
+
+# 기본 팔레트는 Archer(연두 머리 / 주황 코트 / 갈색 스타킹·부츠).
+# 다른 캐릭터는 {캐릭터}.character.json 의 "palette" 또는 --palette로 덮어쓴다. HSV: h 0~360, s/v 0~1.
+DEFAULT_PALETTE = {
+    "hair": {"h": [[55, 150]], "s": [0.30, 1.0], "v": [0.30, 1.0]},
+    "coat": {"h": [[0, 22], [340, 360]], "s": [0.60, 1.0], "v": [0.55, 1.0]},
+    "skin": {"h": [[0, 35], [340, 360]], "s": [0.12, 0.45], "v": [0.75, 1.0]},
+    "boot": {"h": [[5, 45]], "s": [0.35, 1.0], "v": [0.0, 0.45]},
+}
+THRESHOLDS = {"head": 8.0, "hair": 15.0, "boot": 15.0}
+# overall_*: 실루엣 전체 평균. 부위 마스크는 밝아진 픽셀이 범위 밖으로 빠져 전체 밝기 변화를 놓친다
+# (합격본 최대: 전체 명도 0.044, 채도 0.052 / 전체를 25% 밝힌 사본: 명도 +0.142)
+DESIGN_WARN = {"hue": 12.0, "sat": 0.12, "val": 0.12, "palette": 0.25, "overall_sat": 0.06, "overall_val": 0.06}
+COLOR_FAIL_FACTOR = 1.5  # 재생성 검증: 경고 기준의 1.5배를 넘는 색 차이는 불합격 (합격본 최대치: 색조 5°, 채도 0.07, 명도 0.11, 분포 0.06)
+MOTION_MIN = 0.72
+KEYS = ["head", "hair", "skirt", "leg", "boot"]
+
+
+# ---------------------------------------------------------------- 기준
+
+def character_of(path):
+    m = re.match(r"^([A-Z][A-Za-z0-9]*)_", os.path.basename(path))
+    if not m:
+        sys.exit(f"시트 이름에서 캐릭터를 알 수 없다: {path} — {{캐릭터}}_{{액션}}_v{{N}}.png 형식이어야 한다")
+    return m.group(1)
+
+
+def config_path(character):
+    return os.path.join(C.SHEET_ROOT, character, f"{character}.character.json")
+
+
+def load_config(character):
+    p = config_path(character)
+    if os.path.exists(p):
+        with open(p, encoding="utf-8") as fp:
+            return json.load(fp)
+    return {}
+
+
+def load_palette(character, path):
+    if path:
+        with open(path, encoding="utf-8") as fp:
+            return json.load(fp)
+    return load_config(character).get("palette", DEFAULT_PALETTE)
+
+
+def check_reference(path):
+    if not os.path.exists(path):
+        sys.exit(f"기준 시트가 없다: {path}")
+    cfg = load_config(character_of(path))
+    configured = cfg.get("reference")
+    name = os.path.splitext(os.path.basename(path))[0]
+    if configured and configured != name:
+        print(f"[주의] 캐릭터 설정의 기준은 {configured}인데 {name}을 기준으로 비교한다. "
+              f"파이프라인 스케일도 바꾸려면 set-reference를 실행한다.")
+
+
+# ---------------------------------------------------------------- 측정
+
+def part_masks(img, palette):
+    a = np.array(img)
+    alpha = a[:, :, 3] > 128
+    hsv = np.array(img.convert("RGB").convert("HSV")).astype(float)
+    h, s, v = hsv[..., 0] * 360 / 255, hsv[..., 1] / 255, hsv[..., 2] / 255
+    out = {"alpha": alpha, "_hsv": (h, s, v)}
+    for part, rule in palette.items():
+        hm = np.zeros_like(alpha)
+        for lo, hi in rule["h"]:
+            hm |= (h >= lo) & (h <= hi)
+        out[part] = alpha & hm & (s >= rule["s"][0]) & (s <= rule["s"][1]) & (v >= rule["v"][0]) & (v <= rule["v"][1])
+    return out
+
+
+def bbox(mask):
+    ys, xs = np.where(mask)
+    return (ys.min(), ys.max(), xs.min(), xs.max()) if len(ys) else None
+
+
+def body_metrics(img, palette):
+    m = part_masks(img, palette)
+    b = bbox(m["alpha"])
+    hb = bbox(m["hair"])
+    if b is None or hb is None:
+        return None
+    top, bottom = b[0], b[1]
+    H = bottom - top + 1
+    _, hbot, hl, hr = hb
+
+    # 턱: 키 상단 40% 안, 머리카락 가로 범위 안의 피부 최하단 (허벅지·손을 얼굴로 잡지 않게)
+    face = m["skin"].copy()
+    face[top + int(H * 0.40):] = False
+    face[:, :hl] = False
+    face[:, hr + 1:] = False
+    rows = np.where(face.sum(1) > 3)[0]
+    chin = rows.max() if len(rows) else hbot
+
+    # 옷: 주황 픽셀이 키의 6% 이상인 행만 (부츠 하이라이트·활 장식 제외)
+    coat_rows = np.where(m["coat"].sum(1) > H * 0.06)[0]
+    coat_rows = coat_rows[coat_rows < top + H * 0.8]
+    skirt = coat_rows.max() if len(coat_rows) else None
+
+    boot_band = m["boot"][bottom - int(H * 0.08):bottom + 1]
+    return {
+        "height": int(H),
+        "head": (chin - top) / H,
+        "hair": m["hair"].sum() / H ** 2 * 100,
+        "skirt": (skirt - top) / H if skirt is not None else float("nan"),
+        "leg": (bottom - skirt) / H if skirt is not None else float("nan"),
+        "boot": boot_band.any(0).sum() / H,
+    }
+
+
+def design_metrics(img, palette):
+    """부위별 평균 색 + 전체 색조 분포. 색조 평균은 원형 평균(0°/360° 경계 처리)."""
+    m = part_masks(img, palette)
+    h, s, v = m["_hsv"]
+    parts = {}
+    for part in palette:
+        mask = m[part]
+        if mask.sum() < 50:
+            continue
+        rad = np.deg2rad(h[mask])
+        hue = np.rad2deg(np.arctan2(np.sin(rad).mean(), np.cos(rad).mean())) % 360
+        parts[part] = {"hue": float(hue), "sat": float(s[mask].mean()), "val": float(v[mask].mean())}
+    # 전체 분포: 채도 있는 픽셀은 색조 18칸, 무채색은 명도 3칸
+    alpha = m["alpha"]
+    chroma = alpha & (s > 0.15)
+    gray = alpha & (s <= 0.15)
+    hist = np.concatenate([
+        np.histogram(h[chroma], bins=18, range=(0, 360))[0],
+        np.histogram(v[gray], bins=3, range=(0, 1))[0],
+    ]).astype(float)
+    overall = {"sat": float(s[alpha].mean()), "val": float(v[alpha].mean())}
+    return {"parts": parts, "hist": hist / max(1.0, hist.sum()), "overall": overall}
+
+
+def design_diff(d, ref):
+    out = {}
+    for part, r in ref["parts"].items():
+        if part not in d["parts"]:
+            out[part] = {"missing": True}
+            continue
+        x = d["parts"][part]
+        dh = abs((x["hue"] - r["hue"] + 180) % 360 - 180)
+        out[part] = {"hue": dh, "sat": x["sat"] - r["sat"], "val": x["val"] - r["val"]}
+    out["palette"] = float(0.5 * np.abs(d["hist"] - ref["hist"]).sum())
+    out["overall"] = {"sat": d["overall"]["sat"] - ref["overall"]["sat"], "val": d["overall"]["val"] - ref["overall"]["val"]}
+    return out
+
+
+def design_warnings(diff, factor=1.0):
+    """factor=1 경고, factor=COLOR_FAIL_FACTOR 불합격 기준."""
+    lim = {k: v * factor for k, v in DESIGN_WARN.items()}
+    w = []
+    for part, x in diff.items():
+        if part in ("palette", "overall"):
+            continue
+        if x.get("missing"):
+            w.append(f"{part}: 기준에 있는 색 영역이 거의 없다")
+            continue
+        if x["hue"] > lim["hue"]:
+            w.append(f"{part} 색조 {x['hue']:.0f}° 차이")
+        if abs(x["sat"]) > lim["sat"]:
+            w.append(f"{part} 채도 {x['sat']:+.2f}")
+        if abs(x["val"]) > lim["val"]:
+            w.append(f"{part} 명도 {x['val']:+.2f}")
+    if abs(diff["overall"]["val"]) > lim["overall_val"]:
+        w.append(f"전체 명도 {diff['overall']['val']:+.2f}")
+    if abs(diff["overall"]["sat"]) > lim["overall_sat"]:
+        w.append(f"전체 채도 {diff['overall']['sat']:+.2f}")
+    if diff["palette"] > lim["palette"]:
+        w.append(f"전체 색 분포 차이 {diff['palette']:.2f}")
+    return w
+
+
+def summarize(frames, palette):
+    ms = [body_metrics(f["image"], palette) for f in frames]
+    valid = [x for x in ms if x]
+    med = {k: float(np.nanmedian([x[k] for x in valid])) for k in KEYS} if valid else None
+    return ms[0], med
+
+
+def delta(v, ref):
+    return {k: (v[k] / ref[k] - 1) * 100 for k in KEYS}
+
+
+def reference(path, palette):
+    frames, _ = C.load_frames(path)
+    f0, med = summarize(frames, palette)
+    if f0 is None:
+        sys.exit(f"기준 시트 0번 프레임을 측정할 수 없다 (팔레트 확인: masks {path})")
+    return frames, f0, med
+
+
+def silhouettes(frames):
+    """발 중심을 맞추고 키를 256으로 정규화한 실루엣."""
+    out = []
+    for f in frames:
+        a = np.array(f["image"])[:, :, 3] > 128
+        s = 256 / a.shape[0]
+        im = Image.fromarray(a.astype(np.uint8) * 255).resize((max(1, round(a.shape[1] * s)), 256))
+        canvas = Image.new("L", (512, 256))
+        canvas.paste(im, (round(256 - (f["feet_x"] - f["left"]) * s), 0))
+        out.append(np.array(canvas) > 128)
+    return out
+
+
+def motion_amount(frames):
+    """연속 프레임 실루엣 변화량 (XOR / 합집합). 정지 포즈 시트는 작게 나온다."""
+    s = silhouettes(frames)
+    return float(np.mean([(a ^ b).sum() / max(1, (a | b).sum()) for a, b in zip(s, s[1:])]))
+
+
+# ---------------------------------------------------------------- 출력
+
+def compare_image(ref_name, ref_img, ref_f0, items, path):
+    T, pad = 520, 24
+    tiles = [("기준 " + ref_name, C.crop_frame(ref_img))] + [(n, C.crop_frame(img)) for n, img in items]
+    tiles = [(n, t.resize((round(t.width * T / t.height), T), Image.LANCZOS)) for n, t in tiles]
+    W = sum(t.width for _, t in tiles) + pad * (len(tiles) + 1)
+    out = Image.new("RGB", (W, T + 70), (236, 236, 236))
+    d = ImageDraw.Draw(out)
+    x = pad
+    for n, t in tiles:
+        out.paste(t, (x, 25), t)
+        d.text((x, T + 40), n, fill=(0, 0, 0))
+        x += t.width + pad
+    for k, col in (("head", (220, 0, 0)), ("skirt", (0, 160, 0))):
+        if not np.isnan(ref_f0[k]):
+            y = 25 + ref_f0[k] * T
+            d.line([(0, y), (W, y)], fill=col, width=2)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    out.save(path)
+
+
+def fmt_row(label, d, extra=""):
+    return label.ljust(28) + "".join(f"{d[k]:+9.1f}%" for k in KEYS) + extra
+
+
+def header():
+    return "".ljust(28) + "".join(k.rjust(10) for k in KEYS)
+
+
+def fmt_design(label, diff):
+    cells = []
+    for part, x in diff.items():
+        if part in ("palette", "overall"):
+            continue
+        cells.append(f"{part}: 없음" if x.get("missing") else f"{part} {x['hue']:.0f}°/{x['sat']:+.2f}/{x['val']:+.2f}")
+    o = diff["overall"]
+    return f"{label.ljust(28)}{'  '.join(cells)}  전체 {o['sat']:+.2f}/{o['val']:+.2f}  분포 {diff['palette']:.2f}"
+
+
+def slash(p):
+    return p.replace("\\", "/")
+
+
+# ---------------------------------------------------------------- 명령
+
+def cmd_set_reference(args):
+    path = args.sheet
+    character = character_of(path)
+    if os.path.normpath(os.path.dirname(os.path.abspath(path))) != os.path.normpath(os.path.join(C.SHEET_ROOT, character)):
+        sys.exit(f"기준 시트는 처리된 시트여야 한다: Assets/_/Spirte/{character}/ 안의 파일")
+    frames, _ = C.load_frames(path)
+    height, stance = C.P.standing_height(frames[0]["image"])
+    cfg = load_config(character)
+    old = cfg.get("ref_height")
+    cfg.update(ref_height=round(height, 1), ref_method="standing", reference=os.path.splitext(os.path.basename(path))[0])
+    with open(config_path(character), "w", encoding="utf-8") as fp:
+        json.dump(cfg, fp, ensure_ascii=False, indent=2)
+    print(f"{character} 기준 = {cfg['reference']}, 키 {old} → {cfg['ref_height']} ({stance['method']})")
+    print("기존 시트의 스케일은 그대로다. 새 기준에 맞추려면 각 시트를 원본에서 다시 처리·적용한다.")
+    print(f"RESULT {json.dumps({'ok': True, 'character': character, **cfg, 'stance': stance}, ensure_ascii=False)}")
+
+
+def cmd_audit(args):
+    check_reference(args.reference)
+    character = character_of(args.reference)
+    palette = load_palette(character, args.palette)
+    ref_frames, ref_f0, ref_med = reference(args.reference, palette)
+    ref_design = design_metrics(ref_frames[0]["image"], palette)
+    ref_name = os.path.basename(args.reference)
+
+    if args.sheets:
+        sheets = args.sheets
+    else:
+        actions = ("Idle", "Hit", *[f"Skill{i}" for i in range(1, 10)], "Dead")
+        sheets = [p for p in (C.latest_sheet(character, a) for a in actions)
+                  if p and os.path.basename(p) != ref_name]
+
+    print(f"기준: {ref_name}  {1 / ref_f0['head']:.2f}등신")
+    print("[체형] 기준 대비 %, 0번 프레임으로 판정")
+    print(header() + "   등신")
+    result, items, design_lines = {}, [], []
+    for s in sheets:
+        frames, _ = C.load_frames(s)
+        f0, med = summarize(frames, palette)
+        name = os.path.basename(s)
+        if f0 is None:
+            print(f"{name}: 0번 프레임 측정 불가 (팔레트 확인: masks 명령)")
+            continue
+        d0 = delta(f0, ref_f0)
+        bad = [k for k, t in THRESHOLDS.items() if abs(d0[k]) > t]
+        print(fmt_row(f"{name[:22]} f0", d0, f"{1 / f0['head']:7.2f}  " + ("OK" if not bad else "벗어남:" + ",".join(bad))))
+        if med:
+            print(fmt_row("  (전 프레임 중앙값)", delta(med, ref_med)))
+        dd = design_diff(design_metrics(frames[0]["image"], palette), ref_design)
+        dw = design_warnings(dd)
+        design_lines.append(fmt_design(name[:26], dd) + ("" if not dw else "  ← " + ", ".join(dw)))
+        result[name] = {"f0": d0, "outside": bad, "design": dd, "design_warnings": dw}
+        items.append((name, frames[0]["image"]))
+
+    print("\n[디자인] 부위별 색조차°/채도차/명도차, 전체 색 분포 차이(0~1)")
+    for line in design_lines:
+        print(line)
+    print("색으로 안 잡히는 소품·머리 모양 차이는 비교 이미지에서 확인한다.")
+
+    img = os.path.join(C.PREVIEW_DIR, f"_audit_{character}.png")
+    compare_image(ref_name, ref_frames[0]["image"], ref_f0, items, img)
+    print(f"RESULT {json.dumps({'ok': True, 'reference': slash(args.reference), 'compare': slash(img), 'sheets': result}, ensure_ascii=False)}")
+
+
+def cmd_verify(args):
+    check_reference(args.reference)
+    character = character_of(args.reference)
+    palette = load_palette(character, args.palette)
+    ref_frames, ref_f0, ref_med = reference(args.reference, palette)
+    if not args.original:
+        if not args.action:
+            sys.exit("--original 또는 --action이 필요하다")
+        args.original, why = C.resolve_original(character, args.action)
+        if args.original is None:
+            sys.exit(f"{why} — 원본이 없으면 모션 비교를 할 수 없다")
+    new_frames, new_warn = C.load_frames(args.new, args.cols, args.rows, args.frames)
+    orig_frames, _ = C.load_frames(args.original, args.cols, args.rows, args.frames)
+    f0, med = summarize(new_frames, palette)
+    of0, _ = summarize(orig_frames, palette)
+
+    fails = []
+    d0 = None
+    if f0 is None:
+        fails.append("0번 프레임 측정 불가")
+    else:
+        d0 = delta(f0, ref_f0)
+        fails += [f"{k} {d0[k]:+.1f}% (±{t:g})" for k, t in THRESHOLDS.items() if abs(d0[k]) > t]
+    motion = motion_amount(new_frames) / max(1e-6, motion_amount(orig_frames))
+    if motion < args.motion_min:
+        fails.append(f"모션 {motion:.2f} (≥{args.motion_min})")
+    fails += [f"분할: {w}" for w in new_warn if "기준 키" not in w]
+
+    ref_design = design_metrics(ref_frames[0]["image"], palette)
+    dd = design_diff(design_metrics(new_frames[0]["image"], palette), ref_design)
+    dw = design_warnings(dd)
+    fails += [f"색: {w}" for w in design_warnings(dd, args.color_fail)]
+
+    print(f"기준: {os.path.basename(args.reference)}  {1 / ref_f0['head']:.2f}등신")
+    print(header() + "   등신")
+    if d0:
+        print(fmt_row("재생성 f0", d0, f"{1 / f0['head']:7.2f}"))
+    if of0:
+        print(fmt_row("원본 f0", delta(of0, ref_f0), f"{1 / of0['head']:7.2f}"))
+    if med:
+        print(fmt_row("재생성 중앙값(참고)", delta(med, ref_med)))
+    print(f"모션 보존 {motion:.2f}")
+    print(fmt_design("디자인(색)", dd))
+    if dw:
+        print("디자인 경고:", ", ".join(dw), "— 이미지로 확인한다")
+    print("판정:", "합격" if not fails else "불합격 — " + "; ".join(fails))
+
+    img = os.path.join(C.PREVIEW_DIR, f"_verify_{os.path.splitext(os.path.basename(args.new))[0]}.png")
+    compare_image(os.path.basename(args.reference), ref_frames[0]["image"], ref_f0,
+                  [("재생성", new_frames[0]["image"]), ("원본", orig_frames[0]["image"])], img)
+    print(f"RESULT {json.dumps({'ok': True, 'pass': not fails, 'fails': fails, 'design_warnings': dw, 'f0': d0, 'motion': round(motion, 3), 'compare': slash(img)}, ensure_ascii=False)}")
+    sys.exit(0 if not fails else 4)
+
+
+def cmd_masks(args):
+    palette = load_palette(character_of(args.sheet), args.palette)
+    frames, _ = C.load_frames(args.sheet)
+    img = frames[0]["image"]
+    m = part_masks(img, palette)
+    vis = np.full(m["alpha"].shape + (3,), 40, np.uint8)
+    vis[m["alpha"]] = 90
+    colors = {"hair": (0, 220, 0), "coat": (255, 120, 0), "skin": (255, 200, 200), "boot": (120, 60, 255)}
+    for part, col in colors.items():
+        if part in m:
+            vis[m[part]] = col
+    out = Image.fromarray(np.concatenate([np.array(img.convert("RGB")), vis], 1))
+    path = os.path.join(C.PREVIEW_DIR, f"_masks_{os.path.splitext(os.path.basename(args.sheet))[0]}.png")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    out.save(path)
+    print("초록=머리카락 주황=옷 분홍=피부 보라=스타킹·부츠. 엉뚱한 곳이 칠해지면 팔레트를 고친다.")
+    print(f"RESULT {json.dumps({'ok': True, 'image': slash(path)}, ensure_ascii=False)}")
+
+
+def main():
+    C.utf8_stdout()
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    r = sub.add_parser("set-reference")
+    r.add_argument("sheet")
+
+    a = sub.add_parser("audit")
+    a.add_argument("--reference", required=True, help="사용자가 지정한 기준 시트")
+    a.add_argument("sheets", nargs="*")
+
+    v = sub.add_parser("verify")
+    v.add_argument("--reference", required=True, help="사용자가 지정한 기준 시트")
+    v.add_argument("--new", required=True)
+    v.add_argument("--original", help="원본 시트. 생략하면 --action의 첫 버전으로 넣은 파일(매니페스트 source)")
+    v.add_argument("--action", help="--original 생략 시 원본을 찾을 액션 (Hit, Skill1 ...)")
+    v.add_argument("--motion_min", type=float, default=MOTION_MIN)
+    v.add_argument("--color_fail", type=float, default=COLOR_FAIL_FACTOR, help="색 불합격 = 경고 기준 × 이 값")
+    v.add_argument("--head", type=float, default=THRESHOLDS["head"])
+    v.add_argument("--hair", type=float, default=THRESHOLDS["hair"])
+    v.add_argument("--boot", type=float, default=THRESHOLDS["boot"])
+    v.add_argument("--cols", type=int)
+    v.add_argument("--rows", type=int)
+    v.add_argument("--frames", type=int)
+
+    m = sub.add_parser("masks")
+    m.add_argument("sheet")
+
+    for sp in (a, v, m):
+        sp.add_argument("--palette", help="팔레트 JSON 경로 (기본: character.json의 palette → Archer 기본값)")
+
+    args = p.parse_args()
+    if args.cmd == "verify":
+        THRESHOLDS.update(head=args.head, hair=args.hair, boot=args.boot)
+    {"set-reference": cmd_set_reference, "audit": cmd_audit, "verify": cmd_verify, "masks": cmd_masks}[args.cmd](args)
+
+
+if __name__ == "__main__":
+    main()

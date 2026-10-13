@@ -138,11 +138,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 541
-        width: 414
-        height: 541
+        y: 525
+        width: 402
+        height: 525
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.0076190475}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -159,12 +159,12 @@ TextureImporter:
       name: Archer_Hit_v2_1
       rect:
         serializedVersion: 2
-        x: 414
-        y: 541
-        width: 414
-        height: 541
+        x: 402
+        y: 525
+        width: 402
+        height: 525
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.0076190475}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -181,12 +181,12 @@ TextureImporter:
       name: Archer_Hit_v2_2
       rect:
         serializedVersion: 2
-        x: 828
-        y: 541
-        width: 414
-        height: 541
+        x: 804
+        y: 525
+        width: 402
+        height: 525
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.0076190475}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -203,12 +203,12 @@ TextureImporter:
       name: Archer_Hit_v2_3
       rect:
         serializedVersion: 2
-        x: 1242
-        y: 541
-        width: 414
-        height: 541
+        x: 1206
+        y: 525
+        width: 402
+        height: 525
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.0076190475}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -227,10 +227,10 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 414
-        height: 541
+        width: 402
+        height: 525
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.0076190475}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -247,12 +247,12 @@ TextureImporter:
       name: Archer_Hit_v2_5
       rect:
         serializedVersion: 2
-        x: 414
+        x: 402
         y: 0
-        width: 414
-        height: 541
+        width: 402
+        height: 525
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.0076190475}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -269,12 +269,12 @@ TextureImporter:
       name: Archer_Hit_v2_6
       rect:
         serializedVersion: 2
-        x: 828
+        x: 804
         y: 0
-        width: 414
-        height: 541
+        width: 402
+        height: 525
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.0076190475}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -291,12 +291,12 @@ TextureImporter:
       name: Archer_Hit_v2_7
       rect:
         serializedVersion: 2
-        x: 1242
+        x: 1206
         y: 0
-        width: 414
-        height: 541
+        width: 402
+        height: 525
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.0076190475}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []

@@ -138,11 +138,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 541
-        width: 460
-        height: 541
+        y: 534
+        width: 454
+        height: 534
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.007490637}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -159,12 +159,12 @@ TextureImporter:
       name: Archer_Skill1_v1_1
       rect:
         serializedVersion: 2
-        x: 460
-        y: 541
-        width: 460
-        height: 541
+        x: 454
+        y: 534
+        width: 454
+        height: 534
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.007490637}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -181,12 +181,12 @@ TextureImporter:
       name: Archer_Skill1_v1_2
       rect:
         serializedVersion: 2
-        x: 920
-        y: 541
-        width: 460
-        height: 541
+        x: 908
+        y: 534
+        width: 454
+        height: 534
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.007490637}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -203,12 +203,12 @@ TextureImporter:
       name: Archer_Skill1_v1_3
       rect:
         serializedVersion: 2
-        x: 1380
-        y: 541
-        width: 460
-        height: 541
+        x: 1362
+        y: 534
+        width: 454
+        height: 534
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.007490637}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -227,10 +227,10 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 460
-        height: 541
+        width: 454
+        height: 534
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.007490637}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -247,12 +247,12 @@ TextureImporter:
       name: Archer_Skill1_v1_5
       rect:
         serializedVersion: 2
-        x: 460
+        x: 454
         y: 0
-        width: 460
-        height: 541
+        width: 454
+        height: 534
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.007490637}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -269,12 +269,12 @@ TextureImporter:
       name: Archer_Skill1_v1_6
       rect:
         serializedVersion: 2
-        x: 920
+        x: 908
         y: 0
-        width: 460
-        height: 541
+        width: 454
+        height: 534
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.007490637}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -291,12 +291,12 @@ TextureImporter:
       name: Archer_Skill1_v1_7
       rect:
         serializedVersion: 2
-        x: 1380
+        x: 1362
         y: 0
-        width: 460
-        height: 541
+        width: 454
+        height: 534
       alignment: 9
-      pivot: {x: 0.5, y: 0.0073937154}
+      pivot: {x: 0.5, y: 0.007490637}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
