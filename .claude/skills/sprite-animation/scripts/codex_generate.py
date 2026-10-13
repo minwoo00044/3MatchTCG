@@ -77,6 +77,7 @@ def main():
     ap.add_argument("--previous", action="append", default=[], help="이전 시도 이미지")
     ap.add_argument("--previous-note", action="append", default=[], help="--previous 순서대로 무엇이 맞고 틀렸는지 (영어)")
     ap.add_argument("--original")
+    ap.add_argument("--props-reference", help="필수 디자인 요소가 보이는 시트 (기본: character.json design.props_reference)")
     ap.add_argument("--limit", type=float, default=85)
     ap.add_argument("--timeout", type=int, default=900)
     ap.add_argument("--dry-run", action="store_true", help="dryrun/ 폴더에 프롬프트만 만들고 Codex는 호출하지 않는다")
@@ -119,11 +120,28 @@ def main():
 
     images = ["character_reference.png", "original.png"]
     extra = []
-    for i, prev in enumerate(args.previous, start=3):
+    design = SC.load_config(character).get("design", {})
+    required = design.get("required", [])
+    props_sheet = args.props_reference
+    if not props_sheet and design.get("props_reference"):
+        props_sheet = os.path.join(C.SHEET_ROOT, character, design["props_reference"] + ".png")
+    if required and props_sheet:
+        if not os.path.exists(props_sheet):
+            done(False, 1, error=f"소품 참고 시트가 없다: {props_sheet}")
+        pf, _ = C.load_frames(props_sheet)
+        pimg = C.crop_frame(pf[0]["image"])
+        pbg = Image.new("RGBA", pimg.size, (255, 255, 255, 255))
+        pbg.alpha_composite(pimg)
+        pbg.convert("RGB").save(os.path.join(work, "props_reference.png"))
+        images.append("props_reference.png")
+        extra.append(f"{len(images)}. props_reference.png — shows the required design elements ({'; '.join(required)}). "
+                     f"Copy those elements exactly from it; ignore its pose and its body proportions.")
+    first_prev = len(images) + 1
+    for i, prev in enumerate(args.previous, start=first_prev):
         name = f"previous_{i}.png"
         shutil.copy(prev, os.path.join(work, name))
         images.append(name)
-        note = args.previous_note[i - 3] if args.previous_note else "an earlier redraw"
+        note = args.previous_note[i - first_prev] if args.previous_note else "an earlier redraw"
         extra.append(f"{i}. {name} — {note}")
 
     with open(TEMPLATE, encoding="utf-8") as fp:
@@ -131,6 +149,8 @@ def main():
     prompt = (prompt.replace("{GRID}", f"{cols}x{rows}").replace("{COLS}", str(cols)).replace("{ROWS}", str(rows))
               .replace("{FRAMES}", str(frames)).replace("{ACTION}", args.action_desc)
               .replace("{HEAD_PCT}", str(round(ref_f0["head"] * 100)))
+              .replace("{REQUIRED}", ("- Required design elements — must be visible in every frame, even though #1 does not have them: "
+                                      + "; ".join(required) + "." if required else ""))
               .replace("{EXTRA_REFS}", "\n".join(extra) + ("\n" if extra else ""))
               .replace("{FIXES}", "\n".join(f"- {f}" for f in args.fix) or "- (none measured; match #1)"))
     with open(os.path.join(work, "prompt.md"), "w", encoding="utf-8") as fp:

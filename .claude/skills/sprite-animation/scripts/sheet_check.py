@@ -371,10 +371,18 @@ def cmd_audit(args):
     for line in design_lines:
         print(line)
     print("색으로 안 잡히는 소품·머리 모양 차이는 비교 이미지에서 확인한다.")
+    design = load_config(character).get("design", {})
+    if design.get("required"):
+        print()
+        print("[필수 디자인 요소] 사용자 지정 — 기준 시트보다 우선한다. 모든 시트의 0번 프레임에서 눈으로 확인:")
+        for item in design["required"]:
+            print(f"  - {item}")
+        if design.get("note"):
+            print(f"  ({design['note']})")
 
     img = os.path.join(C.PREVIEW_DIR, f"_audit_{character}.png")
     compare_image(ref_name, ref_frames[0]["image"], ref_f0, items, img, palette)
-    print(f"RESULT {json.dumps({'ok': True, 'reference': slash(args.reference), 'compare': slash(img), 'sheets': result}, ensure_ascii=False)}")
+    print(f"RESULT {json.dumps({'ok': True, 'reference': slash(args.reference), 'compare': slash(img), 'required_design': design.get('required', []), 'sheets': result}, ensure_ascii=False)}")
 
 
 def cmd_verify(args):
