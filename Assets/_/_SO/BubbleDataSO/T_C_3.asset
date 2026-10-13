@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: T_C_3
   m_EditorClassIdentifier: 
   SOName: T_C_3
-  action: {fileID: 11400000, guid: d351baa0ba7b42b40887eac93f669ae3, type: 2}
-  target: {fileID: 11400000, guid: 5607394d0c69e4644baf4e12a1f5f941, type: 2}
+  effects:
+  - action: {fileID: 11400000, guid: d351baa0ba7b42b40887eac93f669ae3, type: 2}
+    target: {fileID: 11400000, guid: 5607394d0c69e4644baf4e12a1f5f941, type: 2}
+    value: 10
+    threatMultiplier: 1
   bubbleImage: {fileID: 21300000, guid: db427fab3e94daf4caa704d9314a77a1, type: 3}
   spawnWeight: 1
-  value: 10
   chainWeights: []
-  threatMultiplier: 1

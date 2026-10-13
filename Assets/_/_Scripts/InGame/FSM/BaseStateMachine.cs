@@ -61,7 +61,7 @@ public class BaseStateMachine<T, O>
         if (nextState is null)
         {
             // 등록되지 않은 상태로 전이하려 한 것입니다. 이전 상태는 이미 OnExit을 마쳤으므로
-            // 여기서 돌아가면 어느 상태에도 속하지 않은 채로 멈춥니다. (AGENT.md §8)
+            // 여기서 돌아가면 어느 상태에도 속하지 않은 채로 멈춥니다. (AGENTS.md §8)
             Debug.LogWarning($"[{typeof(O).Name}] 등록되지 않은 상태로 전이를 시도했습니다: {newState}");
             return;
         }

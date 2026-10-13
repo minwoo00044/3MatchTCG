@@ -6,7 +6,7 @@
 public class SkillRecipe
 {
     // 터진 버블의 스펙. MatchGroup이 터뜨리는 시점에 잡아둔 스냅샷입니다.
-    // 연출이 끝난 뒤에는 Bubble.Spec이 이미 null이라 여기서만 얻을 수 있습니다. (AGENT.md §3)
+    // 연출이 끝난 뒤에는 Bubble.Spec이 이미 null이라 여기서만 얻을 수 있습니다. (AGENTS.md §3)
     public BubbleSO Spec { get; }
 
     // 이 덩어리로 터진 버블 개수. 최종 수치 = value * MatchCount * chainWeight (GDD §4.6)

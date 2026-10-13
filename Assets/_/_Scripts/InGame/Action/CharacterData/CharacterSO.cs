@@ -30,7 +30,7 @@ public class CharacterSO : ScriptableObject
     public BubbleSO[] skills;
 
 #if UNITY_EDITOR
-    // 인스펙터 배선 실수는 컴파일로 잡히지 않습니다. 값이 아니라 불변식을 찍습니다. (AGENT.md §9)
+    // 인스펙터 배선 실수는 컴파일로 잡히지 않습니다. 값이 아니라 불변식을 찍습니다. (AGENTS.md §9)
     private void OnValidate()
     {
         if (skills == null) return;

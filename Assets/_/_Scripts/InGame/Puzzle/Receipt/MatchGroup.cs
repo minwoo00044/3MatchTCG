@@ -10,7 +10,7 @@ public class MatchGroup
     //
     // Bubble.ReturnToPool()이 _spec = null을 하고 그 호출이 팝 트윈의 OnComplete에
     // 걸려 있어, 연출이 끝난 뒤에는 Cells[i].Data.Spec이 이미 null입니다.
-    // 터뜨리는 시점에 여기 적어두지 않으면 무슨 버블이었는지 되찾을 방법이 없습니다. (AGENT.md §3)
+    // 터뜨리는 시점에 여기 적어두지 않으면 무슨 버블이었는지 되찾을 방법이 없습니다. (AGENTS.md §3)
     public BubbleSO Spec { get; }
 
     // 터진 칸들. FromPos == ToPos입니다.

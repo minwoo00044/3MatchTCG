@@ -5,7 +5,7 @@ using UnityEngine.UI;
 // 캐릭터 하나의 표현. (GDD §4.1)
 //
 // **언제 보여줄지 모릅니다.** 받은 값을 그릴 뿐이고, 모델(Actor)을 조회하지 않습니다.
-// 조회하기 시작하면 연출 시점에는 이미 여러 대 더 맞은 뒤라 화면이 미래를 그립니다. (AGENT.md §3)
+// 조회하기 시작하면 연출 시점에는 이미 여러 대 더 맞은 뒤라 화면이 미래를 그립니다. (AGENTS.md §3)
 // 순서를 아는 것은 BattleSequencer 하나뿐입니다.
 //
 // 연출 내용(모션·시간·스프라이트)은 아직 기획이 없습니다. 지금은 구조 검증이 목적이라
@@ -31,7 +31,7 @@ public class ActorView : MonoBehaviour
 
     // TMP가 아니라 레거시 UI.Text입니다. TMP는 TMP Essentials를 임포트해야 쓸 수 있어
     // 구조 검증을 시작하는 데 설치 절차가 하나 끼어듭니다. 연출 기획이 오면 이 클래스 안에서
-    // 갈아끼우면 되므로 지금은 의존을 늘리지 않습니다. (AGENT.md §0 - 예외 사유)
+    // 갈아끼우면 되므로 지금은 의존을 늘리지 않습니다. (AGENTS.md §0 - 예외 사유)
 
     [Header("TWEEN")]
     [Tooltip("시전 시 앞으로 내미는 거리")]
@@ -61,7 +61,7 @@ public class ActorView : MonoBehaviour
     [SerializeField]
     private Color shieldColor = new Color(0.5f, 0.8f, 1f);
 
-    // 시전 모션이 돌아올 기준 위치. 트윈 생성 전에 확정해야 합니다. (AGENT.md §7)
+    // 시전 모션이 돌아올 기준 위치. 트윈 생성 전에 확정해야 합니다. (AGENTS.md §7)
     private Vector3 homePos;
 
     // 자기 트윈만 죽입니다. 시퀀서의 타임라인은 건드리지 않습니다.
@@ -83,7 +83,7 @@ public class ActorView : MonoBehaviour
 
     // 게이지는 즉시 값이 아니라 "이 값까지 흐르게" 합니다.
     // 채우는 비율만 받습니다. 최대치를 나누는 계산조차 여기서 하지 않는 이유는
-    // 뷰가 규칙을 판단하지 않기 때문입니다. (AGENT.md §1)
+    // 뷰가 규칙을 판단하지 않기 때문입니다. (AGENTS.md §1)
     public void SetHP(float ratio)
     {
         if (hpFill == null) return;
@@ -115,7 +115,7 @@ public class ActorView : MonoBehaviour
     {
         bodyTween?.Kill();
 
-        // 시작값은 트윈 "생성 전"에 확정합니다. OnStart 안에서 잡으면 이미 늦습니다. (AGENT.md §7)
+        // 시작값은 트윈 "생성 전"에 확정합니다. OnStart 안에서 잡으면 이미 늦습니다. (AGENTS.md §7)
         transform.position = homePos;
 
         Sequence seq = DOTween.Sequence();
@@ -161,7 +161,7 @@ public class ActorView : MonoBehaviour
         Transform anchor = popupAnchor != null ? popupAnchor : transform;
 
         // 풀링하지 않습니다. 수치 표시는 연출 기획이 오면 통째로 갈릴 자리이고,
-        // 지금 풀을 붙이면 반납 주체가 하나 더 늘어납니다. (AGENT.md §4)
+        // 지금 풀을 붙이면 반납 주체가 하나 더 늘어납니다. (AGENTS.md §4)
         Text popup = Instantiate(popupPrefab, anchor);
         popup.text = effect == EBattleEffect.Damage ? $"-{applied}" : $"+{applied}";
         popup.color = ResolvePopupColor(effect);

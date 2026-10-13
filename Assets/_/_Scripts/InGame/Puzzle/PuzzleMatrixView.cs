@@ -117,6 +117,21 @@ public class PuzzleMatrixView : MonoBehaviour
         dataViewDict.Add(data, view);
     }
 
+    // 어떤 스펙이 사망 캐릭터 소유인지는 PuzzleManager가 판단합니다.
+    // 이 뷰는 현재 보드의 데이터-뷰 짝을 찾아 표현만 바꿉니다. (GDD §3.2.1, AGENTS.md §1)
+    public void SetGrayscale(HashSet<BubbleSO> specs)
+    {
+        if (specs == null || specs.Count == 0) return;
+
+        foreach (var pair in dataViewDict)
+        {
+            Bubble data = pair.Key;
+            if (data?.Spec == null || !specs.Contains(data.Spec)) continue;
+
+            pair.Value.SetGrayscale(true);
+        }
+    }
+
     // 데이터와 뷰를 함께 해제하는 단일 창구.
     // Bubble.ReturnToPool() -> PuzzlePool 콜백 -> PuzzleManager.RemoveAtMatrix() -> 여기로 들어옵니다.
     // 뷰 반납 주체를 이곳 하나로 통일해야 모델 경로(InitializeBoard 리롤, ClearBoardAndPool)에서

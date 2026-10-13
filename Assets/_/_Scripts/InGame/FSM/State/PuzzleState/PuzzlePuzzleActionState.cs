@@ -28,7 +28,7 @@ public class PuzzlePuzzleActionState : BaseState<EPuzzleState, PuzzleManager>, I
     {
         readyCount++;
 
-        // 불변식: 완수 보고는 기다리는 수만큼만 온다. (AGENT.md §9)
+        // 불변식: 완수 보고는 기다리는 수만큼만 온다. (AGENTS.md §9)
         if (readyCount > totalTargetCount)
         {
             Debug.LogWarning($"[PuzzlePuzzleActionState] 완수 보고가 초과했습니다. {readyCount}/{totalTargetCount}");

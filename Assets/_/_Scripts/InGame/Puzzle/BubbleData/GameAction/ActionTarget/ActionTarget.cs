@@ -19,7 +19,7 @@ public abstract class ActionTarget : ScriptableObject
     // 시전자가 전장에 올라 있지 않으면 어떤 판정도 할 수 없습니다.
     protected static bool HasField(Actor caster) => caster != null && caster.Field != null;
 
-    // LowestHPAlly와 LowestHPEnemy가 같은 질문을 합니다. 답하는 곳은 여기 하나입니다. (AGENT.md §5)
+    // LowestHPAlly와 LowestHPEnemy가 같은 질문을 합니다. 답하는 곳은 여기 하나입니다. (AGENTS.md §5)
     // 절대 수치가 아니라 비율입니다. 최대 체력이 다른 캐릭터끼리 비교해야 하기 때문입니다. (GDD §4.3)
     protected static Actor LowestHP(Actor[] pool)
     {

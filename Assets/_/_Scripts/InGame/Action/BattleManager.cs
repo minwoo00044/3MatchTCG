@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -10,6 +9,8 @@ using UnityEngine;
 // PuzzleManager와 직접 주고받지 않습니다.
 public class BattleManager : BaseManager
 {
+    private readonly SkillResolver skillResolver = new SkillResolver();
+
     [Header("ENEMY")]
     [Tooltip("적 NPC 표시 이름")]
     [SerializeField]
@@ -67,10 +68,10 @@ public class BattleManager : BaseManager
     // 적의 공격 주기를 세는 쪽. 실행은 이 매니저가 합니다.
     private EnemyController enemyController;
 
-    // 이 매니저가 만든 뷰. 전장을 다시 세울 때 걷어내는 주체가 하나여야 합니다. (AGENT.md §4)
+    // 이 매니저가 만든 뷰. 전장을 다시 세울 때 걷어내는 주체가 하나여야 합니다. (AGENTS.md §4)
     private readonly List<ActorView> spawnedViews = new List<ActorView>();
 
-    // 시계 로그를 마지막으로 찍은 GameTime. 매 프레임 찍으면 로그가 흐름을 덮습니다. (AGENT.md §9)
+    // 시계 로그를 마지막으로 찍은 GameTime. 매 프레임 찍으면 로그가 흐름을 덮습니다. (AGENTS.md §9)
     private float lastTickLogTime;
 
     // 버블 -> 시전자 역추적. (GDD §2.3)
@@ -105,7 +106,7 @@ public class BattleManager : BaseManager
         BuildBattlefield();
 
         // GameInitState는 Init 구독자 수만큼 완료 보고를 기다립니다.
-        // 여기서 보고하지 않으면 readyCount가 1/2에서 멈춰 게임이 Wait로 넘어가지 못합니다. (AGENT.md §8)
+        // 여기서 보고하지 않으면 readyCount가 1/2에서 멈춰 게임이 Wait로 넘어가지 못합니다. (AGENTS.md §8)
         gameManager.ReceiveCompleteSignal();
     }
 
@@ -148,7 +149,7 @@ public class BattleManager : BaseManager
         enemyController = new EnemyController(enemyAttackInterval);
 
         // 스킬 배선 검사는 부팅 시 한 번만 합니다. 실행 시점에 찍으면 적은 주기마다,
-        // 버블은 터질 때마다 반복됩니다. (AGENT.md §9)
+        // 버블은 터질 때마다 반복됩니다. (AGENTS.md §9)
         ValidateSkill(enemySkill, "적 스킬");
         foreach (var skill in skillCasters.Keys) ValidateSkill(skill, "버블 스킬");
 
@@ -169,7 +170,7 @@ public class BattleManager : BaseManager
     // Actor 하나에 뷰 하나를 만들어 붙입니다.
     //
     // 뷰가 없어도 전투는 그대로 돕니다. 수치와 영수증은 뷰를 모르기 때문입니다.
-    // 다만 조용히 넘어가면 "왜 화면이 안 움직이지"를 코드에서 찾게 되므로 한 번 알립니다. (AGENT.md §9)
+    // 다만 조용히 넘어가면 "왜 화면이 안 움직이지"를 코드에서 찾게 되므로 한 번 알립니다. (AGENTS.md §9)
     private void AttachView(Actor actor, ActorView prefab, Transform root, int seat,
                             string displayName, Color color, bool facingRight)
     {
@@ -188,7 +189,7 @@ public class BattleManager : BaseManager
         view.transform.localPosition = new Vector3(seat * allySpacing, 0f, 0f);
 
         // 위치를 확정한 **뒤에** Init을 부릅니다. Init이 시전 모션의 복귀 지점(homePos)을
-        // 캡처하므로, 순서가 뒤집히면 캐릭터가 프리팹 원점으로 돌아갑니다. (AGENT.md §3, §7)
+        // 캡처하므로, 순서가 뒤집히면 캐릭터가 프리팹 원점으로 돌아갑니다. (AGENTS.md §3, §7)
         view.Init(displayName, color, facingRight);
 
         spawnedViews.Add(view);
@@ -200,7 +201,7 @@ public class BattleManager : BaseManager
     // 실제로 적 스킬(E_0)이 전부 빈 채로 오래 지나갔고, 발동 로그를 붙이고서야 드러났습니다.
     //
     // 그래서 "무엇이 비었나"를 부팅 시점에 한 줄로 말하게 합니다. 값을 나열하는 로그가 아니라
-    // "이 스킬은 실행돼도 아무 일이 없다"는 불변식 위반을 찍는 것입니다. (AGENT.md §9)
+    // "이 스킬은 실행돼도 아무 일이 없다"는 불변식 위반을 찍는 것입니다. (AGENTS.md §9)
     private void ValidateSkill(SkillSO skill, string label)
     {
         if (skill == null)
@@ -211,10 +212,29 @@ public class BattleManager : BaseManager
 
         string name = string.IsNullOrEmpty(skill.SOName) ? skill.name : skill.SOName;
         List<string> missing = new List<string>();
+        IReadOnlyList<SkillEffect> effects = skill.Effects;
 
-        if (skill.action == null) missing.Add("action");
-        if (skill.target == null) missing.Add("target");
-        if (skill.value <= 0f) missing.Add("value");
+        if (effects == null || effects.Count == 0)
+        {
+            missing.Add("effects");
+        }
+        else
+        {
+            for (int i = 0; i < effects.Count; i++)
+            {
+                SkillEffect effect = effects[i];
+                if (effect == null)
+                {
+                    missing.Add($"effects[{i}]");
+                    continue;
+                }
+
+                if (effect.action == null) missing.Add($"effects[{i}].action");
+                else if (effect.action.RequiresTarget && effect.target == null)
+                    missing.Add($"effects[{i}].target");
+                if (effect.value <= 0f) missing.Add($"effects[{i}].value");
+            }
+        }
 
         if (missing.Count == 0) return;
 
@@ -284,13 +304,14 @@ public class BattleManager : BaseManager
     private void HandleOnAction()
     {
         MoveReceipt receipt = gameManager.ConsumeMoveReceipt();
-        List<SkillRecipe> recipes = BuildSkillRecipes(receipt);
+        List<SkillRecipe> recipes = skillResolver.BuildRecipes(receipt);
+        SkillBatchContext batch = new SkillBatchContext();
 
         // 수치는 여기서 전부 확정됩니다. 연출은 나중에 이 기록을 재생할 뿐입니다. (GDD §4.1, §4.5)
         BattleReceipt battle = new BattleReceipt();
         foreach (var recipe in recipes)
         {
-            ExecuteRecipe(recipe, battle);
+            ExecuteRecipe(recipe, batch, battle);
         }
 
         ReportBattleReceipt(battle);
@@ -301,7 +322,7 @@ public class BattleManager : BaseManager
         //    유지됩니다. GDD §4.5가 "두 구간 모두"라고 적어둔 그대로입니다.
         //  - 승패 전이가 진짜로 연출 뒤가 됩니다. 지금까지는 동기 실행이라 우연히 지켜졌습니다. (GDD §4.4)
         //
-        // 시퀀서가 없으면 아무도 이 상태를 끝내주지 않으므로 즉시 보고합니다. (AGENT.md §8)
+        // 시퀀서가 없으면 아무도 이 상태를 끝내주지 않으므로 즉시 보고합니다. (AGENTS.md §8)
         if (sequencer == null)
         {
             gameManager.ReceiveCompleteSignal();
@@ -311,47 +332,9 @@ public class BattleManager : BaseManager
         sequencer.Play(battle, () => gameManager.ReceiveCompleteSignal());
     }
 
-    // 퍼즐 영수증을 실행 순서대로 늘어놓은 스킬 목록으로 옮깁니다. (GDD §4.5)
-    //
-    // 퍼즐은 "무슨 버블이 몇 차에 몇 개 터졌나"까지만 적습니다.
-    // 덩어리 1개 = 스킬 1건이라는 판정도, 차수와 개수를 세는 것도 여기서 합니다.
-    private List<SkillRecipe> BuildSkillRecipes(MoveReceipt receipt)
-    {
-        List<SkillRecipe> ret = new List<SkillRecipe>();
-        if (receipt == null) return ret;
-
-        for (int i = 0; i < receipt.ChainSteps.Count; i++)
-        {
-            // 연쇄 차수는 1-based입니다.
-            int chainIndex = i + 1;
-            List<SkillRecipe> ofStep = new List<SkillRecipe>();
-
-            foreach (var group in receipt.ChainSteps[i].MatchGroups)
-            {
-                if (group.Spec == null) continue;
-                ofStep.Add(new SkillRecipe(group.Spec, group.Cells.Count, chainIndex));
-            }
-
-            // 선(先)배치 실행 규칙 - 증폭/버프를 이 차수의 가장 앞으로 당깁니다. (GDD §4.5)
-            //
-            // 정렬 범위는 이번 차수뿐입니다. 앞선 차수로 소급되면 이미 발동이 끝난 스킬의
-            // 수치가 뒤늦게 바뀝니다. OrderBy는 안정 정렬이라 나머지 순서는 보존됩니다.
-            if (ofStep.Count > 1)
-            {
-                ofStep = ofStep
-                    .OrderByDescending(r => r.Spec.action != null && r.Spec.action.IsPreemptive)
-                    .ToList();
-            }
-
-            ret.AddRange(ofStep);
-        }
-
-        return ret;
-    }
-
     // ===================== 스킬 실행 =====================
 
-    private void ExecuteRecipe(SkillRecipe recipe, BattleReceipt battle)
+    private void ExecuteRecipe(SkillRecipe recipe, SkillBatchContext batch, BattleReceipt battle)
     {
         if (recipe == null || recipe.Spec == null) return;
         BubbleSO spec = recipe.Spec;
@@ -359,41 +342,50 @@ public class BattleManager : BaseManager
         // 소속 캐릭터가 죽었으면 여기서 걸러집니다. 버블은 이미 터졌고 효과만 없습니다. (GDD §3.2.1)
         if (!TryResolveCaster(spec, out Actor caster)) return;
 
-        // 최종 수치 = value * matchCount * chainWeight (GDD §4.6)
-        //
-        // 여기서 정수로 확정합니다. Actor의 HP/실드가 int인 이유는, float로 두면
-        // "0.0001 남아 안 죽은 적"이 생기고 그 판정이 타깃 필터와 승패까지 번지기 때문입니다.
-        int amount = Mathf.RoundToInt(spec.value * recipe.MatchCount * spec.GetChainWeight(recipe.ChainIndex));
-
-        ExecuteSkill(caster, spec, amount, battle);
+        // 퍼즐 기본 파워는 매치 그룹 1건에서 한 번만 계산하고 모든 효과가 공유합니다. (GDD §4.6)
+        float skillPower = recipe.MatchCount * spec.GetChainWeight(recipe.ChainIndex);
+        foreach (SkillEffect effect in skillResolver.GetOrderedEffects(spec))
+        {
+            ExecuteEffect(caster, spec, effect, skillPower, batch, battle);
+        }
     }
 
     // 스킬 1건이 실제로 발동하는 유일한 지점입니다.
     //
     // 플레이어와 적이 갈라지는 것은 여기까지 오는 길(시전자를 어떻게 찾는가, 수치를 어떻게 세는가)
     // 뿐이고, 타깃 검색·적용·기록·위협도는 완전히 같습니다. 적 공격용 실행 함수를 따로 만들면
-    // 경로가 둘이 되고, 이후 규칙이 하나만 고쳐질 때 한쪽이 조용히 틀려집니다. (AGENT.md §5)
+    // 경로가 둘이 되고, 이후 규칙이 하나만 고쳐질 때 한쪽이 조용히 틀려집니다. (AGENTS.md §5)
     //
     // 인자가 BubbleSO가 아니라 SkillSO인 것이 이 경계의 선언입니다.
     // **여기부터는 퍼즐 개념이 없습니다.** 연쇄 차수도 매치 개수도 이미 amount에 녹아 끝났고,
     // 이 아래에서 다시 꺼내 쓸 수 없어야 합니다.
-    private void ExecuteSkill(Actor caster, SkillSO spec, int amount, BattleReceipt battle)
+    private void ExecuteEffect(Actor caster, SkillSO spec, SkillEffect effect, float skillPower,
+                               SkillBatchContext batch, BattleReceipt battle)
     {
-        if (caster == null || spec == null || amount <= 0) return;
+        if (caster == null || spec == null || effect == null || effect.value <= 0f) return;
 
-        if (spec.action == null || spec.target == null)
+        GameAction action = effect.action;
+        if (action == null || (action.RequiresTarget && effect.target == null))
         {
-            Debug.LogWarning($"[BattleManager] {spec.SOName}에 액션 또는 타깃이 배정되지 않았습니다.");
+            Debug.LogWarning($"[BattleManager] {spec.SOName} 효과에 액션 또는 필수 타깃이 배정되지 않았습니다.");
             return;
         }
 
-        Actor[] targets = spec.target.FindTarget(caster);
-        if (targets.Length == 0) return;
+        Actor[] targets = action.RequiresTarget
+            ? effect.target.FindTarget(caster)
+            : System.Array.Empty<Actor>();
+        if (action.RequiresTarget && targets.Length == 0) return;
+
+        // 선배치 효과는 먼저 배치 상태를 바꾸므로 같은 레시피의 후속 효과부터 새 배율을 씁니다.
+        float finalValue = action.UsesSkillPower
+            ? effect.value * skillPower * batch.Amplification
+            : effect.value;
+        if (finalValue <= 0f) return;
 
         int before = battle.Steps.Count;
-        spec.action.OnExecute(new SkillContext(caster, spec, targets, amount, battle));
+        action.OnExecute(new SkillContext(caster, spec, targets, finalValue, batch, battle));
 
-        AccumulateThreat(caster, spec, battle, before);
+        AccumulateThreat(caster, effect, battle, before);
     }
 
     // ===================== 적 공격 =====================
@@ -415,7 +407,7 @@ public class BattleManager : BaseManager
     }
 
     // 시계가 흐르는지, 그리고 연출 중에 멈추는지를 눈으로 보기 위한 임시 로그입니다.
-    // 화면에 전투가 보이기 시작하면 제거합니다. (AGENT.md §9)
+    // 화면에 전투가 보이기 시작하면 제거합니다. (AGENTS.md §9)
     //
     // 1초에 한 줄로 묶습니다. 매 프레임 찍으면 초당 수십 줄이라 다른 로그가 묻히고,
     // 무엇보다 "연출 중 멈춤"을 확인하려면 줄 간격이 곧 신호인데 그게 안 보입니다.
@@ -435,19 +427,20 @@ public class BattleManager : BaseManager
         SkillSO skill = enemyActor.Skill;
         if (skill == null) return; // 배선 경고는 BuildBattlefield에서 한 번만 찍습니다.
 
-        // 적 공격은 버블 매치가 없으므로 최종 데미지 = value 고정입니다.
-        // matchCount와 chainWeight를 곱하지 않습니다. (GDD §4.2)
-        int amount = Mathf.RoundToInt(skill.value);
-
         // 발동 자체를 먼저 찍습니다. 아래 영수증 로그는 대상이 없거나 빗나가면 아무것도 남기지 않아,
-        // "적이 안 때린 것"과 "때렸는데 대상이 없던 것"을 구별할 수 없습니다. (AGENT.md §9)
+        // "적이 안 때린 것"과 "때렸는데 대상이 없던 것"을 구별할 수 없습니다. (AGENTS.md §9)
         LogEnemyAttack();
 
         // 발동 시점에 수치를 영수증으로 선확정하고, 연출은 나중에 그 기록을 재생합니다. (GDD §4.2)
         // 플레이어 배치와 섞이지 않도록 이 공격 한 건만 담은 영수증을 만듭니다.
         // 배치가 다르면 연출 타임라인도 다르므로 한 장에 이어붙이면 순서가 뭉갭니다.
         BattleReceipt battle = new BattleReceipt();
-        ExecuteSkill(enemyActor, skill, amount, battle);
+        SkillBatchContext batch = new SkillBatchContext();
+        foreach (SkillEffect effect in skillResolver.GetOrderedEffects(skill))
+        {
+            // 적 스킬에는 매치가 없으므로 skillPower는 항상 1입니다. (GDD §4.2)
+            ExecuteEffect(enemyActor, skill, effect, 1f, batch, battle);
+        }
         ReportBattleReceipt(battle);
 
         // 기다리는 상태가 없으므로 완주 콜백이 없습니다. 두 경로의 유일한 차이입니다.
@@ -461,7 +454,7 @@ public class BattleManager : BaseManager
 
     // 적이 누구를 때리는지만 봐서는 HighestThreatEnemy가 정렬을 하는지, 그냥 명단 첫 번째를
     // 집는지 구별할 수 없습니다. 탱커가 계속 맞으면 두 경우의 결과가 같기 때문입니다.
-    // 그래서 후보 전원의 총 위협도를 함께 찍습니다. 화면이 생기면 제거합니다. (AGENT.md §9)
+    // 그래서 후보 전원의 총 위협도를 함께 찍습니다. 화면이 생기면 제거합니다. (AGENTS.md §9)
     private void LogEnemyAttack()
     {
         if (!logBattleTick) return;
@@ -469,7 +462,7 @@ public class BattleManager : BaseManager
         StringBuilder sb = new StringBuilder();
         sb.Append($"[BattleManager] 적 공격 발동 (GameTime {battlefield.GameTime:F1}s, 주기 {enemyAttackInterval}s) 위협도");
 
-        // 적 기준의 "적군"이 곧 아군 진영입니다. 상대 판정은 반드시 이 경로로 합니다. (AGENT.md §5)
+        // 적 기준의 "적군"이 곧 아군 진영입니다. 상대 판정은 반드시 이 경로로 합니다. (AGENTS.md §5)
         foreach (var actor in battlefield.EnemiesOf(enemyActor))
         {
             sb.Append($" {actor}={actor.GetTotalThreat(battlefield.GameTime):F0}");
@@ -480,7 +473,7 @@ public class BattleManager : BaseManager
     // ===================== 승패 판정 =====================
 
     // 전장을 소유한 쪽이 판정합니다. 다만 전이는 하지 않고 예약만 합니다 —
-    // 사망 시점에 곧바로 전이하면 진행 중인 연출 시퀀스가 남고 뷰가 누수됩니다. (GDD §4.4, AGENT.md §9)
+    // 사망 시점에 곧바로 전이하면 진행 중인 연출 시퀀스가 남고 뷰가 누수됩니다. (GDD §4.4, AGENTS.md §9)
     private void HandleActorDeath(Actor actor)
     {
         if (actor == null || gameManager == null) return;
@@ -521,7 +514,7 @@ public class BattleManager : BaseManager
     //
     // 대상 수만큼 합산합니다. 광역 힐은 1인 힐보다 총량이 크므로 어그로도 그만큼 끌립니다. (GDD §4.1)
     // 방금 적힌 기록에서 요청량을 걷어오므로, 액션이 무엇을 했든 셈이 어긋나지 않습니다.
-    private void AccumulateThreat(Actor caster, SkillSO spec, BattleReceipt battle, int fromIndex)
+    private void AccumulateThreat(Actor caster, SkillEffect effect, BattleReceipt battle, int fromIndex)
     {
         int requested = 0;
         for (int i = fromIndex; i < battle.Steps.Count; i++)
@@ -530,12 +523,12 @@ public class BattleManager : BaseManager
         }
         if (requested <= 0) return;
 
-        caster.AddThreat(requested * spec.threatMultiplier, battlefield.GameTime);
+        caster.AddThreat(requested * effect.threatMultiplier, battlefield.GameTime);
     }
 
     // 전투 결과 확인용 임시 로그입니다.
     //
-    // 연출이 붙었으니 원래는 여기서 제거할 자리인데(AGENT.md §9), HANDOFF §6에 남은 확인 2건 중
+    // 연출이 붙었으니 원래는 여기서 제거할 자리인데(AGENTS.md §9), HANDOFF §6에 남은 확인 2건 중
     // "죽은 캐릭터 버블의 스킬 무효화"가 **이 로그에 안 나오는 것**을 통과 기준으로 삼고 있습니다.
     // 그 검증을 마치면 이 함수와 logBattleTick을 함께 걷어냅니다.
     private void ReportBattleReceipt(BattleReceipt battle)

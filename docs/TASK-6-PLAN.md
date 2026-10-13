@@ -18,11 +18,11 @@
 
 - 기획의 단일 원천: `docs/GDD.md` §3.2, §3.2.1
 - 구현 순서의 근거: `docs/HANDOFF.md` §4 작업 `[6]`
-- 계층 규칙: `docs/AGENT.md` §1, §5
-- 영수증 불변 규칙: `docs/AGENT.md` §3
+- 계층 규칙: `AGENTS.md` §1, §5
+- 영수증 불변 규칙: `AGENTS.md` §3
 - `PuzzleManager`는 `Actor`를 직접 참조하지 않는다.
 - 하위 매니저인 `BattleManager`와 `PuzzleManager`는 직접 통신하지 않고 `GameManager`를 거친다.
-- `docs/GDD.md`, `docs/GDD-TODO.md`, `docs/AGENT.md`는 이번 작업에서 수정하지 않는다.
+- `docs/GDD.md`, `docs/GDD-TODO.md`, `AGENTS.md`는 이번 작업에서 수정하지 않는다.
 - 이 저장소에는 Unity 참조 어셈블리가 없으므로 에이전트가 컴파일을 검증할 수 없다. 코드 변경 후 Unity 에디터 확인이 필요하다.
 
 ## 3. 현재 상태
@@ -177,7 +177,7 @@ Unity 에디터에서 다음 두 항목을 먼저 확인한다.
 - `T_O`의 1.2배 증폭 액션 — 작업 `[10]`
 - `SkillResolver` 분리 — 작업 `[10]` 착수 직전 별도 리팩터링
 - 결과 화면, 리트라이, 씬 전환, 배속 UI
-- `docs/GDD.md`, `docs/GDD-TODO.md`, `docs/AGENT.md` 변경
+- `docs/GDD.md`, `docs/GDD-TODO.md`, `AGENTS.md` 변경
 - 캐릭터 및 스킬 밸런스 값 조정
 
 ## 8. 예상 변경 파일

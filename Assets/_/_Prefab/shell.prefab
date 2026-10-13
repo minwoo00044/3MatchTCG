@@ -58,7 +58,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 4b201975fc0369b489346da9b8392cf4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -104,6 +104,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bubbleShell: {fileID: 7736165684542820631}
   inBubble: {fileID: 1035740160736377496}
+  highlightRing: {fileID: 0}
+  hoverScale: 1.05
+  hoverGlow: 0.25
+  selectedScaleMin: 1.08
+  selectedScaleMax: 1.2
+  selectedGlowMin: 0.35
+  selectedGlowMax: 0.95
+  selectedPulseDuration: 0.35
+  selectedSortingBump: 10
+  hintScaleMin: 1
+  hintScaleMax: 1.13
+  hintGlowMin: 0.1
+  hintGlowMax: 0.8
+  hintPulseDuration: 0.55
   _data:
     _spec: {fileID: 0}
     _pos: {x: 0, y: 0}
@@ -198,7 +212,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 4b201975fc0369b489346da9b8392cf4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -5,14 +5,14 @@ using UnityEngine;
 // 전투 엔티티(플레이어 캐릭터 3인 + 적 NPC)의 모델입니다. (GDD §4.1)
 //
 // MonoBehaviour가 아닙니다. GameAction/ActionTarget이 ScriptableObject에서 Actor 배열을
-// 다루므로, Actor가 씬 객체가 되면 SO가 씬을 참조하게 됩니다. (AGENT.md §1)
+// 다루므로, Actor가 씬 객체가 되면 SO가 씬을 참조하게 됩니다. (AGENTS.md §1)
 //
 // 스탯 변경은 즉시 반영하고 값을 실은 이벤트를 발화합니다. 연출은 그 값을 나중에 소비합니다.
 public abstract class Actor
 {
     // 위협도 누적 윈도우. (GDD §4.1 - 최근 10초 유효 전투 시간)
     //
-    // MonoBehaviour가 아니라 [SerializeField]로 뺄 수 없어 const로 둡니다. (AGENT.md §10 예외)
+    // MonoBehaviour가 아니라 [SerializeField]로 뺄 수 없어 const로 둡니다. (AGENTS.md §10 예외)
     // 튜닝 대상이 되면 BattleManager가 주입하는 형태로 옮깁니다.
     private const float ThreatWindow = 10f;
 
@@ -27,12 +27,12 @@ public abstract class Actor
     public float BaseThreat { get; private set; }
     public bool IsDead { get; private set; }
 
-    // LowestHPAlly와 LowestHPEnemy가 같은 질문을 합니다. 답하는 함수는 여기 하나만 둡니다. (AGENT.md §5)
+    // LowestHPAlly와 LowestHPEnemy가 같은 질문을 합니다. 답하는 함수는 여기 하나만 둡니다. (AGENTS.md §5)
     public float HPRatio => MaxHP > 0 ? (float)CurrentHP / MaxHP : 0f;
 
     // 발화 시점의 값을 인자에 실어 보냅니다.
     // UI는 이 이벤트를 영수증 타임라인으로 지연 소비하므로(GDD §4.1), 구독자가 발화 뒤에
-    // CurrentHP를 다시 조회하면 이미 여러 번 더 맞은 뒤의 값을 읽게 됩니다. (AGENT.md §3)
+    // CurrentHP를 다시 조회하면 이미 여러 번 더 맞은 뒤의 값을 읽게 됩니다. (AGENTS.md §3)
     public event Action<Actor, int, int> OnHPChanged;     // (actor, delta, hpAfter)
     public event Action<Actor, int, int> OnShieldChanged; // (actor, delta, shieldAfter)
     public event Action<Actor> OnDeath;
@@ -64,7 +64,7 @@ public abstract class Actor
     //
     // 타겟팅은 모두 "시전자 상대 기준"입니다. (GDD §4.3)
     // ETeam 값을 직접 비교하면(예: target.Team == ETeam.Player) 플레이어 시전에서는 통과하고
-    // 적 NPC 시전에서만 틀리는 코드가 됩니다. 상대 판정은 반드시 이 두 함수로만 합니다. (AGENT.md §5)
+    // 적 NPC 시전에서만 틀리는 코드가 됩니다. 상대 판정은 반드시 이 두 함수로만 합니다. (AGENTS.md §5)
 
     public bool IsAllyOf(Actor other) => other != null && Team == other.Team;
     public bool IsEnemyOf(Actor other) => other != null && Team != other.Team;
