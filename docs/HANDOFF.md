@@ -8,28 +8,10 @@
 > **[7]·[8]·[9]는 에디터에서 검증됐다.** 승리·패배·사망·오버킬·위협도(정렬/누적/만료)·실드 흡수·
 > Time Freeze를 로그로 확인했고, 영수증 재생도 화면에서 돈다. 남은 확인 2건은 §1 끝과 §6에 있다.
 
-## 최우선 체크포인트 — 2026-08-21 작업 [10] 진행 중
+## 최근 완료 — 작업 [10] (2026-10-13 `main` 병합)
 
-아래 본문의 작업 목록은 이전 세션 기준 설명을 포함한다. **현재 이어갈 작업은 `[10]`이며 이 절을 먼저 따른다.**
-
-### 원격 브랜치와 커밋
-
-```text
-branch: feature/task-10-boost-death-grayscale
-remote: origin/feature/task-10-boost-death-grayscale
-
-7d9db5c 에이전트 규칙과 복합 스킬 기획 정리
-1b092d6 복합 스킬과 사망 버블 회색조 기반 구현
-```
-
-다른 단말기에서 브랜치가 없다면 다음으로 시작한다.
-
-```bash
-git fetch origin
-git switch -c feature/task-10-boost-death-grayscale --track origin/feature/task-10-boost-death-grayscale
-```
-
-`main`에는 아직 병합하지 않았다.
+T_O 증폭(복합 `SkillEffect`)과 사망 버블 회색조가 `main`에 들어갔다.
+에디터 마이그레이션 → 에셋 감사 → 레거시 정리 → 재컴파일까지 끝났고, 플레이 회귀는 개발자가 에디터에서 확인했다.
 
 ### 승인되어 GDD에 반영된 결정
 
@@ -53,79 +35,30 @@ git switch -c feature/task-10-boost-death-grayscale --track origin/feature/task-
 
 **T_O뿐 아니라 현재 `SkillSO`/`BubbleSO`/`CharacterSO` 에셋의 효과·수치는 전부 임시 테스트 데이터다** (§7 "목업이라는 것을 잊지 말 것").
 
-### 원격에 올라간 구현
+### 들어간 구현
 
-- 복수 `SkillEffect` 스키마와 기존 단일 필드 임시 호환 경로
+- 복수 `SkillEffect` 스키마. 레거시 단일 필드와 런타임 폴백은 **제거됨** — `effects`가 비면 아무 일도 하지 않고 부팅 시 `ValidateSkill`이 경고한다
 - `SkillResolver`: 매치 그룹 → 레시피 변환, 레시피/효과 선배치 안정 정렬
 - `SkillBatchContext`: 한 `MoveReceipt` 동안만 유지되는 증폭 배율
-- 독립 `AmplifyAction`; 상한은 액션 에셋의 직렬화 값(기본 2.0)
+- 독립 `AmplifyAction`(`Assets/_/_SO/ActionData/AmplifyAction.asset`); 상한은 액션 에셋의 직렬화 값(기본 2.0)
 - 일반 효과 수치와 효과별 위협도 실행 경로
 - 적 스킬은 `skillPower = 1`, 증폭 기본 1.0으로 기존 고정 수치 유지
 - `PuzzleManager → PuzzleMatrixView → PuzzleView` 사망 버블 회색조 경로
-- `PuzzleGrayscale.shader`
-- `SkillEffectMigration` 에디터 도구
-- 새 스크립트와 셰이더의 Unity 생성 `.meta`
+- `PuzzleGrayscale.shader` + `Assets/_/_Material/PuzzleGrayscale.mat` (`shell.prefab`의 SpriteRenderer 2곳에 배선)
+- 임시 `SkillEffectMigration` 도구는 역할을 마치고 **삭제됨**
 
-### 집에서 가장 먼저 할 Unity 작업
+### 회귀 기준 (테스트 사양 기준)
 
-1. 프로젝트를 열고 **컴파일 오류부터 확인**한다. 오류가 있으면 아래 메뉴를 실행하지 않는다.
-2. 컴파일이 통과하면 다음 메뉴를 순서대로 실행한다.
-
-```text
-Tools/3MatchTCG/Migrate Skill Effects
-Tools/3MatchTCG/Validate Skill Effects
-Tools/3MatchTCG/Setup Puzzle Grayscale Material
-```
-
-기대 결과:
-
-```text
-[SkillEffectMigration] 11개 스킬의 레거시 효과를 마이그레이션했습니다.
-[SkillEffectMigration] 검증 완료. 오류 0건
-[SkillEffectMigration] PuzzleView 회색조 Material 배선을 완료했습니다.
-```
-
-에셋 수는 달라질 수 있지만 검증 오류는 0건이어야 한다. 메뉴 실행 뒤 프로젝트를 저장하고 Git diff에서
-기존 액션·타깃·수치·위협도가 `effects[0]`으로 그대로 옮겨졌는지 확인한다. T_O만 효과가 두 건이어야 한다.
-
-```text
-effects[0] AmplifyAction / target 없음 / value 0.2 / threatMultiplier 0
-effects[1] HealAction / LowestHPAlly / value 50 / threatMultiplier 1
-```
-
-### 현재 사무실 PC에만 남은 변경 — 원격에 없음
-
-`Assets/_/_SO/BubbleDataSO/T_A_3.asset`에 Unity/Inspector가 만든 잘못된 미커밋 변경이 하나 남아 있다.
-원격 브랜치에는 포함하지 않았다. 다른 단말기에서 새로 체크아웃하면 이 변경은 없으므로 가져오려고 하지 않는다.
-
-잘못된 값은 다음과 같았다.
-
-```text
-effects[0]: target AllActors / value 0 / threatMultiplier 0
-```
-
-정상 레거시 값은 `AttackAction / AllEnemies / value 15 / threatMultiplier 1`이다.
-마이그레이션 후에도 T_A_3가 이 정상 값을 유지하는지 반드시 확인한다.
-
-### 에디터 마이그레이션 뒤 남은 개발
-
-1. 변환된 모든 SkillSO/BubbleSO 에셋과 새 Material·프리팹 변경을 감사한다.
-2. 레거시 단일 `action/target/value/threatMultiplier` 필드와 런타임 폴백을 제거한다.
-3. 임시 `SkillEffectMigration` 도구를 제거한다. 에셋 변환 결과와 `.meta`는 유지한다.
-4. 다시 Unity 컴파일한다.
-5. 아래 기능 회귀를 검증한다.
-
-- 첫 T_O 3매치 회복 요청량 180
-- 같은 스왑의 두 번째 T_O 3매치 회복 요청량 210
-- 5매치 T_O도 증폭 증가는 `+0.2` 한 번
-- 최대 2.0배, 다음 스왑은 1.0배로 리셋
+- 첫 T_O 3매치 회복 요청량 180, 같은 스왑의 두 번째 T_O 3매치 210
+- 5매치 T_O도 증폭 증가는 `+0.2` 한 번. 최대 2.0배, 다음 스왑은 1.0배로 리셋
 - 같은 차수 선배치, 앞 차수 증폭은 뒤 차수 유지, 뒤 차수 효과는 앞 차수로 소급하지 않음
-- 적 공격은 기존 `value` 고정
-- 증폭된 회복 요청량 기준 위협도
+- 적 공격은 기존 `value` 고정. 증폭된 회복 요청량 기준 위협도
 - 사망 즉시 기존 버블 회색조, 매치·파괴 가능, 스킬은 무효
 - 풀 재사용 시 정상 색 복구, 하이라이트와 회색조 동시 동작
 
-현재 기능 코드는 **에디터 컴파일 및 플레이 검증 전 상태**다. 검증하지 않은 것을 완료로 표시하지 않는다.
+### 남은 미결
+
+- **증폭 리셋 시점의 문안 불일치** — GDD §3.3은 `PuzzleWaitState` 복귀 시 리셋으로 적었지만 구현은 `BattleManager` 소유(`GameActionState` 퇴장)다. 관측되는 동작은 같으나 기획자 확인이 필요하다 (§7)
 
 ## 0. 읽는 순서
 

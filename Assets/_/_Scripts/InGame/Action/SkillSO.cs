@@ -7,7 +7,9 @@ public class SkillEffect
 {
   public GameAction action;
   public ActionTarget target;
+  [Tooltip("기본 수치. 일반 효과는 여기에 matchCount·chainWeight·증폭 배율이 곱해지고, 고정 효과와 적 스킬은 이 값 그대로입니다 (GDD §4.2, §4.6)")]
   public float value;
+  [Tooltip("이 효과가 시전자에게 쌓는 위협도 배수. 누적량 = (딜 + 힐 + 실드부여) * 이 값 (GDD §2.2, §4.1)")]
   public float threatMultiplier = 1f;
 
   public SkillEffect()
@@ -49,43 +51,8 @@ public class SkillSO : ScriptableObject
   [Header("Effects")]
   public List<SkillEffect> effects = new List<SkillEffect>();
 
-  // 기존 에셋을 effects 목록으로 옮기는 동안만 유지하는 직렬화 호환 필드입니다.
-  // 에디터 마이그레이션이 끝나기 전에 지우면 기존 9종 버블과 적 스킬 배선이 사라집니다.
-  [HideInInspector]
-  [SerializeReference]
-  public GameAction action;
-  [HideInInspector]
-  [SerializeReference]
-  public ActionTarget target;
-  [HideInInspector]
-  [Tooltip("기본 수치. 버블 스킬은 여기에 matchCount와 chainWeight가 곱해지고, 적 스킬은 이 값 그대로입니다 (GDD §4.2, §4.6)")]
-  public float value;
-  [HideInInspector]
-  [Tooltip("이 스킬이 시전자에게 쌓는 위협도 배수. 누적량 = (딜 + 힐 + 실드부여) * 이 값 (GDD §2.2, §4.1)")]
-  public float threatMultiplier = 1f;
-
-  private SkillEffect legacyEffect;
-
-  // 마이그레이션 전에도 기존 에셋이 그대로 동작하게 하는 임시 출구입니다.
-  // 새 목록이 한 건이라도 있으면 레거시 필드는 절대 섞지 않습니다.
-  public IReadOnlyList<SkillEffect> Effects
-  {
-    get
-    {
-      if (effects != null && effects.Count > 0) return effects;
-
-      if (legacyEffect == null
-          || legacyEffect.action != action
-          || legacyEffect.target != target
-          || !Mathf.Approximately(legacyEffect.value, value)
-          || !Mathf.Approximately(legacyEffect.threatMultiplier, threatMultiplier))
-      {
-        legacyEffect = new SkillEffect(action, target, value, threatMultiplier);
-      }
-
-      return new[] { legacyEffect };
-    }
-  }
+  // 비어 있으면 빈 목록을 돌려줍니다. 배선 누락은 BattleManager.ValidateSkill이 부팅 시 경고합니다.
+  public IReadOnlyList<SkillEffect> Effects => effects ?? (IReadOnlyList<SkillEffect>)Array.Empty<SkillEffect>();
 
   // 여기서 스킬을 실행하는 함수는 두지 않습니다.
   // 실행 경로는 BattleManager 하나뿐이어야 합니다. 스킬은 멱등이 아니라
