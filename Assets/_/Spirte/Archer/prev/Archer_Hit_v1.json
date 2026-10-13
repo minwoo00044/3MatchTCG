@@ -1,0 +1,20 @@
+{
+  "name": "Archer_Hit_v1",
+  "character": "Archer",
+  "action": "Hit",
+  "version": 1,
+  "source": "C:/Users/SSAFY/Downloads/Archer_hit_v1.png",
+  "cols": 4,
+  "rows": 2,
+  "frames": 8,
+  "cellWidth": 408,
+  "cellHeight": 540,
+  "pivotX": 0.5,
+  "pivotY": 0.007407407407407408,
+  "fps": 10,
+  "loop": false,
+  "scale": 1.0398,
+  "alignX": "feet",
+  "alignY": "ground",
+  "warnings": []
+}

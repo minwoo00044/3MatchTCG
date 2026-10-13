@@ -1,0 +1,22 @@
+{
+  "name": "Archer_Idle_v3",
+  "character": "Archer",
+  "action": "Idle",
+  "version": 3,
+  "source": "C:/Users/SSAFY/AppData/Local/Temp/claude/C--Users-SSAFY-Desktop-prj-3MatchTCG/d5f46210-7572-433b-a509-b12c7e812498/scratchpad/backup/Spirte/Archer_idle_v3.png",
+  "cols": 4,
+  "rows": 2,
+  "frames": 8,
+  "cellWidth": 348,
+  "cellHeight": 538,
+  "pivotX": 0.5,
+  "pivotY": 0.007434944237918215,
+  "fps": 8,
+  "loop": true,
+  "scale": 1.0,
+  "alignX": "feet",
+  "alignY": "ground",
+  "warnings": [
+    "Archer 기준 키가 없어 이 시트의 기준 프레임 높이 522px를 기준으로 삼았다"
+  ]
+}

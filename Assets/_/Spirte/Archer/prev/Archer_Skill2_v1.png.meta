@@ -1,0 +1,434 @@
+fileFormatVersion: 2
+guid: 1427a75d737170e40a6425a5e7a70a18
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1745371032653900814
+    second: Archer_Skill2_v1_0
+  - first:
+      213: -4084923136560369281
+    second: Archer_Skill2_v1_1
+  - first:
+      213: 447186409024201109
+    second: Archer_Skill2_v1_2
+  - first:
+      213: -2088475886878381645
+    second: Archer_Skill2_v1_3
+  - first:
+      213: -980980799661158020
+    second: Archer_Skill2_v1_4
+  - first:
+      213: 666100682924399734
+    second: Archer_Skill2_v1_5
+  - first:
+      213: 8881554407901852807
+    second: Archer_Skill2_v1_6
+  - first:
+      213: -7455093481244608799
+    second: Archer_Skill2_v1_7
+  - first:
+      213: 6780047510334152809
+    second: Archer_Skill2_v1_8
+  - first:
+      213: 379923855828694184
+    second: Archer_Skill2_v1_9
+  - first:
+      213: -6774428264674364708
+    second: Archer_Skill2_v1_10
+  - first:
+      213: 8903726561922125219
+    second: Archer_Skill2_v1_11
+  - first:
+      213: -3447547132735607616
+    second: Archer_Skill2_v1_12
+  - first:
+      213: 8218576160782398775
+    second: Archer_Skill2_v1_13
+  - first:
+      213: 5852424964798973143
+    second: Archer_Skill2_v1_14
+  - first:
+      213: 8907334030249763792
+    second: Archer_Skill2_v1_15
+  - first:
+      213: 4466632689655336132
+    second: Archer_Skill2_v1_16
+  - first:
+      213: -4964714398041857273
+    second: Archer_Skill2_v1_17
+  - first:
+      213: 3559431272266491938
+    second: Archer_Skill2_v1_18
+  - first:
+      213: 8136676745274529950
+    second: Archer_Skill2_v1_19
+  - first:
+      213: 3081707155444591267
+    second: Archer_Skill2_v1_20
+  - first:
+      213: -5377565553725925072
+    second: Archer_Skill2_v1_21
+  - first:
+      213: -3831618697947821330
+    second: Archer_Skill2_v1_22
+  - first:
+      213: -8737877581651282203
+    second: Archer_Skill2_v1_23
+  - first:
+      213: 7349993199404033059
+    second: Archer_Skill2_v1_24
+  - first:
+      213: 5327655345242622729
+    second: Archer_Skill2_v1_25
+  - first:
+      213: -4473910899329283765
+    second: Archer_Skill2_v1_26
+  - first:
+      213: -8884027850822624230
+    second: Archer_Skill2_v1_27
+  - first:
+      213: 1774950735382010646
+    second: Archer_Skill2_v1_28
+  - first:
+      213: -4496354855023267579
+    second: Archer_Skill2_v1_29
+  - first:
+      213: 2678770908431600949
+    second: Archer_Skill2_v1_30
+  - first:
+      213: 3067679887641793239
+    second: Archer_Skill2_v1_31
+  - first:
+      213: -5646685580206969943
+    second: Archer_Skill2_v1_32
+  - first:
+      213: -5034483886231991745
+    second: Archer_Skill2_v1_33
+  - first:
+      213: -3340075025316434255
+    second: Archer_Skill2_v1_34
+  - first:
+      213: 4886165443940142481
+    second: Archer_Skill2_v1_35
+  - first:
+      213: -7986360396199127255
+    second: Archer_Skill2_v1_36
+  - first:
+      213: -1273214693880331494
+    second: Archer_Skill2_v1_37
+  - first:
+      213: -5629375034192794556
+    second: Archer_Skill2_v1_38
+  - first:
+      213: 5793943028000941648
+    second: Archer_Skill2_v1_39
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Archer_Skill2_v1_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 599
+        width: 484
+        height: 599
+      alignment: 9
+      pivot: {x: 0.5, y: 0.006677796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f3586d0b4237c7e0800000000000000
+      internalID: -1745371032653900814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_Skill2_v1_1
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 599
+        width: 484
+        height: 599
+      alignment: 9
+      pivot: {x: 0.5, y: 0.006677796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f717b86dc007f47c0800000000000000
+      internalID: -4084923136560369281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_Skill2_v1_2
+      rect:
+        serializedVersion: 2
+        x: 968
+        y: 599
+        width: 484
+        height: 599
+      alignment: 9
+      pivot: {x: 0.5, y: 0.006677796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59125427ba9b43600800000000000000
+      internalID: 447186409024201109
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_Skill2_v1_3
+      rect:
+        serializedVersion: 2
+        x: 1452
+        y: 599
+        width: 484
+        height: 599
+      alignment: 9
+      pivot: {x: 0.5, y: 0.006677796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b925a00f3e3403e0800000000000000
+      internalID: -2088475886878381645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_Skill2_v1_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 484
+        height: 599
+      alignment: 9
+      pivot: {x: 0.5, y: 0.006677796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c71d7b0092bd262f0800000000000000
+      internalID: -980980799661158020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_Skill2_v1_5
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 0
+        width: 484
+        height: 599
+      alignment: 9
+      pivot: {x: 0.5, y: 0.006677796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67c9a5eba077e3900800000000000000
+      internalID: 666100682924399734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_Skill2_v1_6
+      rect:
+        serializedVersion: 2
+        x: 968
+        y: 0
+        width: 484
+        height: 599
+      alignment: 9
+      pivot: {x: 0.5, y: 0.006677796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7847b407dae914b70800000000000000
+      internalID: 8881554407901852807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_Skill2_v1_7
+      rect:
+        serializedVersion: 2
+        x: 1452
+        y: 0
+        width: 484
+        height: 599
+      alignment: 9
+      pivot: {x: 0.5, y: 0.006677796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e6b5134aff2a8890800000000000000
+      internalID: -7455093481244608799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: b135f7a9c61a916458ec596494ac8e24
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Archer_Skill2_v1_0: -1745371032653900814
+      Archer_Skill2_v1_1: -4084923136560369281
+      Archer_Skill2_v1_2: 447186409024201109
+      Archer_Skill2_v1_3: -2088475886878381645
+      Archer_Skill2_v1_4: -980980799661158020
+      Archer_Skill2_v1_5: 666100682924399734
+      Archer_Skill2_v1_6: 8881554407901852807
+      Archer_Skill2_v1_7: -7455093481244608799
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
