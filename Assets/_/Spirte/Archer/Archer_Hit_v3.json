@@ -1,0 +1,28 @@
+{
+  "name": "Archer_Hit_v3",
+  "character": "Archer",
+  "action": "Hit",
+  "version": 3,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Archer_Hit/try8/result.png",
+  "cols": 4,
+  "rows": 2,
+  "frames": 8,
+  "cellWidth": 386,
+  "cellHeight": 525,
+  "pivotX": 0.5,
+  "pivotY": 0.007619047619047619,
+  "fps": 10,
+  "loop": false,
+  "scale": 1.037,
+  "anchorHeight": 522.2,
+  "stance": {
+    "method": "standing",
+    "vertical": 489,
+    "spread": 206.5,
+    "leg": 144,
+    "crotch": 344
+  },
+  "alignX": "feet",
+  "alignY": "ground",
+  "warnings": []
+}
