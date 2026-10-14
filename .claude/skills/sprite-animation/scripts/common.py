@@ -37,6 +37,18 @@ def utf8_stdout():
 def load_frames(path, cols=None, rows=None, frames=None):
     """시트를 파이프라인과 같은 seam 분할로 자른다. 옆에 매니페스트가 있으면 그리드를 거기서 읽는다."""
     manifest = os.path.splitext(path)[0] + ".json"
+    if cols is None and os.path.basename(os.path.dirname(os.path.abspath(path))) == "design":
+        # 캐릭터 design/ 폴더의 인물 그림 한 장(예: design/Archer_apose.png) — 기준 모델로 쓴다.
+        # 이름으로 가리면 Codex 결과 시트(result.png)까지 한 장으로 읽혀 검증이 전부 틀린다
+        img = Image.open(path).convert("RGBA")
+        a = np.array(img)
+        a[a[:, :, 3] <= 30] = 0
+        img = crop_frame(Image.fromarray(a))
+        alpha = np.array(img)[:, :, 3] > 128
+        ys, xs = np.where(alpha)
+        band = ys >= ys.max() - max(4, (ys.max() - ys.min()) // 15)
+        return [{"index": 0, "image": img, "left": 0, "right": img.width, "top": 0, "bottom": img.height,
+                 "feet_x": float(xs[band].mean()), "feet": (float(xs[band].min()), float(xs[band].max()))}], []
     if os.path.exists(manifest) and cols is None:
         with open(manifest, encoding="utf-8") as fp:
             m = json.load(fp)

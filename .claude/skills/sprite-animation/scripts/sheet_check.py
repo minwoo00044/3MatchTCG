@@ -12,6 +12,10 @@
       종료 코드 0 합격 / 4 불합격 / 1 오류.
   masks  SHEET
       부위 색 마스크 디버그 이미지. 새 캐릭터는 이걸 보고 팔레트를 맞춘다.
+  coherence --raw RAW.png
+      몸 일관성: 머리·가슴·허리가 한 덩어리로, 무릎이 같은 방향으로 작게 움직이는지. 0 합격 / 4 불합격.
+  set-height --character Knight --relative-to Archer --sheet RAW.png
+      새 캐릭터 ref_height를 설정 키(height_cm) 비율로 정한다. 정수리~발바닥(머리카락 제외)으로 비교.
   jitter SHEET
       처리된 시트에서 부위(머리·몸통·발)가 이웃 프레임 평균에서 튀는 프레임을 보고한다. 판정이 아니라 보고.
 
@@ -59,6 +63,7 @@ THRESHOLDS = {"head": 8.0, "hair": 15.0, "boot": 15.0}
 DESIGN_WARN = {"hue": 12.0, "sat": 0.12, "val": 0.12, "palette": 0.25, "overall_sat": 0.06, "overall_val": 0.06}
 COLOR_FAIL_FACTOR = 1.5  # 재생성 검증: 경고 기준의 1.5배를 넘는 색 차이는 불합격 (합격본 최대치: 색조 5°, 채도 0.07, 명도 0.11, 분포 0.06)
 MOTION_MIN = 0.72
+POSE_MIN = 0.68  # 원본과 프레임별 실루엣 겹침(IoU) 평균. 정상 편집 0.72~0.88, 다른 동작으로 바뀐 시트 0.63 (2026-10-14 Skill2)
 JITTER_LIMIT = 1.5  # 부위가 이웃 프레임 평균에서 키의 이 %를 넘게 벗어나면 튐으로 보고
 KEYS = ["head", "hair", "boot", "leg"]
 
@@ -255,6 +260,36 @@ def silhouettes(frames):
     return out
 
 
+def boot_width(img):
+    """
+    부츠 한 짝의 최대 폭 / 다리를 편 키 (두 발 평균). 아래 15% 띠에서 바닥 근처 틈으로 두 발을 나눠 각자 최대 폭을 잰다.
+    자세·시점에 따라 값이 달라서 기준 시트끼리가 아니라 '같은 시트의 원본 대비 배율'로만 쓴다(--boot-scale).
+    """
+    a = np.array(img)[:, :, 3] > 128
+    ys = np.where(a.any(1))[0]
+    top, sole = ys.min(), ys.max()
+    H = sole - top + 1
+    reg = a[int(sole - 0.15 * H):sole + 1]
+    cols = reg[-max(3, int(0.05 * H)):].any(0)
+    d = np.diff(np.concatenate(([0], cols.astype(np.int8), [0])))
+    runs = sorted(sorted(zip(np.where(d == 1)[0], np.where(d == -1)[0]), key=lambda r: r[1] - r[0], reverse=True)[:2])
+    if len(runs) < 2:
+        return float("nan")
+    split = (runs[0][1] + runs[1][0]) // 2
+    ws = []
+    for x0, x1 in ((0, split), (split, a.shape[1])):
+        w = [(lambda xs: xs.max() - xs.min() + 1 if len(xs) else 0)(np.where(row)[0]) for row in reg[:, x0:x1]]
+        ws.append(max(w))
+    Hs, _ = C.P.standing_height(img)
+    return float(np.mean(ws)) / Hs
+
+
+def pose_match(new_frames, orig_frames):
+    """원본과 같은 동작인지: 프레임마다 실루엣(발 중심·키 정규화) IoU의 평균. 모션 양(motion_amount)은 다른 동작이어도 비슷하게 나온다."""
+    sa, sb = silhouettes(new_frames), silhouettes(orig_frames)
+    return float(np.mean([(a & b).sum() / max(1, (a | b).sum()) for a, b in zip(sa, sb)]))
+
+
 def motion_amount(frames):
     """연속 프레임 실루엣 변화량 (XOR / 합집합). 정지 포즈 시트는 작게 나온다."""
     s = silhouettes(frames)
@@ -331,6 +366,134 @@ def cmd_set_reference(args):
     print(f"{character} 기준 = {cfg['reference']}, 키 {old} → {cfg['ref_height']} ({stance['method']})")
     print("기존 시트의 스케일은 그대로다. 새 기준에 맞추려면 각 시트를 원본에서 다시 처리·적용한다.")
     print(f"RESULT {json.dumps({'ok': True, 'character': character, **cfg, 'stance': stance}, ensure_ascii=False)}")
+
+
+def skull_height(img, skull_over_L):
+    """
+    정수리~발바닥 키(머리카락 제외, 다리를 벌린 만큼 보정). 정수리는 얼굴 턱에서 두개골 높이(턱~발바닥 × skull_over_L)만큼 위.
+    skull_over_L은 캐릭터마다 잰 값(character.json): Archer 0.312(사용자가 그린 두개골 선), Knight 0.304(맞춰 겹친 마네킹 v3).
+    """
+    sys.path.insert(0, os.path.dirname(__file__))
+    import deform as D
+    a = np.array(img)[:, :, 3] > 128
+    ys = np.where(a.any(1))[0]
+    top, sole = ys.min(), ys.max()
+    chin = D.face_chin(img)
+    if chin is None:
+        sys.exit("얼굴 턱을 못 찾았다 — 키를 잴 수 없다")
+    L = sole - chin
+    S, _ = C.P.standing_height(img)
+    return (sole - (chin - skull_over_L * L)) + (S - (sole - top + 1)), S
+
+
+def cmd_set_height(args):
+    """
+    새 캐릭터의 기준 키(ref_height)를 설정 키(height_cm) 비율로 정한다. 같은 크기에 비율만 다르게 그리지 않고
+    실제 키 차이가 보이게 하려는 것(사용자 지정 2026-10-14). 비교 대상 캐릭터의 처리된 기준 시트에서 정수리~발바닥 키를 재고,
+    새 캐릭터 원본 시트 0번 프레임을 그 키 × (내 height_cm / 그쪽 height_cm)로 맞추는 스케일을 ref_height로 쓴다.
+    """
+    me, other = load_config(args.character), load_config(args.relative_to)
+    for name, cfg in ((args.character, me), (args.relative_to, other)):
+        if not cfg.get("height_cm") or not cfg.get("skull_over_L"):
+            sys.exit(f"{name}.character.json에 height_cm, skull_over_L이 필요하다")
+    ref_sheet = os.path.join(C.SHEET_ROOT, args.relative_to, other["reference"] + ".png")
+    of, _ = C.load_frames(ref_sheet)
+    other_h, _ = skull_height(C.crop_frame(of[0]["image"]), other["skull_over_L"])
+    mf, _ = C.load_frames(args.sheet, 4, 2, 8)
+    my_h, my_s = skull_height(mf[0]["image"], me["skull_over_L"])
+    target = other_h * me["height_cm"] / other["height_cm"]
+    scale = target / my_h
+    me.update(ref_height=round(scale * my_s, 1), ref_method="standing",
+              ref_height_note=f"{args.relative_to}({other['reference']}) 정수리~발 {other_h:.1f}px × {me['height_cm']}/{other['height_cm']}cm 기준")
+    with open(config_path(args.character), "w", encoding="utf-8") as fp:
+        json.dump(me, fp, ensure_ascii=False, indent=2)
+    print(f"{args.relative_to} 키 {other_h:.1f}px → {args.character} 목표 {target:.1f}px, 스케일 {scale:.4f}, ref_height {me['ref_height']}")
+    print(f"RESULT {json.dumps({'ok': True, 'ref_height': me['ref_height'], 'scale': round(scale, 4)}, ensure_ascii=False)}")
+
+
+BANDS = {"head": (0.03, 0.15), "chest": (0.30, 0.40), "waist": (0.42, 0.52), "knee": (0.66, 0.76)}
+STRETCH_MAX = 3  # 머리·가슴·허리가 서로 어긋나는 최대 px(원본 키 ~500px 기준). Archer Idle 2, Knight Idle(AI 1차) 4~5
+
+
+def aligned_cells(frames):
+    """원본 프레임을 발 중심·바닥선이 같도록 같은 캔버스에 놓는다(파이프라인 feet 정렬과 같은 기준)."""
+    W = int(max(f["image"].width for f in frames) * 1.6)
+    H = int(max(f["image"].height for f in frames) * 1.2)
+    out = []
+    for f in frames:
+        c = Image.new("RGBA", (W, H))
+        img = f["image"]
+        c.paste(img, (round(W / 2 - (f["feet_x"] - f["left"])), H - 10 - img.height))
+        out.append(np.asarray(c).astype(np.float32))
+    return out
+
+
+def band_motion(frames):
+    """
+    몸 높이대별(머리·가슴·허리·무릎) 세로 이동(0번 프레임 대비, px). 실제 몸은 머리·가슴·허리가 한 덩어리로 같이 움직이고
+    무릎은 같은 방향으로 그보다 작게 따라간다. 부위끼리 어긋나면 목·허벅지가 고무처럼 늘었다 줄었다 해서 'AI 같은' 움직임이 된다
+    (사용자 지적 2026-10-14, Knight Idle). 반환: {부위: [프레임별 dy]}
+    """
+    cs = aligned_cells(frames)
+
+    def g(a):
+        return a[:, :, :3].mean(2) * (a[:, :, 3] / 255)
+
+    g0 = g(cs[0])
+    al = cs[0][:, :, 3] > 128
+    rows = np.where(al.any(1))[0]
+    top, bot = rows.min(), rows.max()
+    Hh = bot - top
+    cols = np.where(al.any(0))[0]
+    x0, x1 = cols.min() + 20, cols.max() - 20
+    # 무릎은 두 발 사이 폭만 본다 — 망토·검처럼 다리 옆에서 안 움직이는 것이 띠를 채우면 무릎이 멈춘 것으로 잡힌다(Knight)
+    lf, rf = C.P.foot_centers(Image.fromarray(cs[0].astype(np.uint8)))
+    leg_pad = 0.06 * Hh
+    out = {k: [] for k in BANDS}
+    for c in cs:
+        gc = g(c)
+        for k, (a, b) in BANDS.items():
+            y0, y1 = int(top + a * Hh), int(top + b * Hh)
+            bx0, bx1 = (int(lf - leg_pad), int(rf + leg_pad)) if k == "knee" else (x0, x1)
+            ref = g0[y0:y1, bx0:bx1]
+            best = (1e18, 0)
+            for dy in range(-14, 15):
+                for dx in range(-6, 7):
+                    d = float(np.abs(gc[y0 + dy:y1 + dy, bx0 + dx:bx1 + dx] - ref).mean())
+                    if d < best[0]:
+                        best = (d, dy)
+            out[k].append(best[1])
+    return out
+
+
+def cmd_coherence(args):
+    frames, _ = C.load_frames(args.sheet, 4, 2, 8) if args.raw else C.load_frames(args.sheet)
+    if not args.raw:
+        sys.exit("처리된 시트는 아직 지원하지 않는다 — 원본 시트에 --raw")
+    bm = band_motion(frames)
+    for k, v in bm.items():
+        print(f"  {k:6} " + " ".join(f"{x:+3d}" for x in v) + f"   범위 {max(v) - min(v)}")
+    upper = np.array([bm["head"], bm["chest"], bm["waist"]])
+    stretch = int((upper.max(0) - upper.min(0)).max())
+    waist, knee = np.array(bm["waist"]), np.array(bm["knee"])
+    opposite = int(((waist * knee) < 0).sum() + ((np.abs(knee) > np.abs(waist) + 1) & (np.abs(knee) > 1)).sum())
+    amp = int(np.ptp(bm["chest"]))
+    fails = []
+    if stretch > STRETCH_MAX:
+        fails.append(f"상체가 따로 움직인다(머리·가슴·허리 어긋남 최대 {stretch}px > {STRETCH_MAX})")
+    if opposite:
+        fails.append(f"무릎이 허리와 반대로/더 크게 움직이는 프레임 {opposite}개")
+    wr, kr = int(np.ptp(waist)), int(np.ptp(knee))
+    if wr >= 6 and kr < 0.25 * wr:
+        fails.append(f"무릎이 거의 안 따라온다(허리 {wr}px, 무릎 {kr}px) — 허벅지가 늘었다 줄었다 한다(Archer는 무릎이 허리의 약 0.55배)")
+    if amp < args.min_amp:
+        fails.append(f"숨쉬기 폭 {amp}px < {args.min_amp} (Archer Idle 12px) — 정지 화면처럼 보인다")
+    if len(set(bm["chest"])) < 4:
+        fails.append(f"자세가 {len(set(bm['chest']))}가지뿐 — 한 번 툭 움직이는 동작이 된다")
+    print(f"상체 어긋남 최대 {stretch}px, 무릎 역행 {opposite}프레임, 숨쉬기 폭(가슴) {amp}px")
+    print("판정:", "합격" if not fails else "불합격 — " + "; ".join(fails))
+    print(f"RESULT {json.dumps({'ok': True, 'pass': not fails, 'fails': fails, 'stretch': stretch, 'amplitude': amp, 'bands': bm}, ensure_ascii=False)}")
+    sys.exit(0 if not fails else 4)
 
 
 def cmd_audit(args):
@@ -410,10 +573,22 @@ def cmd_verify(args):
         fails.append("0번 프레임 측정 불가")
     else:
         d0 = delta(f0, ref_f0)
-        fails += [f"{k} {d0[k]:+.1f}% (±{t:g})" for k, t in THRESHOLDS.items() if abs(d0[k]) > t]
+        # --boot-scale: 부츠는 기준 모델과 자세가 달라 직접 비교하지 않고 아래에서 원본 대비 배율로 본다
+        fails += [f"{k} {d0[k]:+.1f}% (±{t:g})" for k, t in THRESHOLDS.items()
+                  if abs(d0[k]) > t and not (args.boot_scale and k == "boot")]
+    boot_line = None
+    if args.boot_scale:
+        bn, bo = boot_width(new_frames[0]["image"]), boot_width(orig_frames[0]["image"])
+        ratio = bn / bo if bo else float("nan")
+        boot_line = f"부츠 한 짝 폭: 원본 대비 {ratio:.2f}배 (목표 {args.boot_scale:g} ±12%)"
+        if np.isnan(ratio) or abs(ratio / args.boot_scale - 1) > 0.12:
+            fails.append(f"부츠 배율 {ratio:.2f} (목표 {args.boot_scale:g})")
     motion = motion_amount(new_frames) / max(1e-6, motion_amount(orig_frames))
     if motion < args.motion_min:
         fails.append(f"모션 {motion:.2f} (≥{args.motion_min})")
+    pose = pose_match(new_frames, orig_frames)
+    if pose < POSE_MIN:
+        fails.append(f"포즈 일치 {pose:.2f} (≥{POSE_MIN}) — 원본과 다른 동작일 수 있다")
     fails += [f"분할: {w}" for w in new_warn if "기준 키" not in w]
 
     ref_design = design_metrics(ref_frames[0]["image"], palette)
@@ -429,7 +604,9 @@ def cmd_verify(args):
         print(fmt_row("원본 f0", delta(of0, ref_f0), f"{1 / of0['head']:7.2f}"))
     if med:
         print(fmt_row("재생성 중앙값(참고)", delta(med, ref_med)))
-    print(f"모션 보존 {motion:.2f}")
+    print(f"모션 보존 {motion:.2f}  포즈 일치 {pose:.2f} (0.75 미만이면 결과 이미지로 동작이 같은지 본다)")
+    if boot_line:
+        print(boot_line)
     print(fmt_design("디자인(색)", dd))
     if dw:
         print("디자인 경고:", ", ".join(dw), "— 이미지로 확인한다")
@@ -553,12 +730,23 @@ def main():
     v.add_argument("--head", type=float, default=THRESHOLDS["head"])
     v.add_argument("--hair", type=float, default=THRESHOLDS["hair"])
     v.add_argument("--boot", type=float, default=THRESHOLDS["boot"])
+    v.add_argument("--boot-scale", type=float, help="부츠 한 짝 폭의 원본 대비 목표 배율 (예: 0.68). 주면 부츠는 기준 모델과 직접 비교하지 않는다")
     v.add_argument("--cols", type=int)
     v.add_argument("--rows", type=int)
     v.add_argument("--frames", type=int)
 
     m = sub.add_parser("masks")
     m.add_argument("sheet")
+
+    co = sub.add_parser("coherence")
+    co.add_argument("sheet")
+    co.add_argument("--raw", action="store_true", help="원본(4x2) 시트")
+    co.add_argument("--min-amp", type=int, default=6, help="가슴 위아래 최소 폭 px (Idle)")
+
+    h = sub.add_parser("set-height")
+    h.add_argument("--character", required=True)
+    h.add_argument("--relative-to", required=True, help="키를 비교할 캐릭터 (예: Archer)")
+    h.add_argument("--sheet", required=True, help="새 캐릭터 기준 액션의 원본 시트(4x2)")
 
     j = sub.add_parser("jitter")
     j.add_argument("sheet", help="처리된 시트 (Assets/_/Spirte/{캐릭터}/)")
@@ -572,7 +760,7 @@ def main():
     if args.cmd == "verify":
         THRESHOLDS.update(head=args.head, hair=args.hair, boot=args.boot)
     {"set-reference": cmd_set_reference, "audit": cmd_audit, "verify": cmd_verify, "masks": cmd_masks,
-     "jitter": cmd_jitter}[args.cmd](args)
+     "jitter": cmd_jitter, "set-height": cmd_set_height, "coherence": cmd_coherence}[args.cmd](args)
 
 
 if __name__ == "__main__":

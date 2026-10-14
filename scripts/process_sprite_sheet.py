@@ -263,6 +263,9 @@ def foot_centers(img):
     if not runs:
         c = float(np.where(band)[0].mean())
         return c, c
+    # 가장 넓은 두 덩어리 = 두 발. 가장 왼쪽·오른쪽을 고르면 바닥까지 내려온 망토 끝·검 끝을 발로 잡는다
+    # (Knight Idle: 망토 끝이 8프레임 중 7프레임에만 걸려 왼발이 36px 튀었고, both_feet 워프가 다리를 비틀었다)
+    runs = sorted(sorted(runs, key=lambda r: r[1] - r[0], reverse=True)[:2])
     return (runs[0][0] + runs[0][1]) / 2.0, (runs[-1][0] + runs[-1][1]) / 2.0
 
 
@@ -449,6 +452,125 @@ def render_cells(frames, refs, scale, cell_w, cell_h, target_y):
 
 
 # ---------------------------------------------------------------- 프레임 증강
+
+# ---------------------------------------------------------------- 상체 궤적 평활화
+
+STAB_SEARCH = 10       # 상체 위치를 찾을 때 이동 탐색 범위(px)
+STAB_TOP, STAB_BOTTOM = 0.08, 0.55   # 상체 비교 영역 (셀 안 인물 키 대비 세로 범위)
+STAB_HIP = 0.55        # 이 높이(인물 위에서부터 키 대비)까지는 보정을 다 주고
+STAB_FADE = 0.20       # 그 아래 이만큼에 걸쳐 0으로 줄인다 — 다리·발은 그대로
+
+
+def _gray(cell):
+    a = np.asarray(cell).astype(np.float32)
+    return a[:, :, :3].mean(2) * (a[:, :, 3] / 255.0)
+
+
+def upper_body_offsets(cells):
+    """원본 셀마다 상체가 0번 셀 대비 얼마나 옮겨졌는지(dx, dy). 상체 영역의 회색조 차이가 최소인 정수 이동."""
+    g0 = _gray(cells[0])
+    rows = np.where((np.asarray(cells[0])[:, :, 3] > 128).any(1))[0]
+    top, bot = rows.min(), rows.max()
+    H = bot - top
+    y0, y1 = int(top + STAB_TOP * H), int(top + STAB_BOTTOM * H)
+    cols = np.where((np.asarray(cells[0])[y0:y1, :, 3] > 128).any(0))[0]
+    x0, x1 = max(cols.min() - 4, STAB_SEARCH), min(cols.max() + 4, g0.shape[1] - STAB_SEARCH)
+    ref = g0[y0:y1, x0:x1]
+    out = []
+    for c in cells:
+        g = _gray(c)
+        best = (1e18, 0, 0)
+        for dy in range(-STAB_SEARCH, STAB_SEARCH + 1):
+            for dx in range(-STAB_SEARCH, STAB_SEARCH + 1):
+                d = float(np.abs(g[y0 + dy:y1 + dy, x0 + dx:x1 + dx] - ref).mean())
+                if d < best[0]:
+                    best = (d, dx, dy)
+        out.append((best[1], best[2]))
+    return np.array(out, dtype=np.float32), (top, bot)
+
+
+def smooth_path(values, loop):
+    """루프: 1차 푸리에(평균 + 한 주기 사인) — 숨쉬기처럼 한 번 오르내리는 곡선. 비루프: 앞뒤 1프레임 이동 평균(끝은 그대로)."""
+    n = len(values)
+    if loop:
+        t = 2 * np.pi * np.arange(n) / n
+        out = np.empty_like(values)
+        for k in range(values.shape[1]):
+            v = values[:, k]
+            a, b = 2 * (v * np.cos(t)).mean(), 2 * (v * np.sin(t)).mean()
+            out[:, k] = v.mean() + a * np.cos(t) + b * np.sin(t)
+        return out
+    out = values.copy()
+    out[1:-1] = (values[:-2] + values[1:-1] + values[2:]) / 3
+    return out
+
+
+def warp_xy(img, dx_rows, dy_rows):
+    """행마다 다른 (dx, dy)로 옮긴다: 출력 (x, y) ← 원본 (x - dx[y], y - dy[y]), premultiplied 쌍선형."""
+    arr = np.asarray(img).astype(np.float32)
+    alpha = arr[:, :, 3:4] / 255.0
+    pre = np.concatenate([arr[:, :, :3] * alpha, arr[:, :, 3:4]], axis=2)
+    h, w = arr.shape[:2]
+    sx = np.arange(w, dtype=np.float32)[None, :] - dx_rows[:, None]
+    sy = np.arange(h, dtype=np.float32)[:, None] - dy_rows[:, None] + np.zeros((1, w), np.float32)
+    x0, y0 = np.floor(sx).astype(np.int64), np.floor(sy).astype(np.int64)
+    tx, ty = (sx - x0)[:, :, None], (sy - y0)[:, :, None]
+
+    def at(yy, xx):
+        ok = (xx >= 0) & (xx < w) & (yy >= 0) & (yy < h)
+        return pre[np.clip(yy, 0, h - 1), np.clip(xx, 0, w - 1)] * ok[:, :, None]
+
+    out = (at(y0, x0) * (1 - tx) + at(y0, x0 + 1) * tx) * (1 - ty) + (at(y0 + 1, x0) * (1 - tx) + at(y0 + 1, x0 + 1) * tx) * ty
+    a = out[:, :, 3:4]
+    rgb = np.where(a > 0, out[:, :, :3] / np.maximum(a, 1e-6) * 255.0, 0)
+    return Image.fromarray(np.concatenate([rgb, a], axis=2).clip(0, 255).astype(np.uint8))
+
+
+def stabilize_upper_body(cells, loop):
+    """
+    AI가 프레임마다 상체를 불규칙한 위치에 그린 것을 부드러운 궤적으로 바로잡는다(발은 정렬로 이미 고정).
+    Knight Idle: 원본 8장의 상체 높이가 0,+5,+4,+6,0,−1,−2,−5px로 튀어 보간본까지 떨렸다(사용자 지적 2026-10-14).
+    허리 위는 보정량을 다 주고 허리~허벅지에서 0으로 줄인다. 반환: (셀들, 측정값, 보정량)
+    """
+    meas, (top, bot) = upper_body_offsets(cells)
+    target = smooth_path(meas, loop)
+    corr = target - meas
+    H = bot - top
+    ys = np.arange(cells[0].height, dtype=np.float32)
+    u = np.clip((ys - (top + STAB_HIP * H)) / (STAB_FADE * H), 0, 1)
+    weight = 1 - u * u * (3 - 2 * u)   # 허리 위 1 → 허벅지 0 (smoothstep)
+    out = [warp_xy(c, weight * cx, weight * cy) if abs(cx) + abs(cy) >= 0.5 else c for c, (cx, cy) in zip(cells, corr)]
+    return out, meas, corr
+
+
+def match_sharpness(cells, keys):
+    """
+    보간 셀이 원본 셀보다 흐려 3장 주기로 선명도가 맥동하는 것(세밀한 그림일수록 떨림처럼 보인다)을 언샤프 마스크로 맞춘다.
+    목표는 양옆 원본 셀 선명도의 평균.
+    """
+    from PIL import ImageFilter
+
+    def sharp(c):
+        g = _gray(c)
+        return float(np.abs(4 * g[1:-1, 1:-1] - g[:-2, 1:-1] - g[2:, 1:-1] - g[1:-1, :-2] - g[1:-1, 2:]).mean())
+
+    key_s = {k: sharp(cells[k]) for k in keys}
+    out = list(cells)
+    ks = sorted(keys)
+    for i, c in enumerate(cells):
+        if i in key_s:
+            continue
+        prev = max([k for k in ks if k < i], default=ks[-1])
+        nxt = min([k for k in ks if k > i], default=ks[0])
+        target = (key_s[prev] + key_s[nxt]) / 2
+        best = c
+        for pct in (40, 80, 120, 160, 200):
+            s = c.filter(ImageFilter.UnsharpMask(radius=1.2, percent=pct, threshold=0))
+            if abs(sharp(s) - target) < abs(sharp(best) - target):
+                best = s
+        out[i] = best
+    return out
+
 
 def augment(cells, inbetween, loop, keep_haze=False):
     """
@@ -642,9 +764,15 @@ def run(args):
     cells = render_cells(frames, refs, scale, cell_w, cell_h, target_y)
 
     loop = rule["loop"] if args.loop is None else args.loop == "true"
+    stab = None
+    if args.stabilize:
+        cells, meas, corr = stabilize_upper_body(cells, loop)
+        stab = {"measured": meas.round(1).tolist(), "correction": corr.round(1).tolist()}
+        print("  상체 위치(dx,dy):", [tuple(m) for m in meas.round(1)], "→ 보정", [tuple(c) for c in corr.round(1)])
     keys, hazes, strips, cut = list(range(len(cells))), [], [], {}
     if args.inbetween > 0:
         cells, keys, hazes, cut = augment(cells, args.inbetween, loop, args.keep_haze)
+        cells = match_sharpness(cells, keys)
         for i, (g, _) in enumerate(hazes):
             if g > HAZE_CUT:
                 j = (i + 1) % frames_n
@@ -675,7 +803,8 @@ def run(args):
         "inbetween": args.inbetween,
         "keyFrames": keys,  # 원본 프레임이 놓인 셀 번호. 나머지는 RIFE 보간
         "haze": hazes,     # 원본 구간별 [보간 번짐 지표, 고른 흐름 해상도] (번짐이 클수록 두 겹·안개로 보인다)
-        "hazeCut": sorted(cut),  # 번짐 기준을 넘어 보간 대신 앞 프레임을 반복한 구간 (구간 i = 원본 i→i+1)
+        "hazeCut": sorted(cut),
+        "stabilize": stab,  # 상체 궤적 평활화: 원본 셀별 상체 위치(측정)와 보정량 (px, 0번 셀 기준)  # 번짐 기준을 넘어 보간 대신 앞 프레임을 반복한 구간 (구간 i = 원본 i→i+1)
         "cellWidth": cell_w,
         "cellHeight": cell_h,
         "pivotX": 0.5,
@@ -735,6 +864,7 @@ def main():
     p.add_argument("--row_split_y", type=int, nargs="*", default=None, help="자동 분할 대신 직선 행 경계")
     p.add_argument("--fps", type=int, default=None, help="원본 프레임 기준. 증강하면 (inbetween+1)배가 된다")
     p.add_argument("--inbetween", type=int, default=DEFAULT_INBETWEEN, help="원본 프레임 사이 보간 장수 (0 = 증강 안 함)")
+    p.add_argument("--stabilize", action="store_true", help="상체 위치를 부드러운 궤적으로 바로잡는다 (작게 움직이는 Idle용)")
     p.add_argument("--keep_haze", action="store_true", help="번짐 기준을 넘는 구간도 끊지 않고 보간본을 쓴다")
     p.add_argument("--loop", choices=["true", "false"], default=None)
     p.add_argument("--keep_noise", action="store_true", help="작은 부스러기 제거를 끈다")
