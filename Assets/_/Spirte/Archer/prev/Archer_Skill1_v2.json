@@ -1,0 +1,32 @@
+{
+  "name": "Archer_Skill1_v2",
+  "character": "Archer",
+  "action": "Skill1",
+  "version": 2,
+  "source": "C:/Users/SSAFY/Downloads/Archer_atk_v1.png",
+  "cols": 4,
+  "rows": 2,
+  "frames": 8,
+  "cellWidth": 452,
+  "cellHeight": 540,
+  "pivotX": 0.5,
+  "pivotY": 0.007407407407407408,
+  "fps": 10,
+  "loop": false,
+  "scale": 1.008,
+  "anchorHeight": 537.2,
+  "stance": {
+    "method": "standing",
+    "vertical": 516,
+    "spread": 176.5,
+    "leg": 173,
+    "crotch": 342
+  },
+  "alignX": "right_foot",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 69.0,
+    "right": 0.0
+  },
+  "warnings": []
+}

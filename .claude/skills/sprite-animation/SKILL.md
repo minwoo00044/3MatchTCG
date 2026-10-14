@@ -57,12 +57,17 @@ python scripts/process_sprite_sheet.py --input "<사용자가 준 파일>" --nam
 unity cmd eval 'AssetDatabase.Refresh(); return SpriteAnimationPipeline.Apply("Assets/_/Spirte/Archer/Archer_Hit_v2.png");' --result-only
 ```
 
-미리보기는 세 칸이다. 이걸 보지 않고 넘어가지 않는다 — 수치로는 안 보이는 실패가 여기서 보인다.
+미리보기는 서너 칸이다. 이걸 보지 않고 넘어가지 않는다 — 수치로는 안 보이는 실패가 여기서 보인다.
 1. 원본 + 분할선(분홍 행, 하늘 열): 선이 몸을 가로지르면 분할 실패
 2. 아틀라스 + 접지선(빨강)·pivot(파랑): 발이 빨간 선 위에 서야 한다
-3. 겹쳐보기: 발이 좌우로 번지면 흔들린다 → `--align_x feet`. 뒤로 물러나는 동작처럼 이동을 살려야 하면 `anchor`
+3. 겹쳐보기: 고정한 발이 번지면 흔들린다. 가로 정렬은 `{캐릭터}.character.json`의 `align_x`(액션별 고정 발)를 따른다 — 종류는 `docs/SPRITE_ANIMATION_GUIDE.md` 액션별 기본값. RESULT의 `footSlide`(발별 미끄러짐 px)로 숫자도 본다
+4. 번짐 구간(있을 때만): 원본 A | 보간본 | 원본 B. 처리 단계는 기본으로 프레임 증강(원본 사이 2장, RIFE, 구간마다 번짐이 가장 적은 흐름 해상도)을 붙이고, 최선값도 기준을 넘는 구간만 끊는다(`(cut)`) — 가이드의 "프레임 증강". 끊김은 플레이에서 눈에 띄니 끊긴 구간이 있으면 사용자에게 알린다
 
-- RESULT의 `warnings`(원본 가장자리 잘림, 프레임 겹침)는 사용자에게 그대로 전한다. 원본에서 잘린 것은 복구할 수 없다.
+새 캐릭터·새 액션이면 `align_x`가 없다. 시트를 보고 어느 발을 디디는 동작인지 사용자에게 묻고 적는다. 정하기 전에 `--analyze --align_x <방식>`으로 방식별 `footSlide`를 비교해 보여 준다.
+상체가 튀는지는 `python $SK/sheet_check.py jitter <처리된 시트>`로 본다(이웃 프레임 평균에서 벗어난 거리). Idle처럼 작게 움직이는 루프에서만 의미가 있다 — 큰 동작은 의도한 움직임도 걸린다.
+
+- 시트를 여러 장 처리했으면 Apply 전에 `unity cmd eval 'AssetDatabase.Refresh(); return 0;'`을 따로 한 번 돌린다. 여러 장 임포트는 5초 제한에 걸려 응답만 실패할 수 있다 — 임포트는 계속되니 `unity status`가 ready인지 본 뒤 한 장씩 Apply하고, Apply가 실패로 오면 상태를 확인하고 재실행한다.
+- RESULT의 `warnings`(원본 가장자리 잘림, 프레임 겹침, 번짐으로 끊은 구간)는 사용자에게 그대로 전한다. 원본에서 잘린 것은 복구할 수 없다.
 - `scale`은 기준 키 ÷ 이 시트 0번 프레임의 '다리를 편 키'다. 1.1 이상이면 확대로 약간 흐려질 수 있다고 알린다.
 - 넣으려는 파일이 이미 들어간 버전의 원본과 같으면(매니페스트 `source`가 같은 경로) 새 버전이 v1과 똑같아질 뿐이라고 먼저 알린다.
 

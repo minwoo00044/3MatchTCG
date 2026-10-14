@@ -1,0 +1,62 @@
+{
+  "name": "Archer_Dead_v4",
+  "character": "Archer",
+  "action": "Dead",
+  "version": 4,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Archer_Dead/try1/result.png",
+  "cols": 5,
+  "rows": 5,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "ghost": [
+    0.056,
+    0.041,
+    0.131,
+    0.068,
+    0.057,
+    0.074,
+    0.075
+  ],
+  "ghostCut": [
+    2
+  ],
+  "cellWidth": 498,
+  "cellHeight": 520,
+  "pivotX": 0.5,
+  "pivotY": 0.007692307692307693,
+  "fps": 24,
+  "loop": false,
+  "scale": 0.9588,
+  "anchorHeight": 564.8,
+  "stance": {
+    "method": "standing",
+    "vertical": 524,
+    "spread": 244.5,
+    "leg": 163,
+    "crotch": 360
+  },
+  "alignX": "anchor",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 210.0,
+    "right": 95.4
+  },
+  "warnings": [
+    "보간 2→3 잔상 지표 0.13 (기준 0.1) — 보간하지 않고 원본처럼 끊었다. 버린 보간본은 미리보기 아래 칸에 있다 (쓰려면 --keep_ghost)"
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "name": "Archer_Skill2_v4",
+  "character": "Archer",
+  "action": "Skill2",
+  "version": 4,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Archer_Skill2/applied_v2.png",
+  "cols": 5,
+  "rows": 5,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "ghost": [
+    0.057,
+    0.054,
+    0.166,
+    0.037,
+    0.033,
+    0.071,
+    0.091
+  ],
+  "ghostCut": [
+    2
+  ],
+  "cellWidth": 494,
+  "cellHeight": 569,
+  "pivotX": 0.5,
+  "pivotY": 0.007029876977152899,
+  "fps": 30,
+  "loop": false,
+  "scale": 1.0452,
+  "anchorHeight": 518.1,
+  "stance": {
+    "method": "standing",
+    "vertical": 492,
+    "spread": 190.0,
+    "leg": 160,
+    "crotch": 331
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 3.4,
+    "right": 2.9
+  },
+  "warnings": [
+    "보간 2→3 잔상 지표 0.17 (기준 0.1) — 보간하지 않고 원본처럼 끊었다. 버린 보간본은 미리보기 아래 칸에 있다 (쓰려면 --keep_ghost)"
+  ]
+}

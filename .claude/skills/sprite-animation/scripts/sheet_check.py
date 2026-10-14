@@ -12,6 +12,8 @@
       종료 코드 0 합격 / 4 불합격 / 1 오류.
   masks  SHEET
       부위 색 마스크 디버그 이미지. 새 캐릭터는 이걸 보고 팔레트를 맞춘다.
+  jitter SHEET
+      처리된 시트에서 부위(머리·몸통·발)가 이웃 프레임 평균에서 튀는 프레임을 보고한다. 판정이 아니라 보고.
 
 비교·마스크 이미지는 Temp/SpriteAnimationPipeline/ 에 쓴다. 마지막 줄은 RESULT {json}.
 
@@ -57,6 +59,7 @@ THRESHOLDS = {"head": 8.0, "hair": 15.0, "boot": 15.0}
 DESIGN_WARN = {"hue": 12.0, "sat": 0.12, "val": 0.12, "palette": 0.25, "overall_sat": 0.06, "overall_val": 0.06}
 COLOR_FAIL_FACTOR = 1.5  # 재생성 검증: 경고 기준의 1.5배를 넘는 색 차이는 불합격 (합격본 최대치: 색조 5°, 채도 0.07, 명도 0.11, 분포 0.06)
 MOTION_MIN = 0.72
+JITTER_LIMIT = 1.5  # 부위가 이웃 프레임 평균에서 키의 이 %를 넘게 벗어나면 튐으로 보고
 KEYS = ["head", "hair", "boot", "leg"]
 
 
@@ -439,6 +442,76 @@ def cmd_verify(args):
     sys.exit(0 if not fails else 4)
 
 
+def part_track(frames, palette):
+    """
+    프레임별 부위 위치(셀 좌표 px): 머리 = 머리카락 무게중심, 몸통 = 옷 무게중심, 발 = 파이프라인과 같은 foot_centers.
+    처리된 시트는 셀마다 pivot이 같은 곳이라 셀 좌표끼리 그대로 비교된다.
+    """
+    out = []
+    for f in frames:
+        m = part_masks(f["image"], palette)
+        row = {}
+        for part in ("hair", "coat"):
+            ys, xs = np.where(m[part])
+            row[part] = (xs.mean() + f["left"], ys.mean() + f["top"]) if len(ys) else (np.nan, np.nan)
+        left_c, right_c = C.P.foot_centers(f["image"])
+        row["foot_l"] = (left_c + f["left"], np.nan)
+        row["foot_r"] = (right_c + f["left"], np.nan)
+        out.append(row)
+    return out
+
+
+def cmd_jitter(args):
+    """
+    프레임 간 부위 궤적에서 '튀는' 프레임을 찾는다. 튐 = 이웃 두 프레임 평균에서 벗어난 거리(2차 차분).
+    루프 클립은 마지막↔첫 프레임도 이웃이다. 의도한 급동작(피격 순간 등)도 걸리므로 판정이 아니라 보고다 —
+    걸린 프레임은 시트를 보고 의도인지 AI 편차인지 가린다.
+    """
+    sheet = args.sheet
+    manifest = os.path.splitext(sheet)[0] + ".json"
+    loop = args.loop
+    if loop is None and os.path.exists(manifest):
+        with open(manifest, encoding="utf-8") as fp:
+            loop = json.load(fp).get("loop", False)
+    frames, _ = C.load_frames(sheet)
+    palette = load_palette(character_of(sheet), args.palette)
+    track = part_track(frames, palette)
+    H = float(np.median([f["bottom"] - f["top"] for f in frames]))
+    n = len(frames)
+    labels = {"hair": "머리", "coat": "몸통", "foot_l": "왼발", "foot_r": "오른발"}
+    print(f"{os.path.basename(sheet)}  loop={bool(loop)}  키(중앙값) {H:.0f}px  튐 기준 {args.limit:g}% (키 대비)")
+    print("프레임".ljust(6) + "".join(f"{labels[p]:>16}" for p in labels))
+    flagged = []
+    report = {}
+    for p in labels:
+        pts = np.array([t[p] for t in track], dtype=float)
+        res = np.full((n, 2), np.nan)
+        for i in range(n):
+            if not loop and i in (0, n - 1):
+                continue
+            prev, nxt = pts[(i - 1) % n], pts[(i + 1) % n]
+            res[i] = pts[i] - (prev + nxt) / 2
+        report[p] = res
+    for i in range(n):
+        cells = []
+        for p in labels:
+            dx, dy = report[p][i]
+            if np.isnan(dx):
+                cells.append(f"{'-':>16}")
+                continue
+            dist = float(np.hypot(dx, 0 if np.isnan(dy) else dy)) / H * 100
+            mark = "*" if dist > args.limit else " "
+            cells.append(f"{dx:+6.1f},{(0 if np.isnan(dy) else dy):+6.1f}{mark}  ")
+            if dist > args.limit:
+                flagged.append({"frame": i, "part": p, "dx": round(float(dx), 1),
+                                "dy": None if np.isnan(dy) else round(float(dy), 1), "pct": round(dist, 2)})
+        print(f"f{i}".ljust(6) + "".join(cells))
+    print("값 = 이웃 평균에서 벗어난 px (x, y). * = 기준 초과")
+    for fl in flagged:
+        print(f"  [튐] 프레임 {fl['frame']} {labels[fl['part']]} {fl['pct']:.1f}%")
+    print(f"RESULT {json.dumps({'ok': True, 'sheet': slash(sheet), 'loop': bool(loop), 'height': H, 'flagged': flagged}, ensure_ascii=False)}")
+
+
 def cmd_masks(args):
     palette = load_palette(character_of(args.sheet), args.palette)
     frames, _ = C.load_frames(args.sheet)
@@ -487,13 +560,19 @@ def main():
     m = sub.add_parser("masks")
     m.add_argument("sheet")
 
-    for sp in (a, v, m):
+    j = sub.add_parser("jitter")
+    j.add_argument("sheet", help="처리된 시트 (Assets/_/Spirte/{캐릭터}/)")
+    j.add_argument("--limit", type=float, default=JITTER_LIMIT, help="튐 기준 (키 대비 %%)")
+    j.add_argument("--loop", type=lambda s: s == "true", default=None, help="true/false. 생략하면 매니페스트")
+
+    for sp in (a, v, m, j):
         sp.add_argument("--palette", help="팔레트 JSON 경로 (기본: character.json의 palette → Archer 기본값)")
 
     args = p.parse_args()
     if args.cmd == "verify":
         THRESHOLDS.update(head=args.head, hair=args.hair, boot=args.boot)
-    {"set-reference": cmd_set_reference, "audit": cmd_audit, "verify": cmd_verify, "masks": cmd_masks}[args.cmd](args)
+    {"set-reference": cmd_set_reference, "audit": cmd_audit, "verify": cmd_verify, "masks": cmd_masks,
+     "jitter": cmd_jitter}[args.cmd](args)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,83 @@
+{
+  "name": "Archer_Idle_v7",
+  "character": "Archer",
+  "action": "Idle",
+  "version": 7,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Archer_Idle/try1/result.png",
+  "cols": 6,
+  "rows": 4,
+  "frames": 24,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      -0.005,
+      0.5
+    ],
+    [
+      -0.006,
+      0.5
+    ],
+    [
+      -0.005,
+      0.5
+    ],
+    [
+      -0.006,
+      0.5
+    ],
+    [
+      -0.006,
+      0.5
+    ],
+    [
+      -0.006,
+      0.5
+    ],
+    [
+      -0.006,
+      0.5
+    ],
+    [
+      -0.006,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "cellWidth": 346,
+  "cellHeight": 541,
+  "pivotX": 0.5,
+  "pivotY": 0.0073937153419593345,
+  "fps": 24,
+  "loop": true,
+  "scale": 1.004,
+  "anchorHeight": 539.3,
+  "stance": {
+    "method": "standing",
+    "vertical": 521,
+    "spread": 162.5,
+    "leg": 171,
+    "crotch": 349
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 1.0,
+    "right": 1.0
+  },
+  "warnings": []
+}

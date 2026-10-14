@@ -31,8 +31,14 @@ PREVIEW_DIR = "Temp/SpriteAnimationPipeline"
 
 NAME_PATTERN = re.compile(r"^([A-Z][A-Za-z0-9]*)_(Idle|Hit|Skill[1-9]|Dead)_v([1-9][0-9]*)$")
 
-# align_x  feet   : 프레임마다 발 중심을 pivot에 맞춘다 (제자리 모션의 좌우 흔들림 제거)
-#          anchor : 기준 프레임의 발 중심 하나로 전 프레임을 같은 양만큼 옮긴다 (원본의 이동을 보존)
+# align_x  feet       : 프레임마다 발 띠(바닥 근처 실루엣 전체) 중심을 pivot에 맞춘다 (제자리 모션의 좌우 흔들림 제거)
+#          anchor     : 기준 프레임의 발 중심 하나로 전 프레임을 같은 양만큼 옮긴다 (원본의 이동을 보존)
+#          mid        : 프레임마다 두 발 중심의 중점을 맞춘다 (발 띠 평균과 달리 발 사이에 걸친 활 끝에 끌리지 않는다)
+#          left_foot  : 화면 왼쪽 발을 프레임마다 같은 자리에 둔다 — 그 발을 디딘 채 다른 발이 움직이는 동작
+#          right_foot : 화면 오른쪽 발을 같은 자리에 둔다
+#          both_feet  : 중점을 맞춘 뒤 두 발을 기준 프레임의 발 위치로 끌어당긴다(다리 아래쪽만 휘는 워프).
+#                       AI가 프레임마다 보폭을 다르게 그려서 이동만으로는 두 발을 함께 고정할 수 없다
+# 고정할 발은 시트 그림(보폭이 어떻게 변하는지)에 달려 있어서 {캐릭터}.character.json의 "align_x"가 액션 기본값을 덮는다.
 # align_y  ground : 프레임마다 최하단을 접지선에 맞춘다 (서 있든 쓰러지든 몸 어딘가는 땅에 닿는다)
 #          anchor : 기준 프레임 기준으로 일괄 이동 (점프처럼 공중에 뜨는 모션)
 ACTIONS = {
@@ -46,6 +52,16 @@ ALPHA_THRESHOLD = 30
 SEAM_MARGIN = 70          # 셀 경계 ±px 안에서 분할선을 찾는다
 SEAM_OPAQUE_WARN = 40     # 분할선이 이만큼 불투명 픽셀을 지나가면 실제 겹침으로 본다
 NOISE_MIN_AREA = 80
+ALIGN_X = ["feet", "anchor", "mid", "left_foot", "right_foot", "both_feet"]
+FOOT_BAND = 0.12          # 발을 찾는 바닥 띠 높이(프레임 키 대비). Archer 서 있는 시트 전부에서 부츠 색 마스크와 같은 발을 잡았다
+PIN_MAX = 0.06            # both_feet가 발을 옮기는 거리가 키의 이 비율을 넘으면 그려진 보폭 변화를 지우는 것일 수 있어 경고
+PIN_FALLOFF = 0.45        # 워프는 바닥에서 1, 키의 이 비율 높이에서 0 — 가랑이 아래만 휜다
+# 프레임 증강: 원본 프레임 사이마다 RIFE 보간 프레임을 이만큼 넣고 fps를 (n+1)배로 올린다.
+# 원본 프레임은 원래 시각에 그대로 나온다 (루프 8장 → 24장, 비루프 8장 → 22장)
+DEFAULT_INBETWEEN = 2
+HAZE_CUT = 0.06           # 보간 번짐 지표(rife.interpolate.haze)가 이걸 넘으면 그 구간은 끊는다.
+                          # Archer 전 구간의 최선값 ≤0.04, 안개가 눈에 띈 구간(활을 머리 위로, scale 1) 0.093
+ATLAS_MAX = 4096
 CELL_PAD = 12
 GROUND_PAD = 4            # 접지선 아래 여백 (기존 규격 543-1-538 = 4 와 같음)
 
@@ -221,7 +237,9 @@ def extract_frames(rgba, cols, rows, frames, row_splits, clean_noise):
             img = rgba[top:bottom + 1, x0:x1 + 1].copy()
             img[~mask[top:bottom + 1, x0:x1 + 1]] = 0
             ox, oy = c * cell_w, r * cell_h  # 공칭 셀 원점 — 프레임 로컬 좌표의 기준
+            left_c, right_c = foot_centers(img)
             result.append({
+                "feet": (left_c + x0 - ox, right_c + x0 - ox),
                 "index": idx,
                 "image": Image.fromarray(img),
                 "left": x0 - ox, "right": x1 + 1 - ox,
@@ -229,6 +247,23 @@ def extract_frames(rgba, cols, rows, frames, row_splits, clean_noise):
                 "feet_x": float(xs[band].mean()) - ox,
             })
     return result, seams, warnings
+
+
+def foot_centers(img):
+    """
+    바닥 띠에서 가장 왼쪽·오른쪽 덩어리의 중심 = 두 발 (이미지 로컬 x). 두 발이 붙어 한 덩어리면 둘 다 그 중심.
+    """
+    a = np.asarray(img)[:, :, 3] > 128
+    ys, _ = np.where(a)
+    top, bottom = ys.min(), ys.max()
+    h = bottom - top + 1
+    band = a[bottom - max(4, int(h * FOOT_BAND)):bottom + 1].any(0)
+    d = np.diff(np.concatenate(([0], band.astype(np.int8), [0])))
+    runs = [(s, e) for s, e in zip(np.where(d == 1)[0], np.where(d == -1)[0]) if e - s > h * 0.03]
+    if not runs:
+        c = float(np.where(band)[0].mean())
+        return c, c
+    return (runs[0][0] + runs[0][1]) / 2.0, (runs[-1][0] + runs[-1][1]) / 2.0
 
 
 # ---------------------------------------------------------------- 체급(스케일) 기준
@@ -285,12 +320,91 @@ def standing_height(image):
 
 def reference_points(frames, anchor, align_x, align_y):
     a = frames[anchor]
+    a_mid = (a["feet"][0] + a["feet"][1]) / 2
     refs = []
     for f in frames:
-        rx = f["feet_x"] if align_x == "feet" else a["feet_x"]
+        # 한 발 고정도 기준 프레임에서는 두 발 중점이 pivot에 오게 한다. 발 자체를 pivot에 두면
+        # 몸이 반 보폭만큼 옆으로 가서 다른 클립(중점 기준)으로 넘어갈 때 캐릭터가 순간이동한다
+        rx = {
+            "feet": f["feet_x"],
+            "anchor": a["feet_x"],
+            "mid": (f["feet"][0] + f["feet"][1]) / 2,
+            "both_feet": (f["feet"][0] + f["feet"][1]) / 2,
+            "left_foot": f["feet"][0] + (a_mid - a["feet"][0]),
+            "right_foot": f["feet"][1] + (a_mid - a["feet"][1]),
+        }[align_x]
         ry = f["bottom"] if align_y == "ground" else a["bottom"]
         refs.append((rx, ry))
     return refs
+
+
+def warp_x(img, dx):
+    """출력 (x, y)에 원본 (x - dx[y, x], y)를 쌍선형으로 가져온다. premultiplied alpha로 섞어 테두리가 어두워지지 않게."""
+    arr = np.asarray(img).astype(np.float32)
+    alpha = arr[:, :, 3:4] / 255.0
+    pre = np.concatenate([arr[:, :, :3] * alpha, arr[:, :, 3:4]], axis=2)
+    h, w = dx.shape
+    sx = np.arange(w, dtype=np.float32)[None, :] - dx
+    x0 = np.floor(sx).astype(np.int64)
+    t = (sx - x0)[:, :, None]
+    yy = np.arange(h)[:, None]
+
+    def sample(xi):
+        inside = (xi >= 0) & (xi < w)
+        return pre[yy, np.clip(xi, 0, w - 1)] * inside[:, :, None]
+
+    out = sample(x0) * (1 - t) + sample(x0 + 1) * t
+    a = out[:, :, 3:4]
+    rgb = np.where(a > 0, out[:, :, :3] / np.maximum(a, 1e-6) * 255.0, 0)
+    return Image.fromarray(np.concatenate([rgb, a], axis=2).clip(0, 255).astype(np.uint8))
+
+
+def pin_both_feet(frames, refs, anchor):
+    """
+    both_feet: 중점 정렬 뒤 남는 발별 어긋남을 다리 아래쪽 워프로 없앤다.
+    가로 변위는 두 발 사이에서 선형으로 섞고, 세로로는 바닥 1 → 키의 PIN_FALLOFF 높이 0 (smoothstep).
+    상체·머리는 움직이지 않는다. 프레임의 image/left/right/feet를 바꾼다. 반환: 경고 목록.
+    """
+    a, (arx, _) = frames[anchor], refs[anchor]
+    target = (a["feet"][0] - arx, a["feet"][1] - arx)
+    warnings = []
+    for f, (rx, _) in zip(frames, refs):
+        dl = target[0] - (f["feet"][0] - rx)
+        dr = target[1] - (f["feet"][1] - rx)
+        if max(abs(dl), abs(dr)) < 0.5:
+            continue
+        img = f["image"]
+        h = img.height
+        if max(abs(dl), abs(dr)) > h * PIN_MAX:
+            warnings.append(f"프레임 {f['index']}: 발을 {dl:+.0f}/{dr:+.0f}px 옮긴다(키의 {PIN_MAX:.0%} 초과) — "
+                            f"그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다")
+        pad = int(math.ceil(max(abs(dl), abs(dr)))) + 1
+        canvas = Image.new("RGBA", (img.width + 2 * pad, h))
+        canvas.paste(img, (pad, 0))
+        lx = f["feet"][0] - f["left"] + pad  # 캔버스 로컬 발 위치
+        rx_local = f["feet"][1] - f["left"] + pad
+        xs = np.arange(canvas.width, dtype=np.float32)
+        t = np.clip((xs - lx) / (rx_local - lx), 0, 1) if rx_local > lx else np.full_like(xs, 0.5)
+        horiz = (1 - t) * dl + t * dr
+        u = np.clip((np.arange(h, dtype=np.float32) - (h - 1 - h * PIN_FALLOFF)) / (h * PIN_FALLOFF), 0, 1)
+        vert = u * u * (3 - 2 * u)
+        warped = warp_x(canvas, vert[:, None] * horiz[None, :])
+        cols = np.where(np.asarray(warped)[:, :, 3].any(0))[0]
+        x0, x1 = int(cols.min()), int(cols.max())
+        f["image"] = warped.crop((x0, 0, x1 + 1, h))
+        f["left"], f["right"] = f["left"] - pad + x0, f["left"] - pad + x1 + 1
+        f["feet"] = (f["feet"][0] + dl, f["feet"][1] + dr)
+    return warnings
+
+
+def foot_slide(frames, refs, scale):
+    """정렬 후 각 발이 프레임 사이에서 미끄러지는 폭(출력 px). 워프한 프레임도 발을 다시 재서 확인한다."""
+    offs = []
+    for f, (rx, _) in zip(frames, refs):
+        left_c, right_c = foot_centers(f["image"])
+        offs.append((left_c + f["left"] - rx, right_c + f["left"] - rx))
+    o = np.array(offs) * scale
+    return {"left": round(float(np.ptp(o[:, 0])), 1), "right": round(float(np.ptp(o[:, 1])), 1)}
 
 
 def layout(frames, refs, scale, cell_w, cell_h, target_y):
@@ -334,6 +448,52 @@ def render_cells(frames, refs, scale, cell_w, cell_h, target_y):
     return cells
 
 
+# ---------------------------------------------------------------- 프레임 증강
+
+def augment(cells, inbetween, loop, keep_haze=False):
+    """
+    정렬이 끝난 셀 사이에 RIFE 보간 프레임을 넣는다. 정렬 뒤에 거는 이유: 정렬 전 흔들림까지 보간하면 안 되니까.
+    구간마다 흐름 해상도를 바꿔 가며 번짐이 가장 적은 보간본을 쓰고, 그래도 HAZE_CUT을 넘으면 앞 프레임을 반복해
+    원본처럼 끊는다(keep_haze면 보간본 유지). 끊김은 플레이에서 눈에 띈다(사용자 확인 2026-10-14) — 마지막 수단이다.
+    반환: (셀 목록, 원본 프레임의 새 인덱스, 구간별 [번짐, scale], 끊은 구간의 보간본 {구간: [셀...]})
+    """
+    sys.path.insert(0, os.path.dirname(__file__))
+    from rife.interpolate import Interpolator  # torch는 증강할 때만 불러온다
+
+    rife = Interpolator()
+    n = len(cells)
+    gaps = n if loop else n - 1
+    out, keys, hazes, cut = [], [], [], {}
+    for i in range(n):
+        keys.append(len(out))
+        out.append(cells[i])
+        if i >= gaps:
+            break
+        mids, scale, worst = rife.inbetweens(cells[i], cells[(i + 1) % n], inbetween)
+        if worst > HAZE_CUT and not keep_haze:
+            cut[i] = mids
+            mids = [cells[i]] * inbetween
+        out += mids
+        hazes.append([round(worst, 3), scale])
+        print(f"  보간 {i}→{(i + 1) % n}: 번짐 {worst:.3f} (흐름 해상도 {scale})" + (" → 끊음" if i in cut else ""))
+    return out, keys, hazes, cut
+
+
+def atlas_grid(frames, cell_w, cell_h):
+    """긴 변이 가장 짧은(텍스처 크기가 작은) 열 수. 같으면 빈 칸이 적은 쪽."""
+    best = None
+    for cols in range(1, frames + 1):
+        if cols * cell_w > ATLAS_MAX:
+            break
+        rows = math.ceil(frames / cols)
+        key = (max(cols * cell_w, rows * cell_h), cols * rows - frames)
+        if best is None or key < best[0]:
+            best = (key, cols, rows)
+    if best is None:
+        raise PipelineError(f"셀 폭 {cell_w}px이 아틀라스 최대 {ATLAS_MAX}px을 넘는다")
+    return best[1], best[2]
+
+
 # ---------------------------------------------------------------- 미리보기
 
 def fit_width(img, width):
@@ -348,7 +508,8 @@ def checker(size, step=16):
     return Image.fromarray(np.concatenate([arr.repeat(3, axis=2), np.full((h, w, 1), 255, np.uint8)], axis=2))
 
 
-def build_preview(src, seams, cells, cols, rows, cell_w, cell_h, target_y, path):
+def build_preview(src, seams, cells, cols, rows, cell_w, cell_h, target_y, path, keys=None, strips=()):
+    """keys: 원본 프레임의 셀 번호(증강 시 번호를 빨강으로). strips: [(제목, [셀...])] — 잔상 경고 구간을 크게 본다."""
     width = 1200
 
     # 1) 원본 + 분할선
@@ -374,7 +535,7 @@ def build_preview(src, seams, cells, cols, rows, cell_w, cell_h, target_y, path)
         d.rectangle([ox, oy, ox + cell_w - 1, oy + cell_h - 1], outline=(120, 120, 120), width=2)
         d.line([(ox, oy + target_y), (ox + cell_w, oy + target_y)], fill=(255, 0, 0), width=2)
         d.line([(ox + cell_w // 2, oy), (ox + cell_w // 2, oy + cell_h)], fill=(0, 80, 255), width=2)
-        d.text((ox + 6, oy + 4), str(i), fill=(0, 0, 0))
+        d.text((ox + 6, oy + 4), str(i), fill=(220, 0, 0) if keys and i in keys else (0, 0, 0))
 
     # 3) 겹쳐보기 — 좌우/상하로 튀는 프레임이 번져 보인다
     onion = checker((cell_w, cell_h))
@@ -387,6 +548,16 @@ def build_preview(src, seams, cells, cols, rows, cell_w, cell_h, target_y, path)
     d.line([(cell_w // 2, 0), (cell_w // 2, cell_h)], fill=(0, 80, 255), width=2)
 
     panels = [fit_width(a, width), fit_width(b, width), onion]
+
+    # 4) 잔상 경고 구간: 원본 A | 보간 ... | 원본 B
+    for title, row in strips:
+        strip = Image.new("RGBA", (cell_w * len(row), cell_h + 20), (255, 255, 255, 255))
+        for k, cell in enumerate(row):
+            bg = checker((cell_w, cell_h))
+            bg.alpha_composite(cell)
+            strip.paste(bg, (k * cell_w, 20))
+        ImageDraw.Draw(strip).text((6, 4), title, fill=(200, 0, 0))
+        panels.append(fit_width(strip, width) if strip.width > width else strip)
     out = Image.new("RGBA", (width, sum(p.height for p in panels) + 20 * len(panels)), (255, 255, 255, 255))
     y = 0
     for p in panels:
@@ -400,6 +571,17 @@ def build_preview(src, seams, cells, cols, rows, cell_w, cell_h, target_y, path)
 
 def character_config_path(character):
     return os.path.join(PROJECT_ROOT, SHEET_ROOT, character, f"{character}.character.json")
+
+
+def character_align_x(character, action):
+    p = character_config_path(character)
+    if not os.path.exists(p):
+        return None
+    with open(p, encoding="utf-8") as fp:
+        value = json.load(fp).get("align_x", {}).get(action)
+    if value is not None and value not in ALIGN_X:
+        raise PipelineError(f"{character}.character.json align_x.{action} = '{value}' — {ALIGN_X} 중 하나여야 한다")
+    return value
 
 
 def resolve_scale(args, character, anchor_height, analyze):
@@ -430,7 +612,7 @@ def run(args):
         raise PipelineError(f"이름 규칙 위반: '{args.name}' — {{캐릭터}}_{{Idle|Hit|Skill1~9|Dead}}_v{{N}} (예: Archer_Skill1_v1)")
     character, action, version = m.group(1), m.group(2), int(m.group(3))
     rule = action_rule(action)
-    align_x = args.align_x or rule["align_x"]
+    align_x = args.align_x or character_align_x(character, action) or rule["align_x"]
     align_y = args.align_y or rule["align_y"]
     frames_n = args.frames or args.cols * args.rows
     if not 1 <= frames_n <= args.cols * args.rows:
@@ -452,12 +634,33 @@ def run(args):
         warnings.append(note)
 
     refs = reference_points(frames, args.anchor, align_x, align_y)
+    if align_x == "both_feet":
+        warnings += pin_both_feet(frames, refs, args.anchor)
+    slide = foot_slide(frames, refs, scale)
     cell_w, cell_h, target_y, layout_warn = layout(frames, refs, scale, args.cell_w, args.cell_h, args.target_y)
     warnings += layout_warn
     cells = render_cells(frames, refs, scale, cell_w, cell_h, target_y)
 
+    loop = rule["loop"] if args.loop is None else args.loop == "true"
+    keys, hazes, strips, cut = list(range(len(cells))), [], [], {}
+    if args.inbetween > 0:
+        cells, keys, hazes, cut = augment(cells, args.inbetween, loop, args.keep_haze)
+        for i, (g, _) in enumerate(hazes):
+            if g > HAZE_CUT:
+                j = (i + 1) % frames_n
+                mids = cut.get(i, cells[keys[i] + 1:keys[i] + args.inbetween + 1])
+                if i in cut:
+                    warnings.append(f"보간 {i}→{j} 번짐 {g:.3f} (기준 {HAZE_CUT}) — 보간하지 않고 원본처럼 끊었다. "
+                                    f"버린 보간본은 미리보기 아래 칸에 있다 (쓰려면 --keep_haze)")
+                else:
+                    warnings.append(f"보간 {i}→{j} 번짐 {g:.3f} (기준 {HAZE_CUT}) — 미리보기 아래 칸에서 두 겹으로 보이는지 확인한다")
+                strips.append((f"haze {i}->{j}  {g:.3f}" + ("  (cut)" if i in cut else ""),
+                               [cells[keys[i]]] + mids + [cells[keys[j]]]))
+    out_cols, out_rows = atlas_grid(len(cells), cell_w, cell_h)
+
     preview = os.path.join(PROJECT_ROOT, PREVIEW_DIR, f"{args.name}_preview.png")
-    build_preview(src, seams, cells, args.cols, args.rows, cell_w, cell_h, target_y, preview)
+    build_preview(src, seams, cells, out_cols, out_rows, cell_w, cell_h, target_y, preview,
+                  keys if args.inbetween > 0 else None, strips)
 
     manifest = {
         "name": args.name,
@@ -465,20 +668,26 @@ def run(args):
         "action": action,
         "version": version,
         "source": os.path.abspath(args.input).replace("\\", "/"),
-        "cols": args.cols,
-        "rows": args.rows,
-        "frames": frames_n,
+        "cols": out_cols,   # 출력 아틀라스 그리드 (Unity가 이걸로 자른다)
+        "rows": out_rows,
+        "frames": len(cells),
+        "sourceGrid": {"cols": args.cols, "rows": args.rows, "frames": frames_n},
+        "inbetween": args.inbetween,
+        "keyFrames": keys,  # 원본 프레임이 놓인 셀 번호. 나머지는 RIFE 보간
+        "haze": hazes,     # 원본 구간별 [보간 번짐 지표, 고른 흐름 해상도] (번짐이 클수록 두 겹·안개로 보인다)
+        "hazeCut": sorted(cut),  # 번짐 기준을 넘어 보간 대신 앞 프레임을 반복한 구간 (구간 i = 원본 i→i+1)
         "cellWidth": cell_w,
         "cellHeight": cell_h,
         "pivotX": 0.5,
         "pivotY": (cell_h - target_y) / cell_h,  # 접지선은 발 아래 경계 — 아래에서 (cell_h - target_y) px
-        "fps": args.fps or rule["fps"],
-        "loop": rule["loop"] if args.loop is None else args.loop == "true",
+        "fps": (args.fps or rule["fps"]) * (args.inbetween + 1),  # 원본 프레임은 원래 시각에 나온다
+        "loop": loop,
         "scale": round(scale, 4),
         "anchorHeight": round(anchor_height, 1),  # 기준 프레임 standing_height (원본 픽셀)
         "stance": stance,
         "alignX": align_x,
         "alignY": align_y,
+        "footSlide": slide,  # 정렬 후 발별 미끄러짐 폭(출력 px, 화면 왼쪽/오른쪽 발). 고정한 발은 0에 가까워야 한다
         "warnings": warnings,
     }
 
@@ -489,9 +698,9 @@ def run(args):
 
     sheet_rel = f"{SHEET_ROOT}/{character}/{args.name}.png"
     if not args.analyze:
-        atlas = Image.new("RGBA", (cell_w * args.cols, cell_h * args.rows))
+        atlas = Image.new("RGBA", (cell_w * out_cols, cell_h * out_rows))
         for i, cell in enumerate(cells):
-            atlas.paste(cell, ((i % args.cols) * cell_w, (i // args.cols) * cell_h))
+            atlas.paste(cell, ((i % out_cols) * cell_w, (i // out_cols) * cell_h))
         out_png = os.path.join(PROJECT_ROOT, sheet_rel)
         os.makedirs(os.path.dirname(out_png), exist_ok=True)
         atlas.save(out_png)
@@ -504,7 +713,7 @@ def run(args):
         "sheet": None if args.analyze else sheet_rel,
         "preview": preview.replace("\\", "/"),
         "next": None if args.analyze else f"unity cmd eval 'return SpriteAnimationPipeline.Apply(\"{sheet_rel}\");'",
-        **{k: manifest[k] for k in ("cellWidth", "cellHeight", "pivotX", "pivotY", "fps", "loop", "scale", "alignX", "alignY", "warnings")},
+        **{k: manifest[k] for k in ("cellWidth", "cellHeight", "pivotX", "pivotY", "fps", "loop", "scale", "alignX", "alignY", "footSlide", "frames", "haze", "warnings")},
     }
 
 
@@ -517,14 +726,16 @@ def main():
     p.add_argument("--rows", type=int, default=2)
     p.add_argument("--frames", type=int, default=None, help="기본 cols*rows")
     p.add_argument("--anchor", type=int, default=0, help="기준 프레임 (서 있는 프레임)")
-    p.add_argument("--align_x", choices=["feet", "anchor"], default=None, help="기본값은 액션 규칙")
+    p.add_argument("--align_x", choices=ALIGN_X, default=None, help="기본값은 캐릭터 설정 align_x → 액션 규칙")
     p.add_argument("--align_y", choices=["ground", "anchor"], default=None, help="기본값은 액션 규칙")
     p.add_argument("--scale", type=float, default=None, help="기본값은 캐릭터 기준 키 / 기준 프레임 높이")
     p.add_argument("--cell_w", type=int, default=None, help="기본값은 자동")
     p.add_argument("--cell_h", type=int, default=None, help="기본값은 자동")
     p.add_argument("--target_y", type=int, default=None, help="접지선 (셀 위에서부터 px), 기본값은 자동")
     p.add_argument("--row_split_y", type=int, nargs="*", default=None, help="자동 분할 대신 직선 행 경계")
-    p.add_argument("--fps", type=int, default=None)
+    p.add_argument("--fps", type=int, default=None, help="원본 프레임 기준. 증강하면 (inbetween+1)배가 된다")
+    p.add_argument("--inbetween", type=int, default=DEFAULT_INBETWEEN, help="원본 프레임 사이 보간 장수 (0 = 증강 안 함)")
+    p.add_argument("--keep_haze", action="store_true", help="번짐 기준을 넘는 구간도 끊지 않고 보간본을 쓴다")
     p.add_argument("--loop", choices=["true", "false"], default=None)
     p.add_argument("--keep_noise", action="store_true", help="작은 부스러기 제거를 끈다")
     p.add_argument("--analyze", action="store_true", help="측정과 미리보기만 하고 에셋은 쓰지 않는다")

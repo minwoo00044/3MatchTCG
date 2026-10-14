@@ -27,6 +27,9 @@ python scripts/process_sprite_sheet.py --input "원본.png" --name Archer_Dead_v
 unity cmd eval 'AssetDatabase.Refresh(); return SpriteAnimationPipeline.Apply("Assets/_/Spirte/Archer/Archer_Dead_v1.png");'
 ```
 
+CLI eval은 메인 스레드 5초 제한이 있다. 새 시트를 여러 장 만든 뒤 첫 `Apply`의 `Refresh`가 그것들을 한꺼번에 임포트하다 시간 초과가 날 수 있다(무압축 시트 한 장 임포트 약 1초).
+응답만 실패하고 에디터의 임포트·적용은 계속된다. 여러 장이면 `unity cmd eval 'AssetDatabase.Refresh(); return 0;'`을 먼저 한 번 돌려(이것도 시간 초과로 응답이 실패할 수 있다) 임포트를 끝내고, `unity status`가 `ready`인지 본 뒤 한 장씩 `Apply`한다. `Apply`가 실패로 오면 파일·prev/ 상태를 보고 같은 `Apply`를 다시 실행한다.
+
 에디터에서는 시트를 선택하고 `Tools > Sprite Animation > Apply Selected Sheets`로 실행한다.
 
 ### 종료 코드
@@ -60,8 +63,14 @@ unity cmd eval 'AssetDatabase.Refresh(); return SpriteAnimationPipeline.Apply("A
 | Skill1~9 | 10 | | feet | ground |
 | Dead | 8 | | anchor | ground |
 
-- **feet**: 프레임마다 발 중심을 pivot에 맞춘다. 제자리 모션에서 AI가 만든 좌우 흔들림을 없앤다.
+- **feet**: 프레임마다 발 띠(바닥 근처 실루엣 전체) 중심을 pivot에 맞춘다. 제자리 모션에서 AI가 만든 좌우 흔들림을 없앤다.
 - **anchor**: 기준 프레임(`--anchor`, 기본 0)의 발 중심 하나로 모든 프레임을 같은 양만큼 옮긴다. 원본에 그려진 이동을 보존한다.
+- **mid**: 프레임마다 두 발 중심의 중점을 맞춘다.
+- **left_foot / right_foot**: 화면 왼쪽/오른쪽 발을 모든 프레임에서 같은 자리에 둔다(한 발을 디딘 채 다른 발을 빼는 동작). 기준 프레임에서는 두 발 중점이 pivot에 온다 — 발 자체를 pivot에 두면 다른 클립으로 넘어갈 때 몸이 반 보폭만큼 순간이동한다.
+- **both_feet**: 중점을 맞춘 뒤, 두 발을 기준 프레임의 발 위치로 끌어당기는 워프를 건다. 변위는 바닥에서 최대, 키의 45% 높이에서 0이라 상체는 움직이지 않는다. AI는 프레임마다 보폭을 조금씩 다르게 그려서 이동만으로는 두 발을 함께 고정할 수 없다. 옮기는 거리가 키의 6%를 넘으면 그려진 보폭 변화를 지우는 것일 수 있어 경고한다.
+
+**캐릭터별 지정**: 어느 발을 고정할지는 시트 그림에 달려 있어서 `{캐릭터}.character.json`의 `"align_x": {"Idle": "both_feet", ...}`가 위 표의 기본값을 덮는다(CLI `--align_x`가 최우선).
+매니페스트의 `footSlide`(출력 px)는 정렬 후 각 발이 프레임 사이에서 미끄러지는 폭이다. 고정한 발은 0에 가까워야 한다.
 - **ground**: 프레임마다 최하단을 접지선에 맞춘다. 서 있든 쓰러지든 몸 어딘가는 땅에 닿아 있다.
 - **anchor(세로)**: 점프처럼 공중에 뜨는 모션에 쓴다. `--align_y anchor`
 
@@ -79,6 +88,20 @@ unity cmd eval 'AssetDatabase.Refresh(); return SpriteAnimationPipeline.Apply("A
 | 2048px 초과 아틀라스 | `maxTextureSize`를 올려서 조용히 축소되지 않게 한다 |
 | 압축으로 인한 색 번짐 | 무압축(RGBA32). 머리카락 경계·그라데이션 품질을 우선하고 메모리를 쓴다(아틀라스 한 장 약 6MB). 플랫폼별 오버라이드는 두지 않는다 |
 | 작은 부스러기 | 면적 80px 미만 연결 요소 제거 (`--keep_noise`로 끔) |
+| 프레임 수가 적어 뚝뚝 끊김 | **프레임 증강** (아래) |
+
+## 프레임 증강
+
+정렬이 끝난 셀 사이에 RIFE(v4.25, MIT) 보간 프레임을 `--inbetween`(기본 2)장씩 넣고 fps를 (n+1)배로 올린다.
+원본 프레임은 원래 시각에 그대로 나온다 — 루프 8장 → 24장, 비루프 8장 → 22장(사이가 7칸). `--inbetween 0`이면 증강하지 않는다.
+
+- 모델 코드는 `scripts/rife/`(출처·라이선스 주석 포함), 가중치(24MB)는 git이 무시하는 `SpriteRegen/models/rife425/`에 둔다. 없으면 처음 쓸 때 받고 SHA-256을 확인한다. PyTorch(CPU)가 필요하다.
+- 알파: 흐름은 회색 배경에 합성한 RGB로 계산하고, 같은 흐름으로 premultiplied RGB와 알파를 함께 워프한다.
+- **흐름 해상도 자동 선택**: 구간마다 흐름 해상도 1·0.5·0.25로 모두 만들어 번짐이 가장 적은 쪽을 쓴다(매니페스트 `haze`에 [번짐, 고른 해상도]). 큰 움직임은 낮은 해상도에서 시작해야 흐름이 잡힌다. Archer에서 활을 머리 위로 드는 구간은 해상도 1에서 머리 위에 안개가 생겼지만 0.25에서는 깨끗했다. 시트당 약 1분.
+- **번짐 지표**: 보간본의 반투명(알파 0.08~0.85) 면적 ÷ 불투명 면적에서 두 원본의 같은 값을 뺀 것. 보간 실패는 두 겹·안개 같은 반투명으로 나타난다. ('두 원본을 각각 워프한 결과의 차이'는 섞기 마스크가 한쪽을 고르면 결과가 깨끗해도 높게 나와 쓰지 않는다.)
+- **최선값도 0.06을 넘으면 그 구간은 앞 프레임을 반복해 끊는다**(`hazeCut`, 버린 보간본은 미리보기 맨 아래 칸). 끊김은 플레이에서 눈에 띄므로(Archer에서 확인) 마지막 수단이다. 보간본을 그래도 쓰려면 `--keep_haze`.
+- 매니페스트 `cols`/`rows`는 출력 아틀라스 그리드(긴 변이 가장 짧게 자동), 원본 그리드는 `sourceGrid`, 원본 프레임 위치는 `keyFrames`.
+- 메모리: 무압축이라 아틀라스가 약 3배(장당 약 18MB)가 된다. 압축은 별도 검토 과제.
 
 ## 다시 적용해도 참조가 깨지지 않는다
 
@@ -92,8 +115,9 @@ unity cmd eval 'AssetDatabase.Refresh(); return SpriteAnimationPipeline.Apply("A
 `Temp/SpriteAnimationPipeline/{이름}_preview.png` (에디터를 닫으면 지워진다)
 
 1. **원본 + 분할선**: 분홍 = 행 경계, 하늘 = 열 경계. 신체를 가로지르면 분할이 잘못된 것이다
-2. **아틀라스**: 빨강 = 접지선, 파랑 = pivot. 발이 빨간 선 위에 서 있어야 한다
+2. **아틀라스**: 빨강 = 접지선, 파랑 = pivot. 발이 빨간 선 위에 서 있어야 한다. 증강하면 원본 프레임 번호가 빨간 글씨다
 3. **겹쳐보기**: 모든 프레임을 반투명으로 겹친 것. 발이 번져 보이면 그 방향으로 흔들린다는 뜻이다
+4. **번짐 구간**(있을 때만): 원본 A | 보간본 | 원본 B. `(cut)`이면 이 보간본은 버리고 끊었다
 
 ## 한계
 
