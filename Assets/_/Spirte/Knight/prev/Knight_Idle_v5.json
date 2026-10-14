@@ -1,0 +1,84 @@
+{
+  "name": "Knight_Idle_v5",
+  "character": "Knight",
+  "action": "Idle",
+  "version": 5,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Idle/try4/result.png",
+  "cols": 6,
+  "rows": 4,
+  "frames": 24,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      -0.005,
+      0.25
+    ],
+    [
+      -0.005,
+      0.25
+    ],
+    [
+      -0.006,
+      0.25
+    ],
+    [
+      -0.004,
+      0.5
+    ],
+    [
+      -0.006,
+      0.25
+    ],
+    [
+      -0.005,
+      0.25
+    ],
+    [
+      -0.005,
+      0.25
+    ],
+    [
+      -0.006,
+      0.25
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 368,
+  "cellHeight": 523,
+  "pivotX": 0.5,
+  "pivotY": 0.0076481835564053535,
+  "fps": 24,
+  "loop": true,
+  "scale": 1.0119,
+  "anchorHeight": 511.4,
+  "stance": {
+    "method": "standing",
+    "vertical": 500,
+    "spread": 94.5,
+    "leg": 92,
+    "crotch": 407
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 1.5,
+    "right": 2.0
+  },
+  "warnings": []
+}

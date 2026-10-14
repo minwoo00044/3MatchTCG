@@ -1,0 +1,9 @@
+{
+  "character": "Knight",
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/Assets/_/Spirte/Knight/Knight_HD.png",
+  "hint": "tall",
+  "design_note": "Must keep from #1: the brown leather waist belts with buckles crossing the hips; all gold armor ornaments; the long white cape with navy-blue lining and gold trim; long silver hair with the side braid; navy pleated skirt. A knight's longsword (silver blade, gold cross-guard, navy grip) held loosely in the right hand pointing down. Flat armored shoes.",
+  "accepted_from": "SpriteRegen/Knight_Deform/try9/result.png",
+  "height_cm": 170,
+  "height_note": "설정 키(사용자 지정 2026-10-14). Archer 160cm 대비 1.0625배. 시트 단계에서 기준 키(정수리~발바닥, 머리카락 제외)에 반영한다"
+}

@@ -1,14 +1,14 @@
 {
-  "ref_height": 541.5,
+  "ref_height": 541.4,
   "ref_method": "standing",
-  "reference": "Archer_Idle_v7",
+  "reference": "Archer_Idle_v8",
   "design": {
     "required": [
       "quiver with arrows on the back",
       "brown waist belt with a buckle"
     ],
-    "props_reference": "Archer_Idle_v7",
-    "note": "모든 시트에 있어야 한다 (사용자 지정 2026-10-14). 기준 시트 Idle_v7(=v4와 같은 그림)에도 있다"
+    "props_reference": "Archer_Idle_v8",
+    "note": "모든 시트에 있어야 한다 (사용자 지정 2026-10-14). 기준 시트 Idle_v8에도 있다. 부츠는 design/Archer_apose.png 크기(축소)"
   },
   "align_x": {
     "Idle": "both_feet",
@@ -18,5 +18,18 @@
     "Skill3": "mid",
     "Dead": "anchor"
   },
-  "align_x_note": "고정 부위 (사용자 지정 2026-10-14). left/right는 화면 기준 — Archer는 오른쪽을 보므로 right_foot = 앞발. Hit은 측정 후 뒷발 → 두 발로 변경"
+  "align_x_note": "고정 부위 (사용자 지정 2026-10-14). left/right는 화면 기준 — Archer는 오른쪽을 보므로 right_foot = 앞발. Hit은 측정 후 뒷발 → 두 발로 변경",
+  "height_cm": 160,
+  "skull_over_L": 0.312,
+  "skull_note": "두개골(턱~정수리)/턱~발바닥. 사용자가 그린 두개골 선(2026-10-14)을 Idle_v7 0번 프레임에서 잼",
+  "idle": {
+    "method": "ai_sheet",
+    "moves": {
+      "whole_body": "넓은 보폭 자세에서 무릎 굽혀 상체가 키의 약 2.3% 오르내림(머리·가슴·허리 한 덩어리, 무릎 0.55배)",
+      "eyes": "깜빡임",
+      "hair": "풍성한 머리가 몸과 함께",
+      "feet": "고정(정렬 both_feet)"
+    },
+    "note": "AI가 그린 8장(Idle_v8) 그대로 + 프레임 증강. 얼굴이 작고 머리카락에 가려 재작화가 덜 드러나 불쾌감이 없었다. 반자동으로 바꾸려면 Knight idle 설정을 참고"
+  }
 }

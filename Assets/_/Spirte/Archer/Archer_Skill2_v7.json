@@ -1,0 +1,81 @@
+{
+  "name": "Archer_Skill2_v7",
+  "character": "Archer",
+  "action": "Skill2",
+  "version": 7,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Archer_Skill2/try6/result.png",
+  "cols": 5,
+  "rows": 5,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      0.003,
+      0.25
+    ],
+    [
+      -0.0,
+      0.5
+    ],
+    [
+      0.052,
+      0.25
+    ],
+    [
+      -0.006,
+      0.5
+    ],
+    [
+      -0.008,
+      0.5
+    ],
+    [
+      0.019,
+      0.5
+    ],
+    [
+      0.002,
+      1.0
+    ]
+  ],
+  "hazeCut": [],
+  "cellWidth": 524,
+  "cellHeight": 561,
+  "pivotX": 0.5,
+  "pivotY": 0.0071301247771836,
+  "fps": 30,
+  "loop": false,
+  "scale": 1.0323,
+  "anchorHeight": 524.5,
+  "stance": {
+    "method": "standing",
+    "vertical": 496,
+    "spread": 197.5,
+    "leg": 157,
+    "crotch": 338
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 3.1,
+    "right": 2.6
+  },
+  "warnings": [
+    "프레임 3: 원본 시트 위 가장자리에서 이미 잘려 있다"
+  ]
+}

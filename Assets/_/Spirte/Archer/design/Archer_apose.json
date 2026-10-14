@@ -1,0 +1,12 @@
+{
+  "character": "Archer",
+  "view": "front A-pose",
+  "from": "Archer_Idle_v7 0번 프레임 비율 유지(SpriteRegen/Archer_APose/try1) → 부츠를 Knight 9차 신발 크기로 축소(try2)",
+  "boot_width_over_L": {
+    "before": 0.199,
+    "after": 0.135,
+    "knight9": 0.129
+  },
+  "height_cm": 160,
+  "note": "사용자 요청 2026-10-14. 기존 Archer 시트들의 부츠는 아직 큰 상태"
+}

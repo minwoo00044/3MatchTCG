@@ -1,0 +1,79 @@
+{
+  "name": "Archer_Skill1_v5",
+  "character": "Archer",
+  "action": "Skill1",
+  "version": 5,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Archer_Skill1/try2/result.png",
+  "cols": 6,
+  "rows": 4,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      -0.004,
+      0.5
+    ],
+    [
+      -0.004,
+      0.5
+    ],
+    [
+      -0.001,
+      0.5
+    ],
+    [
+      -0.005,
+      0.5
+    ],
+    [
+      0.016,
+      0.5
+    ],
+    [
+      0.025,
+      0.5
+    ],
+    [
+      0.014,
+      0.25
+    ]
+  ],
+  "hazeCut": [],
+  "cellWidth": 444,
+  "cellHeight": 537,
+  "pivotX": 0.5,
+  "pivotY": 0.0074487895716946,
+  "fps": 30,
+  "loop": false,
+  "scale": 1.0099,
+  "anchorHeight": 536.1,
+  "stance": {
+    "method": "standing",
+    "vertical": 514,
+    "spread": 178.0,
+    "leg": 168,
+    "crotch": 345
+  },
+  "alignX": "right_foot",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 65.6,
+    "right": 0.0
+  },
+  "warnings": []
+}
