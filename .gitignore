@@ -104,3 +104,7 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# sprite-animation 스킬 재생성 작업 폴더
+/SpriteRegen/
+__pycache__/

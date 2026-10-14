@@ -1,0 +1,23 @@
+{
+  "name": "Archer_Dead_v1",
+  "character": "Archer",
+  "action": "Dead",
+  "version": 1,
+  "source": "C:/Users/SSAFY/Downloads/초록 머리 궁수의 낙하 애니메이션 spritesheet.png",
+  "cols": 4,
+  "rows": 2,
+  "frames": 8,
+  "cellWidth": 440,
+  "cellHeight": 538,
+  "pivotX": 0.5,
+  "pivotY": 0.007434944237918215,
+  "fps": 8,
+  "loop": false,
+  "scale": 0.911,
+  "alignX": "anchor",
+  "alignY": "ground",
+  "warnings": [
+    "프레임 3: 원본 시트 오른쪽 가장자리에서 이미 잘려 있다",
+    "프레임 6↔7 겹침: 경계선이 불투명 픽셀 46개를 자른다"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Archer_Skill2_v2",
+  "character": "Archer",
+  "action": "Skill2",
+  "version": 2,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Archer_Skill2/applied_v2.png",
+  "cols": 4,
+  "rows": 2,
+  "frames": 8,
+  "cellWidth": 494,
+  "cellHeight": 569,
+  "pivotX": 0.5,
+  "pivotY": 0.007029876977152899,
+  "fps": 10,
+  "loop": false,
+  "scale": 1.0446,
+  "anchorHeight": 518.1,
+  "stance": {
+    "method": "standing",
+    "vertical": 492,
+    "spread": 190.0,
+    "leg": 160,
+    "crotch": 331
+  },
+  "alignX": "feet",
+  "alignY": "ground",
+  "warnings": []
+}

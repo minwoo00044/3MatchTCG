@@ -1,0 +1,13 @@
+{
+  "ref_height": 541.5,
+  "ref_method": "standing",
+  "reference": "Archer_Idle_v4",
+  "design": {
+    "required": [
+      "quiver with arrows on the back",
+      "brown waist belt with a buckle"
+    ],
+    "props_reference": "Archer_Idle_v4",
+    "note": "모든 시트에 있어야 한다 (사용자 지정 2026-10-14). 기준 시트 Idle_v4에도 있다"
+  }
+}
