@@ -105,9 +105,18 @@ def main():
         work = os.path.join(base, "dryrun")
         shutil.rmtree(work, ignore_errors=True)
     else:
+        # 여러 생성을 동시에 띄워도 번호가 겹치지 않게, 폴더 생성에 성공한 번호를 쓴다
+        os.makedirs(base, exist_ok=True)
         n = len([d for d in glob.glob(os.path.join(base, "try*")) if os.path.isdir(d)]) + 1
-        work = os.path.join(base, f"try{n}")
-    os.makedirs(work)
+        while True:
+            work = os.path.join(base, f"try{n}")
+            try:
+                os.makedirs(work)
+                break
+            except FileExistsError:
+                n += 1
+    if args.dry_run:
+        os.makedirs(work)
 
     SC.check_reference(args.reference)
     palette = SC.load_palette(character, None)
