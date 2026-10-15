@@ -1,0 +1,90 @@
+{
+  "name": "Knight_Skill2_v5",
+  "character": "Knight",
+  "action": "Skill2",
+  "version": 5,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill2/try11/result.png",
+  "sources": [
+    "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill2/try11/result.png",
+    "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill2/try12/result.png"
+  ],
+  "cols": 3,
+  "rows": 5,
+  "frames": 15,
+  "sourceGrid": {
+    "cols": 2,
+    "rows": 4,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    2,
+    3,
+    4,
+    6,
+    9,
+    12,
+    14
+  ],
+  "haze": [
+    [
+      0.033,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      -0.038,
+      0.5
+    ],
+    [
+      0.005,
+      0.25
+    ],
+    [
+      0.024,
+      0.5
+    ],
+    [
+      0.001,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 1244,
+  "cellHeight": 554,
+  "pivotX": 0.5,
+  "pivotY": 0.007220216606498195,
+  "fps": 30,
+  "durations": null,
+  "loop": false,
+  "scale": 1.1206,
+  "sizeFit": {
+    "reference": "Knight_Idle_v10",
+    "factor": 0.99,
+    "iou": 0.722
+  },
+  "anchorHeight": 481.1,
+  "stance": {
+    "method": "standing",
+    "vertical": 448,
+    "spread": 186.0,
+    "leg": 114,
+    "crotch": 333
+  },
+  "alignX": "left_foot",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 0.0,
+    "right": 411.3
+  },
+  "warnings": []
+}

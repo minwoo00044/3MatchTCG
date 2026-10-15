@@ -1,0 +1,676 @@
+fileFormatVersion: 2
+guid: 2b6ae09617c382a44878486115b55de4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3166319493985761512
+    second: Knight_Dead_v5_0
+  - first:
+      213: 4647965153276680942
+    second: Knight_Dead_v5_1
+  - first:
+      213: 7956978480262082116
+    second: Knight_Dead_v5_2
+  - first:
+      213: -5859042013292174132
+    second: Knight_Dead_v5_3
+  - first:
+      213: 384699627294851033
+    second: Knight_Dead_v5_4
+  - first:
+      213: 2448982948550275198
+    second: Knight_Dead_v5_5
+  - first:
+      213: -6688840086608234613
+    second: Knight_Dead_v5_6
+  - first:
+      213: 4654637225447667307
+    second: Knight_Dead_v5_7
+  - first:
+      213: -429250745440791808
+    second: Knight_Dead_v5_8
+  - first:
+      213: -4626730621762904549
+    second: Knight_Dead_v5_9
+  - first:
+      213: 3814649154994035638
+    second: Knight_Dead_v5_10
+  - first:
+      213: -2584615528681309330
+    second: Knight_Dead_v5_11
+  - first:
+      213: -8848746171295008575
+    second: Knight_Dead_v5_12
+  - first:
+      213: -8148194019418203274
+    second: Knight_Dead_v5_13
+  - first:
+      213: 3869923572510005596
+    second: Knight_Dead_v5_14
+  - first:
+      213: -7279335693169096942
+    second: Knight_Dead_v5_15
+  - first:
+      213: -4437400036103873782
+    second: Knight_Dead_v5_16
+  - first:
+      213: 5694345114071960400
+    second: Knight_Dead_v5_17
+  - first:
+      213: -3049878631636539876
+    second: Knight_Dead_v5_18
+  - first:
+      213: -8070452709938905016
+    second: Knight_Dead_v5_19
+  - first:
+      213: 3319998254330081803
+    second: Knight_Dead_v5_20
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Knight_Dead_v5_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2570
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81785933239fe04d0800000000000000
+      internalID: -3166319493985761512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_1
+      rect:
+        serializedVersion: 2
+        x: 810
+        y: 2570
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eea53715ea3e08040800000000000000
+      internalID: 4647965153276680942
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_2
+      rect:
+        serializedVersion: 2
+        x: 1620
+        y: 2570
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44ee27915cddc6e60800000000000000
+      internalID: 7956978480262082116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_3
+      rect:
+        serializedVersion: 2
+        x: 2430
+        y: 2570
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc461a9d45080bea0800000000000000
+      internalID: -5859042013292174132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2056
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9df7226d54ab65500800000000000000
+      internalID: 384699627294851033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_5
+      rect:
+        serializedVersion: 2
+        x: 810
+        y: 2056
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e70f35534098cf120800000000000000
+      internalID: 2448982948550275198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_6
+      rect:
+        serializedVersion: 2
+        x: 1620
+        y: 2056
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b87b25651677c23a0800000000000000
+      internalID: -6688840086608234613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_7
+      rect:
+        serializedVersion: 2
+        x: 2430
+        y: 2056
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b663e1d25e7989040800000000000000
+      internalID: 4654637225447667307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1542
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0031e66a8befa0af0800000000000000
+      internalID: -429250745440791808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_9
+      rect:
+        serializedVersion: 2
+        x: 810
+        y: 1542
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1e5662530d8acfb0800000000000000
+      internalID: -4626730621762904549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_10
+      rect:
+        serializedVersion: 2
+        x: 1620
+        y: 1542
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bbd922123b50f430800000000000000
+      internalID: 3814649154994035638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_11
+      rect:
+        serializedVersion: 2
+        x: 2430
+        y: 1542
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6bfdfbded9912cd0800000000000000
+      internalID: -2584615528681309330
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1028
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c8fc586d30f23580800000000000000
+      internalID: -8848746171295008575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_13
+      rect:
+        serializedVersion: 2
+        x: 810
+        y: 1028
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67b9d97d5bccbee80800000000000000
+      internalID: -8148194019418203274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_14
+      rect:
+        serializedVersion: 2
+        x: 1620
+        y: 1028
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c599e574cfab4b530800000000000000
+      internalID: 3869923572510005596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_15
+      rect:
+        serializedVersion: 2
+        x: 2430
+        y: 1028
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21785df21ca9afa90800000000000000
+      internalID: -7279335693169096942
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 514
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0b19b17d203b62c0800000000000000
+      internalID: -4437400036103873782
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_17
+      rect:
+        serializedVersion: 2
+        x: 810
+        y: 514
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05b8db816b0660f40800000000000000
+      internalID: 5694345114071960400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_18
+      rect:
+        serializedVersion: 2
+        x: 1620
+        y: 514
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c16ef312b87aca5d0800000000000000
+      internalID: -3049878631636539876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_19
+      rect:
+        serializedVersion: 2
+        x: 2430
+        y: 514
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 840c087f40effff80800000000000000
+      internalID: -8070452709938905016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Dead_v5_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 810
+        height: 514
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007782101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b02f24c72d0031e20800000000000000
+      internalID: 3319998254330081803
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 52edf709f3e6b42459914f2b981c5f37
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Knight_Dead_v5_0: -3166319493985761512
+      Knight_Dead_v5_1: 4647965153276680942
+      Knight_Dead_v5_10: 3814649154994035638
+      Knight_Dead_v5_11: -2584615528681309330
+      Knight_Dead_v5_12: -8848746171295008575
+      Knight_Dead_v5_13: -8148194019418203274
+      Knight_Dead_v5_14: 3869923572510005596
+      Knight_Dead_v5_15: -7279335693169096942
+      Knight_Dead_v5_16: -4437400036103873782
+      Knight_Dead_v5_17: 5694345114071960400
+      Knight_Dead_v5_18: -3049878631636539876
+      Knight_Dead_v5_19: -8070452709938905016
+      Knight_Dead_v5_2: 7956978480262082116
+      Knight_Dead_v5_20: 3319998254330081803
+      Knight_Dead_v5_3: -5859042013292174132
+      Knight_Dead_v5_4: 384699627294851033
+      Knight_Dead_v5_5: 2448982948550275198
+      Knight_Dead_v5_6: -6688840086608234613
+      Knight_Dead_v5_7: 4654637225447667307
+      Knight_Dead_v5_8: -429250745440791808
+      Knight_Dead_v5_9: -4626730621762904549
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

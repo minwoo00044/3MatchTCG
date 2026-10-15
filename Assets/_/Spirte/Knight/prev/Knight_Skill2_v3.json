@@ -1,0 +1,86 @@
+{
+  "name": "Knight_Skill2_v3",
+  "character": "Knight",
+  "action": "Skill2",
+  "version": 3,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill2/try3/result.png",
+  "cols": 4,
+  "rows": 6,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      0.03,
+      0.5
+    ],
+    [
+      0.027,
+      0.25
+    ],
+    [
+      0.123,
+      0.25
+    ],
+    [
+      0.052,
+      0.25
+    ],
+    [
+      0.026,
+      0.25
+    ],
+    [
+      0.019,
+      1.0
+    ],
+    [
+      0.025,
+      1.0
+    ]
+  ],
+  "hazeCut": [
+    2
+  ],
+  "stabilize": null,
+  "cellWidth": 696,
+  "cellHeight": 522,
+  "pivotX": 0.5,
+  "pivotY": 0.007662835249042145,
+  "fps": 30,
+  "durations": null,
+  "loop": false,
+  "scale": 1.1522,
+  "anchorHeight": 472.0,
+  "stance": {
+    "method": "standing",
+    "vertical": 438,
+    "spread": 180.0,
+    "leg": 102,
+    "crotch": 335
+  },
+  "alignX": "mid",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 74.6,
+    "right": 74.6
+  },
+  "warnings": [
+    "프레임 7: 원본 시트 아래 가장자리에서 이미 잘려 있다",
+    "보간 2→3 번짐 0.123 (기준 0.06) — 보간하지 않고 원본처럼 끊었다. 버린 보간본은 미리보기 아래 칸에 있다 (쓰려면 --keep_haze)"
+  ]
+}

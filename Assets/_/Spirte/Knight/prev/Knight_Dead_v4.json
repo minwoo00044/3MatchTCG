@@ -1,0 +1,135 @@
+{
+  "name": "Knight_Dead_v4",
+  "character": "Knight",
+  "action": "Dead",
+  "version": 4,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Dead/try10/result.png",
+  "sources": [
+    "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Dead/try10/result.png",
+    "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Dead/try13/result.png",
+    "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Dead/try14/result.png"
+  ],
+  "cols": 4,
+  "rows": 6,
+  "frames": 21,
+  "sourceGrid": {
+    "cols": 2,
+    "rows": 6,
+    "frames": 12
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    1,
+    3,
+    5,
+    7,
+    9,
+    11,
+    13,
+    14,
+    15,
+    17,
+    20
+  ],
+  "haze": [
+    [
+      0.0,
+      null
+    ],
+    [
+      0.015,
+      0.5
+    ],
+    [
+      0.069,
+      0.5
+    ],
+    [
+      0.011,
+      1.0
+    ],
+    [
+      0.004,
+      0.5
+    ],
+    [
+      0.01,
+      0.25
+    ],
+    [
+      0.02,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.019,
+      0.5
+    ],
+    [
+      0.002,
+      0.25
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 826,
+  "cellHeight": 533,
+  "pivotX": 0.5,
+  "pivotY": 0.0075046904315197,
+  "fps": 24,
+  "durations": [
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.4
+  ],
+  "loop": false,
+  "scale": 0.9855,
+  "sizeFit": {
+    "reference": "Knight_Idle_v10",
+    "factor": 0.96,
+    "iou": 0.804
+  },
+  "anchorHeight": 522.9,
+  "stance": {
+    "method": "standing",
+    "vertical": 499,
+    "spread": 143.0,
+    "leg": 95,
+    "crotch": 403
+  },
+  "alignX": "anchor",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 251.8,
+    "right": 347.9
+  },
+  "warnings": [
+    "보간 2→3 번짐 0.069 (기준 0.06) — 미리보기 아래 칸에서 두 겹으로 보이는지 확인한다"
+  ]
+}

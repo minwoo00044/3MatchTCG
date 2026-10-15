@@ -1,0 +1,708 @@
+fileFormatVersion: 2
+guid: fca78f922005afc4d855d2024abc3828
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -618812907915713513
+    second: Knight_Skill2_v3_0
+  - first:
+      213: 8486154726513284499
+    second: Knight_Skill2_v3_1
+  - first:
+      213: -7712162123366255990
+    second: Knight_Skill2_v3_2
+  - first:
+      213: 1891158762396058723
+    second: Knight_Skill2_v3_3
+  - first:
+      213: -1345566892377372924
+    second: Knight_Skill2_v3_4
+  - first:
+      213: 8215365251194933620
+    second: Knight_Skill2_v3_5
+  - first:
+      213: 5978250186312495190
+    second: Knight_Skill2_v3_6
+  - first:
+      213: 8344439391549521482
+    second: Knight_Skill2_v3_7
+  - first:
+      213: -2069491130113459911
+    second: Knight_Skill2_v3_8
+  - first:
+      213: -981811903231759850
+    second: Knight_Skill2_v3_9
+  - first:
+      213: -3587001543608175947
+    second: Knight_Skill2_v3_10
+  - first:
+      213: -2903277849676852218
+    second: Knight_Skill2_v3_11
+  - first:
+      213: 3370415722396641710
+    second: Knight_Skill2_v3_12
+  - first:
+      213: -6087280621590046431
+    second: Knight_Skill2_v3_13
+  - first:
+      213: -7653902856232361501
+    second: Knight_Skill2_v3_14
+  - first:
+      213: 714840342443948216
+    second: Knight_Skill2_v3_15
+  - first:
+      213: -2517589122765858967
+    second: Knight_Skill2_v3_16
+  - first:
+      213: -7311342847537348382
+    second: Knight_Skill2_v3_17
+  - first:
+      213: -3635481684612124456
+    second: Knight_Skill2_v3_18
+  - first:
+      213: -5762840720028144288
+    second: Knight_Skill2_v3_19
+  - first:
+      213: -4704413046133689932
+    second: Knight_Skill2_v3_20
+  - first:
+      213: -1581154868763186593
+    second: Knight_Skill2_v3_21
+  - first:
+      213: 3226656865778837555
+    second: Knight_Skill2_v3_22
+  - first:
+      213: 3023191071496786172
+    second: Knight_Skill2_v3_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2610
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 714e14950f88967f0800000000000000
+      internalID: -618812907915713513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_1
+      rect:
+        serializedVersion: 2
+        x: 696
+        y: 2610
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 39593de13c0e4c570800000000000000
+      internalID: 8486154726513284499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_2
+      rect:
+        serializedVersion: 2
+        x: 1392
+        y: 2610
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a82388ad865e8f490800000000000000
+      internalID: -7712162123366255990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_3
+      rect:
+        serializedVersion: 2
+        x: 2088
+        y: 2610
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3640c76efdebe3a10800000000000000
+      internalID: 1891158762396058723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2088
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 407025e5a06935de0800000000000000
+      internalID: -1345566892377372924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_5
+      rect:
+        serializedVersion: 2
+        x: 696
+        y: 2088
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 471df894b27d20270800000000000000
+      internalID: 8215365251194933620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_6
+      rect:
+        serializedVersion: 2
+        x: 1392
+        y: 2088
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 650b19dced207f250800000000000000
+      internalID: 5978250186312495190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_7
+      rect:
+        serializedVersion: 2
+        x: 2088
+        y: 2088
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4ef5177a676dc370800000000000000
+      internalID: 8344439391549521482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1566
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 939f3c328c0b743e0800000000000000
+      internalID: -2069491130113459911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_9
+      rect:
+        serializedVersion: 2
+        x: 696
+        y: 1566
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61aee9f9647ef52f0800000000000000
+      internalID: -981811903231759850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_10
+      rect:
+        serializedVersion: 2
+        x: 1392
+        y: 1566
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b2f470d919683ec0800000000000000
+      internalID: -3587001543608175947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_11
+      rect:
+        serializedVersion: 2
+        x: 2088
+        y: 1566
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60450cd8d2c75b7d0800000000000000
+      internalID: -2903277849676852218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1044
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea9e7d60e3f16ce20800000000000000
+      internalID: 3370415722396641710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_13
+      rect:
+        serializedVersion: 2
+        x: 696
+        y: 1044
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1299106c682a58ba0800000000000000
+      internalID: -6087280621590046431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_14
+      rect:
+        serializedVersion: 2
+        x: 1392
+        y: 1044
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e12ce487efd7c590800000000000000
+      internalID: -7653902856232361501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_15
+      rect:
+        serializedVersion: 2
+        x: 2088
+        y: 1044
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b87d7a018f9be900800000000000000
+      internalID: 714840342443948216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 522
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9675727180abf0dd0800000000000000
+      internalID: -2517589122765858967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_17
+      rect:
+        serializedVersion: 2
+        x: 696
+        y: 522
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e08175da64e88a90800000000000000
+      internalID: -7311342847537348382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_18
+      rect:
+        serializedVersion: 2
+        x: 1392
+        y: 522
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d071416bac2c8dc0800000000000000
+      internalID: -3635481684612124456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_19
+      rect:
+        serializedVersion: 2
+        x: 2088
+        y: 522
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06de091e5e64600b0800000000000000
+      internalID: -5762840720028144288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b1fc74724196beb0800000000000000
+      internalID: -4704413046133689932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Skill2_v3_21
+      rect:
+        serializedVersion: 2
+        x: 696
+        y: 0
+        width: 696
+        height: 522
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007662835}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5aad70360c9e0ae0800000000000000
+      internalID: -1581154868763186593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: e9fb3a2d67c7edb4786160a86bdf1709
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Knight_Skill2_v3_0: -618812907915713513
+      Knight_Skill2_v3_1: 8486154726513284499
+      Knight_Skill2_v3_10: -3587001543608175947
+      Knight_Skill2_v3_11: -2903277849676852218
+      Knight_Skill2_v3_12: 3370415722396641710
+      Knight_Skill2_v3_13: -6087280621590046431
+      Knight_Skill2_v3_14: -7653902856232361501
+      Knight_Skill2_v3_15: 714840342443948216
+      Knight_Skill2_v3_16: -2517589122765858967
+      Knight_Skill2_v3_17: -7311342847537348382
+      Knight_Skill2_v3_18: -3635481684612124456
+      Knight_Skill2_v3_19: -5762840720028144288
+      Knight_Skill2_v3_2: -7712162123366255990
+      Knight_Skill2_v3_20: -4704413046133689932
+      Knight_Skill2_v3_21: -1581154868763186593
+      Knight_Skill2_v3_3: 1891158762396058723
+      Knight_Skill2_v3_4: -1345566892377372924
+      Knight_Skill2_v3_5: 8215365251194933620
+      Knight_Skill2_v3_6: 5978250186312495190
+      Knight_Skill2_v3_7: 8344439391549521482
+      Knight_Skill2_v3_8: -2069491130113459911
+      Knight_Skill2_v3_9: -981811903231759850
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

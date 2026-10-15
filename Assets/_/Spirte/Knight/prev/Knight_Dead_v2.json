@@ -1,0 +1,86 @@
+{
+  "name": "Knight_Dead_v2",
+  "character": "Knight",
+  "action": "Dead",
+  "version": 2,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Dead/try3/result.png",
+  "cols": 5,
+  "rows": 5,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      0.01,
+      0.5
+    ],
+    [
+      0.009,
+      0.25
+    ],
+    [
+      0.076,
+      0.25
+    ],
+    [
+      0.014,
+      0.25
+    ],
+    [
+      -0.003,
+      0.25
+    ],
+    [
+      -0.003,
+      0.25
+    ],
+    [
+      -0.002,
+      0.25
+    ]
+  ],
+  "hazeCut": [
+    2
+  ],
+  "stabilize": null,
+  "cellWidth": 604,
+  "cellHeight": 524,
+  "pivotX": 0.5,
+  "pivotY": 0.007633587786259542,
+  "fps": 24,
+  "durations": null,
+  "loop": false,
+  "scale": 1.1386,
+  "anchorHeight": 456.8,
+  "stance": {
+    "method": "standing",
+    "vertical": 446,
+    "spread": 89.5,
+    "leg": 87,
+    "crotch": 358
+  },
+  "alignX": "anchor",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 108.2,
+    "right": 136.1
+  },
+  "warnings": [
+    "덩어리 9가 프레임 4와 다른 칸에 크게 걸쳐 있다(실제로 붙어 그려짐) — 그 부분은 경계선으로 잘랐다",
+    "보간 2→3 번짐 0.076 (기준 0.06) — 보간하지 않고 원본처럼 끊었다. 버린 보간본은 미리보기 아래 칸에 있다 (쓰려면 --keep_haze)"
+  ]
+}

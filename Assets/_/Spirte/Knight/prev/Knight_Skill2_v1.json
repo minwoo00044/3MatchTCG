@@ -1,0 +1,86 @@
+{
+  "name": "Knight_Skill2_v1",
+  "character": "Knight",
+  "action": "Skill2",
+  "version": 1,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill2/try2/result.png",
+  "cols": 4,
+  "rows": 6,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      0.022,
+      0.5
+    ],
+    [
+      0.02,
+      0.25
+    ],
+    [
+      0.061,
+      0.25
+    ],
+    [
+      0.05,
+      0.25
+    ],
+    [
+      0.023,
+      0.5
+    ],
+    [
+      0.015,
+      1.0
+    ],
+    [
+      0.028,
+      0.25
+    ]
+  ],
+  "hazeCut": [
+    2
+  ],
+  "stabilize": null,
+  "cellWidth": 644,
+  "cellHeight": 499,
+  "pivotX": 0.5,
+  "pivotY": 0.008016032064128256,
+  "fps": 30,
+  "loop": false,
+  "scale": 1.0963,
+  "anchorHeight": 472.0,
+  "stance": {
+    "method": "standing",
+    "vertical": 438,
+    "spread": 180.0,
+    "leg": 102,
+    "crotch": 335
+  },
+  "alignX": "mid",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 71.0,
+    "right": 71.0
+  },
+  "warnings": [
+    "프레임 4↔5 겹침: 경계선이 불투명 픽셀 49개를 자른다",
+    "프레임 7: 원본 시트 아래 가장자리에서 이미 잘려 있다",
+    "보간 2→3 번짐 0.061 (기준 0.06) — 보간하지 않고 원본처럼 끊었다. 버린 보간본은 미리보기 아래 칸에 있다 (쓰려면 --keep_haze)"
+  ]
+}

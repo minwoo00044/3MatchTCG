@@ -1,0 +1,87 @@
+{
+  "name": "Knight_Skill3_v4",
+  "character": "Knight",
+  "action": "Skill3",
+  "version": 4,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill3/try3/result.png",
+  "sources": null,
+  "cols": 5,
+  "rows": 5,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      0.004,
+      0.25
+    ],
+    [
+      0.02,
+      0.25
+    ],
+    [
+      0.001,
+      0.5
+    ],
+    [
+      0.014,
+      0.5
+    ],
+    [
+      0.018,
+      0.5
+    ],
+    [
+      0.013,
+      1.0
+    ],
+    [
+      -0.007,
+      0.25
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 518,
+  "cellHeight": 528,
+  "pivotX": 0.5,
+  "pivotY": 0.007575757575757576,
+  "fps": 30,
+  "durations": null,
+  "loop": false,
+  "scale": 1.1312,
+  "sizeFit": {
+    "reference": "Knight_Idle_v10",
+    "factor": 0.97,
+    "iou": 0.836
+  },
+  "anchorHeight": 453.7,
+  "stance": {
+    "method": "standing",
+    "vertical": 438,
+    "spread": 109.0,
+    "leg": 87,
+    "crotch": 350
+  },
+  "alignX": "mid",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 35.3,
+    "right": 35.3
+  },
+  "warnings": []
+}

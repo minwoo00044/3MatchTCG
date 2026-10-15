@@ -1,0 +1,80 @@
+{
+  "name": "Knight_Skill1_v1",
+  "character": "Knight",
+  "action": "Skill1",
+  "version": 1,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill1/try2/result.png",
+  "cols": 4,
+  "rows": 6,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      0.011,
+      0.5
+    ],
+    [
+      -0.006,
+      0.5
+    ],
+    [
+      0.008,
+      0.5
+    ],
+    [
+      -0.001,
+      0.5
+    ],
+    [
+      -0.003,
+      0.5
+    ],
+    [
+      0.005,
+      0.25
+    ],
+    [
+      0.013,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 848,
+  "cellHeight": 522,
+  "pivotX": 0.5,
+  "pivotY": 0.007662835249042145,
+  "fps": 30,
+  "loop": false,
+  "scale": 1.2432,
+  "anchorHeight": 416.3,
+  "stance": {
+    "method": "standing",
+    "vertical": 404,
+    "spread": 92.5,
+    "leg": 81,
+    "crotch": 322
+  },
+  "alignX": "left_foot",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 0.0,
+    "right": 106.9
+  },
+  "warnings": []
+}
