@@ -54,6 +54,11 @@ SEAM_OPAQUE_WARN = 40     # 분할선이 이만큼 불투명 픽셀을 지나가
 NOISE_MIN_AREA = 80
 ALIGN_X = ["feet", "anchor", "mid", "left_foot", "right_foot", "both_feet"]
 FOOT_BAND = 0.12          # 발을 찾는 바닥 띠 높이(프레임 키 대비). Archer 서 있는 시트 전부에서 부츠 색 마스크와 같은 발을 잡았다
+SIZE_FIT_RANGE = (0.88, 1.12)  # 기준 시트 실루엣 맞춤 배율 탐색 범위
+PART_EQ_MIN = 0.03        # 장별 얼굴 크기 차이가 이보다 작으면 건드리지 않는다
+PART_EQ_MAX = 0.15        # 이보다 크면 측정 실패로 보고 건드리지 않는다
+SIZE_FIT_MIN_IOU = 0.6   # 이보다 안 겹치면 기준 프레임이 준비 자세가 아닌 것 — 보정하지 않는다
+FOOT_FILL = 0.4          # 띠에서 이 비율 이상 세로로 차 있는 열만 발(정강이+신발). 얇은 칼날·스미어 사선을 거른다
 PIN_MAX = 0.06            # both_feet가 발을 옮기는 거리가 키의 이 비율을 넘으면 그려진 보폭 변화를 지우는 것일 수 있어 경고
 PIN_FALLOFF = 0.45        # 워프는 바닥에서 1, 키의 이 비율 높이에서 0 — 가랑이 아래만 휜다
 # 프레임 증강: 원본 프레임 사이마다 RIFE 보간 프레임을 이만큼 넣고 fps를 (n+1)배로 올린다.
@@ -187,6 +192,45 @@ def remove_small_components(mask, min_area):
     return out, removed
 
 
+def label_components(mask):
+    """4-연결 요소 라벨 (행 단위 run + union-find, scipy 없이). 반환: (라벨 배열 int32, 0 = 배경)."""
+    h = mask.shape[0]
+    parent = []
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    runs, prev = [], []
+    for y in range(h):
+        d = np.diff(np.concatenate(([0], mask[y].astype(np.int8), [0])))
+        cur, j = [], 0
+        for s0, e0 in zip(np.where(d == 1)[0], np.where(d == -1)[0]):
+            rid = len(parent)
+            parent.append(rid)
+            while j < len(prev) and prev[j][1] <= s0:
+                j += 1
+            k = j
+            while k < len(prev) and prev[k][0] < e0:
+                ra, rb = find(rid), find(prev[k][2])
+                if ra != rb:
+                    parent[ra] = rb
+                k += 1
+            cur.append((s0, e0, rid))
+            runs.append((y, s0, e0, rid))
+        prev = cur
+    labels = np.zeros(mask.shape, np.int32)
+    roots = {}
+    for y, s0, e0, rid in runs:
+        labels[y, s0:e0] = roots.setdefault(find(rid), len(roots) + 1)
+    return labels
+
+
+COMPONENT_SHARED = 0.15  # 한 덩어리가 두 칸에 이만큼 넘게 걸치면 실제로 붙어 그려진 것 — 그 덩어리만 경계선으로 자른다
+
+
 def extract_frames(rgba, cols, rows, frames, row_splits, clean_noise):
     h, w = rgba.shape[:2]
     alpha = rgba[:, :, 3].astype(np.float64) / 255.0
@@ -195,22 +239,23 @@ def extract_frames(rgba, cols, rows, frames, row_splits, clean_noise):
     xx = np.arange(w)[None, :]
     cell_w, cell_h = w / cols, h / rows
 
+    # 열 경계선 비용: 칼날처럼 채도가 낮고 밝은 픽셀을 자르는 비용을 크게 — 뻗은 검끝이 옆 인물 머리카락에 닿아 그려지면
+    # 경계선이 칼날 대신 머리카락을 지나가게 한다(Knight Skill1 런지, 검끝이 잘림)
+    rgbf = rgba[:, :, :3].astype(np.float32) / 255
+    mx, mn = rgbf.max(2), rgbf.min(2)
+    metal = (mx > 0.65) & ((mx - mn) < 0.12 * mx + 0.02)
+    seam_alpha = alpha * (1 + 8 * metal)
     row_bounds, row_cross = split_rows(alpha, rows, row_splits)
     warnings = []
-    for k, n in enumerate(row_cross, start=1):
-        if n > SEAM_OPAQUE_WARN:
-            warnings.append(f"{k - 1}행↔{k}행 겹침: 경계선이 불투명 픽셀 {n}개를 자른다")
 
     seams = {"rows": row_bounds, "cols": []}
     result = []
+    cell_masks = {}
     for r in range(rows):
         row_mask = (yy >= row_bounds[r][None, :]) & (yy < row_bounds[r + 1][None, :])
         y0, y1 = int(row_bounds[r].min()), int(row_bounds[r + 1].max())
-        col_bounds, col_cross = split_cols(alpha, row_mask, cols, y0, y1)
+        col_bounds, col_cross = split_cols(seam_alpha, row_mask, cols, y0, y1)
         seams["cols"].append((y0, col_bounds))
-        for k, n in enumerate(col_cross, start=1):
-            if n > SEAM_OPAQUE_WARN and r * cols + k < frames:
-                warnings.append(f"프레임 {r * cols + k - 1}↔{r * cols + k} 겹침: 경계선이 불투명 픽셀 {n}개를 자른다")
 
         for c in range(cols):
             idx = r * cols + c
@@ -220,32 +265,51 @@ def extract_frames(rgba, cols, rows, frames, row_splits, clean_noise):
             left = col_bounds[c][:, None]
             right = col_bounds[c + 1][:, None]
             col_mask[y0:y1] = (xx >= left) & (xx < right)
-            mask = fg & row_mask & col_mask
-            if clean_noise:
-                mask, _ = remove_small_components(mask, NOISE_MIN_AREA)
-            ys, xs = np.where(mask)
-            if len(ys) == 0:
-                raise PipelineError(f"프레임 {idx}: 비어 있다 (--frames를 확인)")
+            cell_masks[idx] = (r, c, fg & row_mask & col_mask)
 
-            x0, x1, top, bottom = xs.min(), xs.max(), ys.min(), ys.max()
-            edges = [n for n, hit in (("왼쪽", c == 0 and x0 == 0), ("오른쪽", c == cols - 1 and x1 == w - 1),
-                                       ("위", r == 0 and top == 0), ("아래", r == rows - 1 and bottom == h - 1)) if hit]
-            if edges:
-                warnings.append(f"프레임 {idx}: 원본 시트 {'/'.join(edges)} 가장자리에서 이미 잘려 있다")
+    # 덩어리 단위 배정: 경계선은 칸을 대략 나눌 뿐, 이어진 덩어리(캐릭터 + 손에 든 검 + 붙은 효과)는 가장 많이 걸친 칸에 통째로 준다.
+    # 길게 뻗은 검·베기 궤적이 옆 칸으로 넘어가면 경계선이 잘라 검끝이 잘리고 조각이 옆 프레임에 붙었다(Knight Skill2, 사용자 지적 2026-10-15)
+    labels = label_components(fg)
+    n_lab = labels.max()
+    share = np.zeros((n_lab + 1, frames), np.int64)
+    for idx, (_, _, m) in cell_masks.items():
+        share[:, idx] = np.bincount(labels[m], minlength=n_lab + 1)
+    area = share.sum(1)
+    owner = share.argmax(1)
+    second = np.sort(share, 1)[:, -2] if frames > 1 else np.zeros(n_lab + 1, np.int64)
+    split_lab = (second > COMPONENT_SHARED * np.maximum(area, 1)) & (area > 0)
+    small = area < (NOISE_MIN_AREA if clean_noise else 0)
+    for lab in np.where(split_lab & ~small)[0]:
+        warnings.append(f"덩어리 {lab}가 프레임 {owner[lab]}와 다른 칸에 맞닿아 그려져 있다 — 경계선으로 잘랐다(칸이 좁아 검이 옆 인물에 닿음). "
+                        f"생성 배치를 넓혀 다시 뽑는다")
 
-            band = ys >= bottom - max(4, (bottom - top) // 15)
-            img = rgba[top:bottom + 1, x0:x1 + 1].copy()
-            img[~mask[top:bottom + 1, x0:x1 + 1]] = 0
-            ox, oy = c * cell_w, r * cell_h  # 공칭 셀 원점 — 프레임 로컬 좌표의 기준
-            left_c, right_c = foot_centers(img)
-            result.append({
-                "feet": (left_c + x0 - ox, right_c + x0 - ox),
-                "index": idx,
-                "image": Image.fromarray(img),
-                "left": x0 - ox, "right": x1 + 1 - ox,
-                "top": top - oy, "bottom": bottom + 1 - oy,
-                "feet_x": float(xs[band].mean()) - ox,
-            })
+    for idx, (r, c, seam_mask) in sorted(cell_masks.items()):
+        mine = (owner == idx) & ~split_lab & ~small
+        mine[0] = False
+        mask = mine[labels] | (seam_mask & split_lab[labels] & ~small[labels])
+        ys, xs = np.where(mask)
+        if len(ys) == 0:
+            raise PipelineError(f"프레임 {idx}: 비어 있다 (--frames를 확인)")
+
+        x0, x1, top, bottom = xs.min(), xs.max(), ys.min(), ys.max()
+        edges = [n for n, hit in (("왼쪽", c == 0 and x0 == 0), ("오른쪽", c == cols - 1 and x1 == w - 1),
+                                   ("위", r == 0 and top == 0), ("아래", r == rows - 1 and bottom == h - 1)) if hit]
+        if edges:
+            warnings.append(f"프레임 {idx}: 원본 시트 {'/'.join(edges)} 가장자리에서 이미 잘려 있다")
+
+        band = ys >= bottom - max(4, (bottom - top) // 15)
+        img = rgba[top:bottom + 1, x0:x1 + 1].copy()
+        img[~mask[top:bottom + 1, x0:x1 + 1]] = 0
+        ox, oy = c * cell_w, r * cell_h  # 공칭 셀 원점 — 프레임 로컬 좌표의 기준
+        left_c, right_c = foot_centers(img)
+        result.append({
+            "feet": (left_c + x0 - ox, right_c + x0 - ox),
+            "index": idx,
+            "image": Image.fromarray(img),
+            "left": x0 - ox, "right": x1 + 1 - ox,
+            "top": top - oy, "bottom": bottom + 1 - oy,
+            "feet_x": float(xs[band].mean()) - ox,
+        })
     return result, seams, warnings
 
 
@@ -257,7 +321,12 @@ def foot_centers(img):
     ys, _ = np.where(a)
     top, bottom = ys.min(), ys.max()
     h = bottom - top + 1
-    band = a[bottom - max(4, int(h * FOOT_BAND)):bottom + 1].any(0)
+    rows = a[bottom - max(4, int(h * FOOT_BAND)):bottom + 1]
+    # 띠 높이의 FOOT_FILL 이상 차 있는 열만 발로 본다. 바닥까지 내려온 칼날·스미어는 띠 안에서 얇은 사선이라
+    # any(0)로 잡으면 발 덩어리에 붙거나 발로 뽑혀 중점이 끌려갔다(Knight Skill2 내려 베기: 몸이 좌우로 194px 미끄러짐)
+    band = rows.sum(0) >= rows.shape[0] * FOOT_FILL
+    if not band.any():
+        band = rows.any(0)
     d = np.diff(np.concatenate(([0], band.astype(np.int8), [0])))
     runs = [(s, e) for s, e in zip(np.where(d == 1)[0], np.where(d == -1)[0]) if e - s > h * 0.03]
     if not runs:
@@ -572,7 +641,24 @@ def match_sharpness(cells, keys):
     return out
 
 
-def augment(cells, inbetween, loop, keep_haze=False):
+def silhouette_change(a, b):
+    ma, mb = np.asarray(a)[:, :, 3] > 128, np.asarray(b)[:, :, 3] > 128
+    return float((ma ^ mb).sum() / max(1, (ma | mb).sum()))
+
+
+def adaptive_counts(cells, inbetween, loop):
+    """
+    원본 구간마다 보간 장수를 자세 변화량에 비례해 정한다(평균 = inbetween, 1~3배 범위).
+    같은 장수를 넣으면 크게 움직이는 구간이 화면에서 빨라져 '뚝' 끊겨 보였다(Knight Skill1 런지: 최대 뻗음 → 회수가 3.3배 점프).
+    """
+    n = len(cells)
+    gaps = n if loop else n - 1
+    d = np.array([silhouette_change(cells[i], cells[(i + 1) % n]) for i in range(gaps)])
+    w = d / max(1e-6, d.mean())
+    return [int(np.clip(round(inbetween * x), 1, inbetween * 3)) for x in w]
+
+
+def augment(cells, inbetween, loop, keep_haze=False, counts=None):
     """
     정렬이 끝난 셀 사이에 RIFE 보간 프레임을 넣는다. 정렬 뒤에 거는 이유: 정렬 전 흔들림까지 보간하면 안 되니까.
     구간마다 흐름 해상도를 바꿔 가며 번짐이 가장 적은 보간본을 쓰고, 그래도 HAZE_CUT을 넘으면 앞 프레임을 반복해
@@ -591,10 +677,14 @@ def augment(cells, inbetween, loop, keep_haze=False):
         out.append(cells[i])
         if i >= gaps:
             break
-        mids, scale, worst = rife.inbetweens(cells[i], cells[(i + 1) % n], inbetween)
+        k = counts[i] if counts is not None else inbetween
+        if k == 0:
+            hazes.append([0.0, None])
+            continue
+        mids, scale, worst = rife.inbetweens(cells[i], cells[(i + 1) % n], k)
         if worst > HAZE_CUT and not keep_haze:
             cut[i] = mids
-            mids = [cells[i]] * inbetween
+            mids = [cells[i]] * k
         out += mids
         hazes.append([round(worst, 3), scale])
         print(f"  보간 {i}→{(i + 1) % n}: 번짐 {worst:.3f} (흐름 해상도 {scale})" + (" → 끊음" if i in cut else ""))
@@ -706,6 +796,117 @@ def character_align_x(character, action):
     return value
 
 
+def character_config(character):
+    p = character_config_path(character)
+    if not os.path.exists(p):
+        return {}
+    with open(p, encoding="utf-8") as fp:
+        return json.load(fp)
+
+
+def chin_to_sole(img):
+    """얼굴 피부 아래 끝(턱) ~ 발바닥(px). 스킬 스크립트의 deform.face_chin을 쓴다. 못 찾으면 None."""
+    sys.path.insert(0, os.path.join(PROJECT_ROOT, ".claude", "skills", "sprite-animation", "scripts"))
+    import deform
+    chin = deform.face_chin(img)
+    if chin is None:
+        return None
+    a = np.asarray(img)[:, :, 3] > 128
+    return float(np.where(a.any(1))[0].max() - chin)
+
+
+def face_size(img):
+    """얼굴 피부 덩어리(정수리 쪽 첫 덩어리, 턱까지) 면적의 제곱근(px). 자세·키와 무관하게 그림 크기만 따라간다. 못 찾으면 None."""
+    sys.path.insert(0, os.path.join(PROJECT_ROOT, ".claude", "skills", "sprite-animation", "scripts"))
+    import deform
+    chin = deform.face_chin(img)
+    if chin is None:
+        return None
+    skin = deform.skin_mask(img)
+    xs = np.where((np.asarray(img)[:, :, 3] > 128).any(0))[0]
+    cx = int(xs.mean())
+    band = skin[:chin + 1, max(0, cx - img.width // 6): cx + img.width // 6]
+    rows = np.where(band.sum(1) > 8)[0]
+    if not len(rows):
+        return None
+    return float(np.sqrt(band[rows[0]:].sum()))
+
+
+def scale_frame(f, s):
+    """프레임을 두 발 중점·바닥 기준으로 s배 한다(좌표는 그 기준으로 같이 옮긴다)."""
+    cx = (f["feet"][0] + f["feet"][1]) / 2
+    im = f["image"]
+    f["image"] = im.resize((max(1, round(im.width * s)), max(1, round(im.height * s))), Image.LANCZOS)
+    f["left"] = cx + (f["left"] - cx) * s
+    f["right"] = f["left"] + f["image"].width
+    f["top"] = f["bottom"] - f["image"].height
+    f["feet"] = (cx + (f["feet"][0] - cx) * s, cx + (f["feet"][1] - cx) * s)
+    f["feet_x"] = cx + (f["feet_x"] - cx) * s
+
+
+def equalize_parts(frames, n_parts):
+    """
+    여러 장으로 나눠 생성하면 장마다 인물을 다른 크기로 그린다(Knight Hit: 둘째 장 머리가 첫 장보다 +15~20%,
+    사용자 지적 2026-10-15). 장별 얼굴 크기 중앙값을 첫 장에 맞춰 그 장의 프레임을 키우거나 줄인다.
+    반환: 장별 배율 목록
+    """
+    per = len(frames) // n_parts
+    meds = []
+    for k in range(n_parts):
+        v = [x for x in (face_size(f["image"]) for f in frames[k * per:(k + 1) * per]) if x]
+        meds.append(float(np.median(v)) if len(v) >= 2 else None)
+    factors = [1.0 if (m is None or meds[0] is None) else meds[0] / m for m in meds]
+    for k, s in enumerate(factors):
+        # 얼굴이 거의 안 보이는 장(엎드림 등)은 얼굴 크기를 잘못 잰다(Knight Dead 셋째 장: 1.33배) — 큰 차이는 믿지 않는다
+        if PART_EQ_MIN < abs(s - 1) <= PART_EQ_MAX:
+            for f in frames[k * per:(k + 1) * per]:
+                scale_frame(f, s)
+        else:
+            factors[k] = 1.0
+    return [round(s, 3) for s in factors]
+
+
+def _fit_mask(img, s, w, h, dx=0):
+    im = img.resize((max(1, round(img.width * s)), max(1, round(img.height * s))), Image.BILINEAR)
+    c = Image.new("L", (w, h))
+    c.paste(im.split()[3], ((w - im.width) // 2 + dx, h - im.height))
+    return np.asarray(c) > 128
+
+
+def size_fit(img, scale, character, name):
+    """
+    턱~발바닥으로 맞춰도 AI가 시트마다 머리·몸통 부피를 다르게 그려 동작이 바뀔 때 크기가 튄다
+    (Knight: 0번 준비 자세가 Idle보다 2~6% 크게 보였다, 사용자 지적 2026-10-15 "애니메이션별로 크기가 제각각").
+    기준 프레임을 기준 시트(character.json reference) 0번 실루엣에 겹쳐 IoU가 가장 큰 배율을 곱한다.
+    반환: (보정 배율, 정보 dict 또는 None)
+    """
+    ref_name = character_config(character).get("reference")
+    if not ref_name or ref_name == name:
+        return 1.0, None
+    ref_png = os.path.join(PROJECT_ROOT, SHEET_ROOT, character, ref_name + ".png")
+    if not os.path.exists(ref_png):
+        return 1.0, None
+    with open(ref_png[:-4] + ".json", encoding="utf-8") as fp:
+        rm = json.load(fp)
+    ref = Image.open(ref_png).convert("RGBA").crop((0, 0, rm["cellWidth"], rm["cellHeight"]))
+    ref = ref.crop(ref.getbbox())
+    half = 0.5  # 반 크기로 비교 (속도)
+    W, H = round(max(ref.width, img.width * scale) * 1.4 * half), round(max(ref.height, img.height * scale) * 1.3 * half)
+    rmask = _fit_mask(ref, half, W, H)
+    best = (0.0, 1.0)
+    for f in np.arange(SIZE_FIT_RANGE[0], SIZE_FIT_RANGE[1] + 1e-6, 0.01):
+        for dx in range(-12, 13, 4):
+            m = _fit_mask(img, scale * f * half, W, H, dx)
+            iou = np.logical_and(rmask, m).sum() / max(1, np.logical_or(rmask, m).sum())
+            if iou > best[0]:
+                best = (float(iou), float(f))
+    info = {"reference": ref_name, "factor": round(best[1], 3), "iou": round(best[0], 3)}
+    if best[0] < SIZE_FIT_MIN_IOU:
+        info["skipped"] = "기준 프레임 자세가 기준 시트와 너무 달라 보정하지 않았다"
+        return 1.0, info
+    return best[1], info
+
+
 def resolve_scale(args, character, anchor_height, analyze):
     """
     캐릭터 기준 키(ref_height)를 한 곳에 둬서 시트마다 다른 AI 그림 크기를 같은 체급으로 맞춘다.
@@ -743,15 +944,49 @@ def run(args):
         raise PipelineError(f"--anchor {args.anchor}가 프레임 범위를 벗어난다")
     if args.row_split_y and len(args.row_split_y) != args.rows - 1:
         raise PipelineError(f"--row_split_y는 {args.rows - 1}개가 필요하다")
+    inputs = args.input
+    args.input = inputs[0]
+    for f in inputs:
+        if not os.path.exists(f):
+            raise PipelineError(f"입력 파일이 없다: {f}")
     if not os.path.exists(args.input):
         raise PipelineError(f"입력 파일이 없다: {args.input}")
 
     src = Image.open(args.input).convert("RGBA")  # 입력과 출력이 같은 파일이어도 여기서 메모리로 다 읽는다
+    if len(inputs) > 1:
+        # 여러 장을 세로로 이어 한 시트로: 큰 동작은 칸이 넓어야 해서 6장씩 나눠 생성한다(Knight Skill1 런지, 검이 옆 칸에 닿음).
+        # --rows는 이어 붙인 전체 행 수
+        parts = [Image.open(f).convert("RGBA") for f in inputs]
+        w = max(pt.width for pt in parts)
+        joined = Image.new("RGBA", (w, sum(pt.height for pt in parts)))
+        y = 0
+        for pt in parts:
+            joined.paste(pt.resize((w, round(pt.height * w / pt.width))) if pt.width != w else pt, (0, y))
+            y += pt.height if pt.width == w else round(pt.height * w / pt.width)
+        src = joined.crop((0, 0, w, y))
     rgba = np.array(src)
     frames, seams, warnings = extract_frames(rgba, args.cols, args.rows, frames_n, args.row_split_y, not args.keep_noise)
+    part_scale = None
+    if len(inputs) > 1 and frames_n % len(inputs) == 0 and not args.no_size_fit:
+        part_scale = equalize_parts(frames, len(inputs))
+        if any(s != 1.0 for s in part_scale):
+            print("  장별 크기 맞춤:", part_scale)
 
     anchor_height, stance = standing_height(frames[args.anchor]["image"])
     scale, note = resolve_scale(args, character, anchor_height, args.analyze)
+    chin_ref = character_config(character).get("ref_chin_to_sole")
+    if args.scale is None and chin_ref:
+        # 턱~발바닥으로 크기를 맞춘다: 다리를 편 키는 바닥까지 내려온 검을 발로 잡아 틀렸다(Knight Skill2: 게임 내 81%).
+        # 턱~발바닥은 머리카락·검·보폭에 흔들리지 않는다. ref_chin_to_sole = 기준 Idle 출력 시트 0번 프레임의 값(px)
+        chin_len = chin_to_sole(frames[args.anchor]["image"])
+        if chin_len:
+            scale = chin_ref / chin_len
+    fit = None
+    if args.scale is None and not args.no_size_fit:
+        f, fit = size_fit(frames[args.anchor]["image"], scale, character, args.name)
+        scale *= f
+        if fit and "skipped" in fit:
+            warnings.append(f"크기 보정 건너뜀 — 기준 프레임 {args.anchor}번이 {fit['reference']} 0번과 IoU {fit['iou']} (기준 {SIZE_FIT_MIN_IOU})")
     if note:
         warnings.append(note)
 
@@ -771,12 +1006,22 @@ def run(args):
         print("  상체 위치(dx,dy):", [tuple(m) for m in meas.round(1)], "→ 보정", [tuple(c) for c in corr.round(1)])
     keys, hazes, strips, cut = list(range(len(cells))), [], [], {}
     if args.inbetween > 0:
-        cells, keys, hazes, cut = augment(cells, args.inbetween, loop, args.keep_haze)
+        counts = adaptive_counts(cells, args.inbetween, loop) if args.even_speed else None
+        if args.gap_counts:
+            # 완급: 구간마다 보간 장수를 직접 준다. 터프한 동작은 타격 구간을 0~1장으로 순식간에, 준비·회수는 여러 장으로.
+            # 전 구간을 고르게 보간하면 발레처럼 부드러워 보였다(Knight Skill1, 사용자 지적 2026-10-15)
+            n_gaps = frames_n if loop else frames_n - 1
+            if len(args.gap_counts) != n_gaps:
+                raise PipelineError(f"--gap_counts는 {n_gaps}개가 필요하다 (원본 프레임 사이 구간 수)")
+            counts = args.gap_counts
+        if counts:
+            print("  구간별 보간 장수:", counts)
+        cells, keys, hazes, cut = augment(cells, args.inbetween, loop, args.keep_haze, counts)
         cells = match_sharpness(cells, keys)
         for i, (g, _) in enumerate(hazes):
             if g > HAZE_CUT:
                 j = (i + 1) % frames_n
-                mids = cut.get(i, cells[keys[i] + 1:keys[i] + args.inbetween + 1])
+                mids = cut.get(i, cells[keys[i] + 1:keys[i + 1] if i + 1 < len(keys) else len(cells)])
                 if i in cut:
                     warnings.append(f"보간 {i}→{j} 번짐 {g:.3f} (기준 {HAZE_CUT}) — 보간하지 않고 원본처럼 끊었다. "
                                     f"버린 보간본은 미리보기 아래 칸에 있다 (쓰려면 --keep_haze)")
@@ -796,6 +1041,7 @@ def run(args):
         "action": action,
         "version": version,
         "source": os.path.abspath(args.input).replace("\\", "/"),
+        "sources": [os.path.abspath(f).replace("\\", "/") for f in inputs] if len(inputs) > 1 else None,
         "cols": out_cols,   # 출력 아틀라스 그리드 (Unity가 이걸로 자른다)
         "rows": out_rows,
         "frames": len(cells),
@@ -810,8 +1056,12 @@ def run(args):
         "pivotX": 0.5,
         "pivotY": (cell_h - target_y) / cell_h,  # 접지선은 발 아래 경계 — 아래에서 (cell_h - target_y) px
         "fps": (args.fps or rule["fps"]) * (args.inbetween + 1),  # 원본 프레임은 원래 시각에 나온다
+        # 프레임별 표시 시간(초). 주면 Unity 클립이 균일 간격 대신 이 길이를 쓴다(완급 — 준비 자세 멈춤, 빠른 휘두름)
+        "durations": [round(d, 4) for d in args.durations] if args.durations else None,
         "loop": loop,
         "scale": round(scale, 4),
+        "sizeFit": fit,
+        "partScale": part_scale,  # 여러 장 입력일 때 장별 얼굴 크기를 첫 장에 맞춘 배율  # 기준 시트 0번 실루엣에 맞춘 보정(factor는 scale에 이미 곱해짐)
         "anchorHeight": round(anchor_height, 1),  # 기준 프레임 standing_height (원본 픽셀)
         "stance": stance,
         "alignX": align_x,
@@ -825,7 +1075,18 @@ def run(args):
     for w in warnings:
         print(f"  [경고] {w}")
 
-    sheet_rel = f"{SHEET_ROOT}/{character}/{args.name}.png"
+    if args.hold and not args.durations:
+        # 원본 프레임 몇 장을 더 오래 보여 준다(준비 자세·임팩트 멈춤). 나머지는 1/fps
+        base = 1.0 / ((args.fps or rule["fps"]) * (args.inbetween + 1))
+        durs = [base] * len(cells)
+        for h in args.hold:
+            src_i, sec = h.split(":")
+            durs[keys[int(src_i)]] = float(sec)
+        args.durations = durs
+        manifest["durations"] = [round(d, 4) for d in durs]
+    if args.durations and len(args.durations) != len(cells):
+        raise PipelineError(f"--durations {len(args.durations)}개, 프레임 {len(cells)}개")
+    sheet_rel = f"{args.out_dir or SHEET_ROOT + '/' + character}/{args.name}.png"
     if not args.analyze:
         atlas = Image.new("RGBA", (cell_w * out_cols, cell_h * out_rows))
         for i, cell in enumerate(cells):
@@ -849,7 +1110,7 @@ def run(args):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--input", required=True, help="원본 스프라이트 시트")
+    p.add_argument("--input", required=True, nargs="+", help="원본 스프라이트 시트 (여러 장이면 세로로 이어 붙인다)")
     p.add_argument("--name", required=True, help="{캐릭터}_{액션}_v{N}")
     p.add_argument("--cols", type=int, default=4)
     p.add_argument("--rows", type=int, default=2)
@@ -865,9 +1126,15 @@ def main():
     p.add_argument("--fps", type=int, default=None, help="원본 프레임 기준. 증강하면 (inbetween+1)배가 된다")
     p.add_argument("--inbetween", type=int, default=DEFAULT_INBETWEEN, help="원본 프레임 사이 보간 장수 (0 = 증강 안 함)")
     p.add_argument("--stabilize", action="store_true", help="상체 위치를 부드러운 궤적으로 바로잡는다 (작게 움직이는 Idle용)")
+    p.add_argument("--durations", type=float, nargs="+", help="프레임별 표시 시간(초). 출력 프레임 수와 같아야 한다")
+    p.add_argument("--out_dir", help="캐릭터 폴더 대신 여기에 쓴다 (비교·시험용, 예: Assets/_/_Compare)")
+    p.add_argument("--gap_counts", type=int, nargs="+", help="원본 구간별 보간 장수 (0 = 보간 없이 바로 다음 원본)")
+    p.add_argument("--hold", nargs="+", help="원본프레임:초 — 그 원본 프레임을 이 시간만큼 보여 준다 (예: 2:0.15 6:0.2)")
+    p.add_argument("--even_speed", action="store_true", help="구간별 보간 장수를 자세 변화량에 비례하게 (큰 동작의 끊김 방지)")
     p.add_argument("--keep_haze", action="store_true", help="번짐 기준을 넘는 구간도 끊지 않고 보간본을 쓴다")
     p.add_argument("--loop", choices=["true", "false"], default=None)
     p.add_argument("--keep_noise", action="store_true", help="작은 부스러기 제거를 끈다")
+    p.add_argument("--no_size_fit", action="store_true", help="기준 시트 0번 실루엣에 맞추는 크기 보정을 끈다")
     p.add_argument("--analyze", action="store_true", help="측정과 미리보기만 하고 에셋은 쓰지 않는다")
     args = p.parse_args()
 

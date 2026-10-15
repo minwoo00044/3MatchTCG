@@ -496,6 +496,77 @@ def cmd_coherence(args):
     sys.exit(0 if not fails else 4)
 
 
+PROPORTION_TOL = 0.10  # 프레임별 머리·신발 크기가 기준 프레임과 이만큼 넘게 다르면 불합격
+
+
+def shoe_height(img):
+    """두 발 중 큰 쪽의 신발 높이(px): 발 중심 ±폭에서 바닥부터 띠 폭이 신발 최대폭의 55% 아래로 줄어드는 높이."""
+    a = np.array(img)[:, :, 3] > 128
+    sole = np.where(a.any(1))[0].max()
+    out = []
+    for fx in C.P.foot_centers(img):
+        x0 = max(0, int(fx - 60))
+        widths = [a[y, x0:int(fx + 60)].sum() for y in range(sole, max(0, sole - 260), -1)]
+        mx = max(widths[:25]) if widths else 0
+        h = next((i for i, w in enumerate(widths) if i > 8 and w < 0.55 * mx), None)
+        if h:
+            out.append(h)
+    return min(out) if out else None
+
+
+def cmd_proportions(args):
+    """
+    원본 시트의 프레임마다 머리(정수리~턱)와 신발 높이를 기준(같은 시트의 0번 프레임 = 준비 자세, 또는 --ref 그림)과 비교한다.
+    같은 생성물 안의 크기 비교라 스케일과 무관하다. 큰 동작에서 AI가 머리를 키우고 신발을 부풀리는 것을 잡는다(Knight Skill1 런지:
+    머리 +11~+30%, 신발 2배). 정수리는 머리카락 꼭대기라 머리카락이 크게 날리는 프레임은 약간 크게 나온다 — 이미지로 같이 본다.
+    """
+    sys.path.insert(0, os.path.dirname(__file__))
+    if len(args.sheets) > 1:
+        parts = [Image.open(p).convert("RGBA") for p in args.sheets]
+        w = parts[0].width
+        src = Image.new("RGBA", (w, sum(p.height for p in parts)))
+        y = 0
+        for p in parts:
+            src.paste(p, (0, y))
+            y += p.height
+    else:
+        src = Image.open(args.sheets[0]).convert("RGBA")
+    frames, _, _ = C.P.extract_frames(np.array(src), args.cols, args.rows, args.frames or args.cols * args.rows, None, True)
+    ref_img = C.crop_frame(Image.open(args.ref).convert("RGBA")) if args.ref else frames[0]["image"]
+
+    def meas(img):
+        # 머리 = 정수리 ~ 어깨 갑옷(가장 위의 금색) — 피부색 턱 검출은 은분홍 머리카락을 피부로 잡아 틀렸다(Knight)
+        a = np.array(img)[:, :, 3] > 128
+        top = np.where(a.any(1))[0].min()
+        hsv = np.array(img.convert("RGB").convert("HSV")).astype(float)
+        h, sat, v = hsv[..., 0] * 360 / 255, hsv[..., 1] / 255, hsv[..., 2] / 255
+        gold = a & (h >= 30) & (h <= 50) & (sat > 0.45) & (v > 0.55)
+        rows = np.where(gold.sum(1) > 6)[0]
+        shoulder = rows.min() if len(rows) else None
+        return (shoulder - top) if shoulder is not None else None, shoe_height(img)
+
+    rh, rs = meas(ref_img)
+    if not rh or not rs:
+        sys.exit("기준 프레임에서 머리·신발을 못 쟀다")
+    fails = []
+    rows = []
+    for f in frames:
+        h, s = meas(f["image"])
+        dh = (h / rh - 1) if h else float("nan")
+        ds = (s / rs - 1) if s else float("nan")
+        rows.append((f["index"], dh, ds))
+        if not np.isnan(dh) and abs(dh) > args.tol:
+            fails.append(f"프레임 {f['index']} 머리 {dh * 100:+.0f}%")
+        if not np.isnan(ds) and ds > args.tol * 2:
+            fails.append(f"프레임 {f['index']} 신발 {ds * 100:+.0f}%")
+    print("프레임  " + " ".join(f"{i:>5}" for i, _, _ in rows))
+    print("머리    " + " ".join(f"{d * 100:+5.0f}" if not np.isnan(d) else "    -" for _, d, _ in rows))
+    print("신발    " + " ".join(f"{d * 100:+5.0f}" if not np.isnan(d) else "    -" for _, _, d in rows))
+    print("판정:", "합격" if not fails else "불합격 — " + "; ".join(fails))
+    print(f"RESULT {json.dumps({'ok': True, 'pass': not fails, 'fails': fails}, ensure_ascii=False)}")
+    sys.exit(0 if not fails else 4)
+
+
 def cmd_audit(args):
     check_reference(args.reference)
     character = character_of(args.reference)
@@ -738,6 +809,14 @@ def main():
     m = sub.add_parser("masks")
     m.add_argument("sheet")
 
+    pr = sub.add_parser("proportions")
+    pr.add_argument("sheets", nargs="+", help="원본 시트 (여러 장이면 세로로 이어 붙인다)")
+    pr.add_argument("--cols", type=int, default=4)
+    pr.add_argument("--rows", type=int, default=2)
+    pr.add_argument("--frames", type=int)
+    pr.add_argument("--ref", help="기준 인물 그림(예: Idle 0번). 생략하면 같은 시트의 0번 프레임")
+    pr.add_argument("--tol", type=float, default=PROPORTION_TOL)
+
     co = sub.add_parser("coherence")
     co.add_argument("sheet")
     co.add_argument("--raw", action="store_true", help="원본(4x2) 시트")
@@ -760,7 +839,7 @@ def main():
     if args.cmd == "verify":
         THRESHOLDS.update(head=args.head, hair=args.hair, boot=args.boot)
     {"set-reference": cmd_set_reference, "audit": cmd_audit, "verify": cmd_verify, "masks": cmd_masks,
-     "jitter": cmd_jitter, "set-height": cmd_set_height, "coherence": cmd_coherence}[args.cmd](args)
+     "jitter": cmd_jitter, "set-height": cmd_set_height, "coherence": cmd_coherence, "proportions": cmd_proportions}[args.cmd](args)
 
 
 if __name__ == "__main__":

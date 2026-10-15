@@ -39,6 +39,7 @@ public static class SpriteAnimationPipeline
         public float pivotY;
         public int fps;
         public bool loop;
+        public float[] durations; // 프레임별 표시 시간(초). 없으면 1/fps 균일
         public string[] warnings;
     }
 
@@ -82,6 +83,19 @@ public static class SpriteAnimationPipeline
             : "";
         string prev = archived.Count > 0 ? $" | prev로 이동: {string.Join(", ", archived)}" : "";
         return $"{manifest.name}: {sprites.Length}프레임 {manifest.fps}fps loop={manifest.loop} → {clipPath}, {controllerPath} [{manifest.action}]{prev}{warn}";
+    }
+
+    /// <summary>
+    /// 시트를 슬라이스해 clipPath에 클립만 만든다. 컨트롤러 연결·이전 버전 정리·폴더 이동을 하지 않는다 — 비교·시험용.
+    /// </summary>
+    public static string BuildClipAt(string sheetPath, string clipPath, bool loop)
+    {
+        var manifest = LoadManifest(sheetPath);
+        manifest.loop = loop;
+        var sprites = Slice(sheetPath, manifest);
+        WriteClipTo(clipPath, sprites, manifest);
+        AssetDatabase.SaveAssets();
+        return $"{clipPath}: {sprites.Length}프레임, 길이 {AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath).length:0.00}s";
     }
 
     /// <summary>
@@ -243,6 +257,13 @@ public static class SpriteAnimationPipeline
     private static string WriteClip(Sprite[] sprites, SheetManifest m)
     {
         string clipPath = $"{EnsureFolder($"{AnimRoot}/{m.character}")}/{m.name}.anim";
+        WriteClipTo(clipPath, sprites, m);
+        return clipPath;
+    }
+
+    private static void WriteClipTo(string clipPath, Sprite[] sprites, SheetManifest m)
+    {
+        EnsureFolder(Path.GetDirectoryName(clipPath).Replace('\\', '/'));
         var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(clipPath);
         bool created = clip == null;
         if (created)
@@ -254,9 +275,28 @@ public static class SpriteAnimationPipeline
 
         clip.frameRate = m.fps;
         var binding = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
-        var keys = sprites
-            .Select((s, i) => new ObjectReferenceKeyframe { time = i / (float)m.fps, value = s })
-            .ToArray();
+        ObjectReferenceKeyframe[] keys;
+        if (m.durations != null && m.durations.Length > 0)
+        {
+            // 프레임별 길이(완급): 준비 자세에서 멈추고 휘두름은 짧게. 마지막 프레임이 제 길이만큼 보이도록 끝에 같은 스프라이트를 한 번 더 둔다
+            if (m.durations.Length != sprites.Length)
+                throw new InvalidDataException($"durations {m.durations.Length}개, 프레임 {sprites.Length}개");
+            var list = new List<ObjectReferenceKeyframe>();
+            float t = 0f;
+            for (int i = 0; i < sprites.Length; i++)
+            {
+                list.Add(new ObjectReferenceKeyframe { time = t, value = sprites[i] });
+                t += m.durations[i];
+            }
+            list.Add(new ObjectReferenceKeyframe { time = t, value = sprites[^1] });
+            keys = list.ToArray();
+        }
+        else
+        {
+            keys = sprites
+                .Select((s, i) => new ObjectReferenceKeyframe { time = i / (float)m.fps, value = s })
+                .ToArray();
+        }
         AnimationUtility.SetObjectReferenceCurve(clip, binding, keys);
 
         var settings = AnimationUtility.GetAnimationClipSettings(clip);
@@ -267,7 +307,6 @@ public static class SpriteAnimationPipeline
             AssetDatabase.CreateAsset(clip, clipPath);
         else
             EditorUtility.SetDirty(clip);
-        return clipPath;
     }
 
     /// <summary>캐릭터당 컨트롤러 하나, 액션당 상태 하나. 같은 액션의 새 버전을 적용하면 그 상태의 클립이 바뀐다.</summary>
