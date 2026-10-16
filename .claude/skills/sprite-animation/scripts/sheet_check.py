@@ -360,12 +360,43 @@ def cmd_set_reference(args):
     height, stance = C.P.standing_height(frames[0]["image"])
     cfg = load_config(character)
     old = cfg.get("ref_height")
-    cfg.update(ref_height=round(height, 1), ref_method="standing", reference=os.path.splitext(os.path.basename(path))[0])
+    cfg.update(ref_method="standing", reference=os.path.splitext(os.path.basename(path))[0])
+    if args.keep_height and old:
+        # set-height로 정한 게임 내 키를 그대로 둔다 — 그 키로 처리한 시트라 다시 재도 같고, 반올림만큼 흔들린다
+        print(f"{character} 키 {old} 유지 (--keep-height)")
+    else:
+        cfg["ref_height"] = round(height, 1)
+    if args.chin or "ref_chin_to_sole" in cfg:
+        # 기준을 바꾸면 턱~발바닥도 새 기준에서 다시 잰다(남겨 두면 옛 기준 크기로 처리된다)
+        chin = reference_chin_to_sole(path)
+        print(f"턱~발바닥 {cfg.get('ref_chin_to_sole')} → {chin}")
+        cfg["ref_chin_to_sole"] = chin
     with open(config_path(character), "w", encoding="utf-8") as fp:
         json.dump(cfg, fp, ensure_ascii=False, indent=2)
     print(f"{character} 기준 = {cfg['reference']}, 키 {old} → {cfg['ref_height']} ({stance['method']})")
     print("기존 시트의 스케일은 그대로다. 새 기준에 맞추려면 각 시트를 원본에서 다시 처리·적용한다.")
     print(f"RESULT {json.dumps({'ok': True, 'character': character, **cfg, 'stance': stance}, ensure_ascii=False)}")
+
+
+def reference_chin_to_sole(path):
+    """
+    처리된 기준 시트의 턱~발바닥(출력 px) = 원본 기준 프레임의 턱~발바닥 × 처리 배율(매니페스트 scale).
+    출력 프레임에서 바로 재면 축소된 그림에서 분홍빛 머리카락 하이라이트를 얼굴로 잡는다(Knight_Idle_v10: 턱을 키의 2%로 잡음).
+    Knight_Idle_v10: 366 × 1.0541 = 386 (손으로 넣었던 값과 같다).
+    """
+    with open(os.path.splitext(path)[0] + ".json", encoding="utf-8") as fp:
+        m = json.load(fp)
+    g = m.get("sourceGrid") or {"cols": m["cols"], "rows": m["rows"], "frames": m["frames"]}
+    if m.get("sources"):
+        sys.exit("여러 장을 이어 붙인 시트는 기준으로 쓰지 않는다 — 기준은 보통 Idle 한 장이다")
+    src = m["source"]
+    if not os.path.exists(src):
+        sys.exit(f"원본 시트가 없어 턱~발바닥을 못 잰다: {src}")
+    fr, _ = C.load_frames(src, g["cols"], g["rows"], g["frames"])
+    raw = C.P.chin_to_sole(fr[m.get("anchor", 0)]["image"])
+    if raw is None:
+        sys.exit("원본 기준 프레임에서 턱을 못 찾았다 — ref_chin_to_sole을 손으로 잰다")
+    return round(raw * m["scale"])
 
 
 def skull_height(img, skull_over_L):
@@ -786,6 +817,8 @@ def main():
 
     r = sub.add_parser("set-reference")
     r.add_argument("sheet")
+    r.add_argument("--keep-height", action="store_true", help="ref_height를 다시 재지 않는다 (set-height로 정한 새 캐릭터)")
+    r.add_argument("--chin", action="store_true", help="ref_chin_to_sole도 쓴다 (이미 있으면 항상 다시 잰다)")
 
     a = sub.add_parser("audit")
     a.add_argument("--reference", required=True, help="사용자가 지정한 기준 시트")

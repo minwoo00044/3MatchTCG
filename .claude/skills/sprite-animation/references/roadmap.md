@@ -1,4 +1,4 @@
-# sprite-animation 고도화 로드맵 (2026-10-14 기준, 미착수)
+# sprite-animation 고도화 로드맵 (3·2·1 완료, 2026-10-16 갱신)
 
 사용자가 꼽은 부족한 기능 세 가지와, 세션에서 합의 전 단계로 제안한 접근이다.
 **제안 순서: 3 → 2 → 1.** 시작 전에 아래 "정할 것"을 사용자에게 먼저 묻는다.
@@ -13,7 +13,7 @@
 - 사용자 지시: v1 생성 첫 단계 = HD 원화 → 데포르메. 그 전에 Archer 기반 체형 마네킹. 이후 단계는 사용자가 따로 지시한다.
 - 결정: 마네킹 민머리, A포즈, 턴어라운드 4방향(앞·3/4·옆·뒤), 체형 힌트(normal/young/tall)로 허용 폭 조절.
 - 완료: 마네킹(assets/mannequin/, 사용자 확정), deform.py(generate/verify/accept), SKILL.md D 갈래. codex 호출은 codex_image.py로 통합.
-- Knight로 시험 완료(8차 확정, 마네킹 v2, Assets/_/Spirte/Knight/design/). 기록은 SKILL.md D 끝. young/tall 힌트는 아직 실물 시험 없음.
+- Knight로 시험 완료(9차 확정 = hint tall, Assets/_/Spirte/Knight/design/). 기록은 SKILL.md D 끝. young 힌트는 아직 실물 시험 없음.
 - 다음 단계(턴어라운드 → 시트)는 사용자가 지시한다. 시트 단계에서 Archer와 같은 자세로 신체 비율을 다시 비교하기로 함(발 크기 −15% 포함).
 - 설정 키: Archer 160cm, Knight 170cm(×1.0625). character.json/design json의 height_cm. 시트 스케일은 지금 캐릭터마다 기준 키를 따로 맞추므로, 시트 단계에서 height_cm 비율과 '머리카락 제외 키'(두개골 꼭대기 기준)로 스케일을 정하도록 파이프라인을 고쳐야 한다. Knight 키 큰 비율 버전(hint tall)도 생성함.
 
@@ -82,3 +82,28 @@
 - v6(상체 통째 11px 오르내림) → '스프링 인형'. v7(다리 고정, 가슴·어깨 4px, 머리 2프레임 지연) → '그 폭이면 무릎이 움직여야, 아니면 호흡 수준으로'. 
   v9: 폭 0.4%(약 2px) + 줄마다 정수 px 이동(소수 이동은 쌍선형으로 흐려져 선명도가 13% 맥동 → 1.6%). procedural_idle.py 기본값으로 반영할지 사용자 확인 후.
 - Knight_Idle_v10(knee 모드) 사용자 확정 '딱 좋다'. procedural_idle.py 기본값으로, SKILL.md E 갈래로 반영. 다음: Knight Hit/Skill/Dead.
+
+## 원화 → 애니메이션 한 줄로 잇기 (2026-10-16)
+- 점검 결과: 단계(D·E·F·A)는 다 있었지만 사이가 끊겨 있었다 — D→E의 Idle AI 시트 생성이 손으로 쓴 프롬프트였고, character.json을 손으로 만들었고, 문서 순서가 어긋났다(0절 기준 시트, E-5 set-height, D의 "이후는 사용자가 지시").
+- 추가: `idle_base.py`(generate/verify/accept — Knight_Idle try1·2를 옮김. verify가 try1 +16% 불합격, try2 +1% 합격을 재현), `deform.py accept --height-cm --required`(설정 뼈대, skull_over_L 추정), `set-reference --keep-height --chin`(ref_chin_to_sole을 원본 × 배율로 — Knight 386 재현. 출력 프레임에서 재면 머리카락 하이라이트를 턱으로 잡음), 파이프라인이 ref_height 없는 설정에서 set-height를 안내.
+- SKILL.md에 "새 캐릭터 전체 순서" 표.
+- 남은 것: 새 캐릭터로 처음부터 한 번 돌려 보기(실제 Codex 생성은 아직 이 순서로 안 돌림). skull_over_L 추정이 맞는지 그때 _deform_face.png로 확인. `.agents/skills/sprite-animation/`는 예전 사본(deform.py 없음) — 동기화 여부는 사용자 판단.
+
+## 사용자 관문 3개 (2026-10-16, 사용자 제안)
+- 사용자 판단: 원화 → 데포르메 → 애니메이팅 원큐는 현실적으로 어렵다. 관문마다 멈추고 사용자 입력·확정을 받는다.
+- 관문 1 설정 입력: `deform.py init`(키·힌트·필수 디자인 요소·프로필). generate가 init 없이는 멈추고, 힌트·필수 요소를 설정에서 읽는다. 설정 뼈대 생성은 accept에서 init으로 옮겼다.
+- 관문 2 비교샷: `deform.py lineup` — 설정 키 비율대로 기존 캐릭터와 같은 바닥선에(set-height와 같은 잣대). Knight 턴어라운드 vs Archer A포즈로 확인(600:565 = 170:160). 확정 후 accept.
+- 관문 3 동작별 디렉팅: character.json `actions.{액션}`(direction 원문·feel·definition·confirmed). 없으면 generate_action.py가 멈춤(`--skip-direction`은 관문 이전 캐릭터용).
+- Knight·Archer에는 actions 기록이 없다 — 다시 뽑을 때 받거나 --skip-direction.
+
+## Priest — 원화부터 Idle까지 첫 실행 (2026-10-16), 다음: 동작 5개
+- 완료: ★1 설정(174cm, 필수 요소 7개) → 턴어라운드 4회 중 3차 채택(tall이 안 나와 hint normal로) → ★2 비교샷 → **3/4 모습이 왼쪽을 향해 생성되어 좌우 반전**(지팡이 왼손·책 오른손) →
+  Idle AI 시트 1차(반전본 `SpriteRegen/Priest_Idle/try1_flip/`, 몸 0번·눈 감은 2번) → set-height(정수리~발 목표 526.7px → ref_height 552.4 = 다리 편 키) → Idle_v2(kneebody + 지팡이 고정 층) 적용·기준 시트 → ★3 디렉팅·정의 확정.
+- 씬: `Assets/Scenes/New Scene.unity`에 Priest(Knight 왼쪽, 같은 바닥선).
+- **다음 작업 = 동작 제작(SKILL.md F)**. 사용자 지시 전에는 시작하지 않는다(2026-10-16 "아직 작업시작하지마셈").
+  - 디렉팅 원문·확정 정의·align_x: `Assets/_/Spirte/Priest/Priest.character.json` `actions`. 정의 전문·근거: `references/motion.md` 3절 "Priest 동작 정의".
+  - 손: Skill2는 두 손(책은 사라져도 됨), Skill3는 한 손. Dead 끝 = 앞으로 쓰러짐.
+  - 순서는 사용자에게 묻는다(제안: Skill1 → Hit → Skill3 → Dead → Skill2).
+  - 몸 기준(generate_action의 character.png) = `idle.source` 0번 = 반전본. `SpriteRegen/`는 git 무시 — **이 PC에만 있다**. 다른 PC면 Idle AI 시트부터 다시.
+  - 레퍼런스 후보: `SpriteRegen/_refs/priest_candidates/`(SOURCES.txt, 머이브리지 PD·LPC CC0). 실루엣으로 바꿔 사용자가 고른다(F 2).
+- 이번에 드러난 도구 빈칸(아직 안 고침): deform verify에 **향하는 방향**·**머리 크기** 검사 없음(2차 실사 비율·3/4 좌우 반전을 못 잡음), 금발·흰 피부는 색으로 못 갈라 얼굴 지표 무효, 비교 녹화 이름표에 한글이 안 나옴(영문으로), 손에 쥔 고정 소품 층 나누기는 좌표 수작업(`staff_split`).

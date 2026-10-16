@@ -6,6 +6,7 @@ description: 이 프로젝트(3MatchTCG)의 캐릭터 스프라이트 시트를 
 # 스프라이트 시트 → 애니메이션 (3MatchTCG)
 
 요청에 맞는 갈래만 따라간다. 셋은 이어진다: 감사(B)에서 벗어난 시트를 재생성(C)하고, 합격본을 적용(A)한다.
+**HD 원화로 새 캐릭터를 처음부터 만들면** 갈래를 고르지 말고 아래 "새 캐릭터 전체 순서"를 따른다.
 
 | 갈래 | 언제 |
 |---|---|
@@ -20,6 +21,64 @@ description: 이 프로젝트(3MatchTCG)의 캐릭터 스프라이트 시트를 
 
 파이프라인 자체(분할·정렬·스케일·매니페스트·Unity 적용)의 규칙은 `docs/SPRITE_ANIMATION_GUIDE.md`에 있다.
 
+## 새 캐릭터 전체 순서 (HD 원화 → 게임 내 애니메이션)
+
+Knight(2026-10-14~15)가 이 순서로 원화에서 6개 동작까지 갔다. **한 번에 끝까지 돌리지 않는다** — 원화 → 데포르메 → 애니메이팅은 사람 판단이 필요한 곳이 많아서,
+**관문(★)마다 멈추고 사용자 입력·확정을 받은 뒤** 다음으로 간다. 각 단계는 앞 단계의 산출물이 있어야 돈다(스크립트가 없으면 멈춘다).
+
+| # | 단계 | 명령 | 산출물 / 사용자 |
+|---|---|---|---|
+| ★1 | **설정 입력** | AskUserQuestion → `deform.py init` | `{캐릭터}.character.json`. 아래 "관문 1" |
+| 2 | 턴어라운드 (D) | `deform.py generate` → `verify` | 비율·디자인 (지금처럼 결과마다 보고) |
+| ★2 | **비교샷 검증** | `deform.py lineup` → 사용자 확정 → `deform.py accept` | `_lineup_{캐릭터}.png`. 아래 "관문 2" |
+| 3 | Idle AI 시트 | `idle_base.py generate` → `verify` → `accept --base i --blink j` | 몸·눈 감은 프레임 |
+| 4 | 게임 내 키 | `sheet_check.py set-height --character X --relative-to Archer --sheet <3의 시트>` | `ref_height` |
+| 5 | 반자동 Idle (E) | 움직임 정하기 → `procedural_idle.py` → 처리 → Apply | `{캐릭터}_Idle_v1`. 움직임 폭은 사용자 확정 |
+| 6 | 기준 시트 지정 | `sheet_check.py set-reference <Idle_v1> --keep-height --chin` | `reference`, `ref_chin_to_sole` (0절의 '기준 시트'가 여기서 생긴다) |
+| ★3 | **동작별 디렉팅** | 동작마다 사용자 디렉팅 → `actions.{액션}` 기록 | 아래 "관문 3". 없으면 `generate_action.py`가 멈춘다 |
+| 7 | 동작별 생성 (F) | 정의 → 레퍼런스 → spec → `generate_action.py` → 처리 → 검사 → 비교 녹화 → Apply | Hit·Skill1~3·Dead |
+| 8 | 감사 (B) | `sheet_check.py audit --reference <Idle>` | 크기·디자인이 동작끼리 맞는지 |
+
+### 관문 1 — 설정 입력 (생성 전에)
+원화를 보고 후보를 제안하고, AskUserQuestion으로 받는다. 짐작으로 채우지 않는다.
+- **이름**(영문, 대문자 시작), **키(cm)** — 기존 캐릭터를 함께 보여 준다(Archer 160, Knight 170). 키 차이는 게임 안에서 실제 크기 차이로 보인다.
+- **체형 힌트** `normal`/`young`/`tall` — 원화의 인상(어림·성숙)으로 제안한다. 힌트는 **현재 마네킹 대비**다: 마네킹 v3 = Knight 9차 비율이라 `normal` = Knight와 같은 비율, `tall` = Knight보다 머리 −8%·다리 +8%.
+  ("Knight가 tall로 확정됐다"는 옛 마네킹 기준이다 — 그렇게 설명하면 tall이 Knight 비율인 줄 안다. Priest 설정 때 실제로 헷갈렸다.)
+- **필수 디자인 요소** — 원화에서 무기·장식·망토 같은 후보를 영어 짧은 문장으로 뽑아 고르게 한다. 원화에 오류로 보이는 것(Knight 하이힐)은 따로 묻는다.
+- **프로필** — 체격·성격·무기와 쥐는 손. Idle 움직임(E)과 동작 디렉팅(관문 3)의 근거가 된다.
+```bash
+python $SK/deform.py init --character Knight --height-cm 170 --hint tall \
+  --required "longsword with a gold cross-guard" --required "..." --profile "중갑 기사, 침착함, 검은 오른손"
+```
+`skull_over_L`(두개골/턱~발바닥)은 기준 캐릭터 값 × 힌트로 **추정**한다. 게임 내 키에만 쓰이고, 틀리면 키가 2~3% 어긋난다(관문 2 그림의 파랑 선으로 확인).
+
+### 관문 2 — 비교샷 검증 (데포르메 후, accept 전)
+```bash
+python $SK/deform.py lineup --character Knight SpriteRegen/Knight_Deform/tryN/result.png   # 기본: 설정이 있는 다른 캐릭터 전부
+```
+새 캐릭터 3/4와 기존 캐릭터(턴어라운드 3/4 → A포즈 → 기준 시트 순)를 **설정 키 비율대로** 같은 바닥선에 세운다. 크기 잣대는 `set-height`와 같아서 게임 안 크기와 같다.
+파랑 = 정수리(머리카락 제외), 회색 = 10cm. 그림을 Read로 직접 본 뒤 사용자에게 보여 주고 묻는다: 키 차이, 머리 크기, 화풍, 같은 게임 캐릭터로 보이는지.
+`verify`의 마네킹 비교는 비율 검사이고, 이 그림은 **다른 캐릭터 옆에 섰을 때**를 본다 — 둘 다 본다. 사용자가 확정해야 `accept`한다. 지적이 나오면 2로 돌아가거나(디자인·비율) init 값을 고친다(키·힌트).
+
+### 관문 3 — 동작별 디렉팅 (동작마다, 생성 전에)
+동작 하나씩 사용자에게 받는다. GDD 기준 캐릭터마다 Idle·Hit·Skill1~3·Dead(스킬은 3개)다. 받을 것:
+- **무엇을 하는 동작인가** — 사용자의 말 그대로 기록한다(예: "의장대처럼 칼을 돌리고 꽂는다").
+- **느낌** — "터프하게", "가볍게" 같은 말이 나오면 G로 정의한다.
+- 무기·손, 바닥에 박힌 발(`align_x` 후보), 장수(8/12), 참고 영상·이미지가 있는지.
+`character.json`에 적는다(사용자 말은 한국어 그대로, 정리한 정의는 따로):
+```json
+"actions": {
+  "Skill1": {"direction": "사용자의 말 그대로", "feel": ["터프", "빠름"], "definition": "motion.md 3절 형식으로 정리한 것", "confirmed": "2026-10-16"}
+}
+```
+`definition`은 사용자에게 보여 주고 확인받는다. spec(F 3)은 이 정의를 영어로 옮긴 것이다. 디렉팅 없이 spec부터 쓰면 짐작으로 그리게 된다(Knight Skill3 "칼 휘두르기"는 두 번 퇴짜).
+관문 이전에 만든 캐릭터(Knight·Archer)를 다시 뽑을 때만 `generate_action.py --skip-direction`.
+
+### 그 밖에
+- 3은 그대로 게임에 넣지 않는다. Knight에서 AI Idle 8장을 그대로 쓰면 얼굴이 프레임마다 다시 그려졌다(E 참고). 이 시트의 쓰임은 5의 몸, 7의 `character.png`, 4의 키 측정이다.
+- 6 전에는 기준 시트가 없으므로 0절 질문을 하지 않는다. 6 이후 작업부터 0절을 따른다.
+- 4를 하기 전에 시트를 처리하면 파이프라인이 "기준 키가 아직 없다"며 멈춘다(의도된 동작).
+
 ## 0. 시작 전에: 기준 시트를 사용자에게 지정받는다
 
 모든 갈래는 **기준 시트** 하나에 맞춘다. 스케일(체급), 체형 비교, 재생성 레퍼런스가 전부 이 시트에서 나온다.
@@ -27,12 +86,14 @@ description: 이 프로젝트(3MatchTCG)의 캐릭터 스프라이트 시트를 
 
 1. 캐릭터의 현재 기준을 확인한다: `Assets/_/Spirte/{캐릭터}/{캐릭터}.character.json`의 `reference`.
 2. 사용자에게 묻는다(AskUserQuestion). 후보는 그 캐릭터의 현재 시트들(`prev/` 제외)이고, 설정에 기준이 있으면 그것을 첫 번째로 둔다.
-   새 캐릭터라 시트가 하나도 없으면, 기준이 될 시트(보통 Idle)를 먼저 A로 넣자고 안내한다 — 첫 시트가 기준이 된다.
+   새 캐릭터라 시트가 하나도 없으면 "새 캐릭터 전체 순서"의 1~6을 먼저 한다 — 6에서 Idle이 기준이 된다.
+   (사용자가 원화 없이 시트를 바로 주면, 그 시트를 A로 넣는다 — 설정이 없으면 첫 시트가 기준이 된다.)
 3. 사용자가 고른 시트가 설정의 기준과 다르면 기준을 바꾼다:
    ```bash
    python $SK/sheet_check.py set-reference Assets/_/Spirte/Archer/Archer_Idle_v3.png
    ```
-   기준 키(다리를 편 키)가 다시 재진다. **기존 시트의 스케일은 자동으로 바뀌지 않는다** — 새 기준에 맞추려면 각 시트를 원본에서 다시 처리·적용한다(A). 사용자에게 그 범위를 알리고 진행 여부를 묻는다.
+   기준 키(다리를 편 키)가 다시 재진다. 설정에 `ref_chin_to_sole`이 있으면 그것도 새 기준에서 다시 잰다(원본 프레임 × 처리 배율).
+   `set-height`로 게임 내 키를 정한 캐릭터는 `--keep-height`를 붙여 그 키를 유지한다. **기존 시트의 스케일은 자동으로 바뀌지 않는다** — 새 기준에 맞추려면 각 시트를 원본에서 다시 처리·적용한다(A). 사용자에게 그 범위를 알리고 진행 여부를 묻는다.
 
 4. **필수 디자인 요소**도 확인한다. `character.json`의 `design.required`(예: 화살통, 벨트)를 보여 주고 맞는지 묻는다.
    기준 시트는 체형의 정답이지만, 소품은 기준 시트에 빠져 있을 수도 있다(Archer는 Idle_v3에 화살통·벨트가 없지만 모든 시트에 있어야 한다).
@@ -151,7 +212,7 @@ python $SK/sheet_check.py audit --reference <기준 시트> a.png b.png # 특정
 
 ## D. 새 캐릭터 — HD 원화 → 데포르메 턴어라운드
 
-v1 생성(원본 시트 없이 시작)의 첫 단계다. 이후 단계(턴어라운드 → 시트)는 사용자가 따로 지시한다.
+"새 캐릭터 전체 순서"의 ★1 → 2 → ★2다. 다음은 3(`idle_base.py`).
 비율·자세는 **체형 마네킹**(`assets/mannequin/`), 디자인은 **원화**, 화풍은 **마네킹을 만든 기준 시트**(mannequin.json `source`)에서 온다.
 
 ### 체형 마네킹 (이미 있음 — 다시 만들 때만)
@@ -160,11 +221,11 @@ v1 생성(원본 시트 없이 시작)의 첫 단계다. 이후 단계(턴어라
 `stretch-legs`(가랑이~발목 띠만 세로로 늘림)로 맞췄다. 바꾸려면 사용자 확인이 필요하다 — 모든 캐릭터의 기준이다.
 
 ### 루프
-1. **입력**: 원화 파일, 캐릭터 이름(영문 대문자 시작), 체형 힌트. 힌트는 원화를 보고 제안하고 사용자가 정한다:
-   `normal`(마네킹 그대로), `young`(머리 +10%, 다리 −10%), `tall`(머리 −8%, 다리 +8%). 꼭 지킬 디자인 요소가 있으면 `--design-note`.
-2. **생성** (백그라운드, 수 분):
+1. **입력** = **관문 1(설정 입력)**: 이름·키·체형 힌트·필수 디자인 요소·프로필을 받아 `deform.py init`. 힌트는 원화를 보고 제안하고 사용자가 정한다:
+   `normal`(마네킹 그대로), `young`(머리 +10%, 다리 −10%), `tall`(머리 −8%, 다리 +8%).
+2. **생성** (백그라운드, 수 분). 힌트·필수 디자인 요소는 character.json에서 읽는다(인자로 덮을 수 있다):
    ```bash
-   python $SK/deform.py generate --character Knight --source "<원화>" --hint normal [--design-note "..."]
+   python $SK/deform.py generate --character Knight --source "<원화>"
    ```
 3. **검증**:
    ```bash
@@ -184,7 +245,7 @@ v1 생성(원본 시트 없이 시작)의 첫 단계다. 이후 단계(턴어라
 4. **불합격·사용자 지적** → C의 재시도 요령(측정값을 넣은 `--fix`, 가장 가까운 시도를 `--previous`)을 따른다. 최대 4회.
    측정 이미지(비교 이미지)를 `--previous`로 붙이면 모델이 무엇을 고칠지 더 잘 알아듣는다(Knight 4차: 기준 캐릭터와 나란한 그림을 붙여 허리를 올림).
    **고치기 전에 측정이 맞는지부터 본다.** 사용자가 "크다/짜리몽땅하다"고 하면 마스크·기준선을 그린 이미지로 무엇을 쟀는지 확인하고 원인을 숫자로 좁힌다.
-5. **합격** → 사용자에게 결과를 보여 주고 확정받은 뒤:
+5. **합격** → **관문 2(비교샷)**: `deform.py lineup`으로 기존 캐릭터 옆에 세운 그림을 보여 주고 확정받은 뒤:
    ```bash
    python $SK/deform.py accept --character Knight SpriteRegen/Knight_Deform/tryN/result.png
    ```
@@ -218,9 +279,24 @@ v1 생성(원본 시트 없이 시작)의 첫 단계다. 이후 단계(턴어라
 
 AI에게 Idle 8장을 그리게 하면 얼굴·세부가 프레임마다 다시 그려지고 부위가 따로 움직여 'AI가 만든 듯한' 움직임이 된다(Knight Idle v1~v5, 지표로는 안 잡혔고 사용자가 지적).
 그래서 Idle은 **반자동**으로 만든다:
-1. AI로 Idle 시트를 한 번 생성한다(디자인·비율 확인용, 턴어라운드를 레퍼런스로). 같은 몸으로 그려진 '눈 뜬 프레임'과 '눈 감은 프레임'이 필요하다(위치·크기가 같은 두 프레임).
+1. AI로 Idle 시트를 한 번 생성한다(디자인·비율 확인용). 같은 몸으로 그려진 '눈 뜬 프레임'과 '눈 감은 프레임'이 필요하다(위치·크기가 같은 두 프레임).
+   ```bash
+   python $SK/idle_base.py generate --character Knight --pose "standing in a calm ready stance ...; the longsword held in the right hand, lowered, tip pointing down ..."   # 백그라운드
+   python $SK/idle_base.py verify --character Knight SpriteRegen/Knight_Idle/tryN/result.png
+   ```
+   - 턴어라운드 3/4·앞모습을 몸·디자인으로, 다른 캐릭터(`--motion-from`, 기본 Archer) 기준 Idle의 원본 4x2 시트를 타이밍·시점·칸 크기 참고로 붙인다. `--pose`는 무기를 어떻게 드는지까지 원화를 보고 쓴다.
+   - 판정: 장마다 턱 높이(얼굴 아래 끝 / 머리카락 포함 키)가 턴어라운드 3/4와 ±5%, 장끼리 키 ±4%. 눈 감은 장·디자인·필수 요소·시점은 눈으로 본다.
+   - 비율만 틀리면 편집으로 고친다: `--previous <그 결과> --edit --fix "the chin is at 27% of the figure height, in #1 it is at 23.6% -> head about 13% smaller, legs about 7% longer"`.
+     Knight는 1차 머리 +16% → 편집 2차 +1%로 합격했다.
+   - 합격이면 사용자에게 보여 주고 몸·눈 감은 프레임을 고른 뒤: `idle_base.py accept --character Knight <result.png> --base 0 --blink 2` (character.json `idle.source`·`base`·`blink`).
+   - 이어서 게임 내 키(전체 순서 4): `sheet_check.py set-height ... --sheet <result.png>`.
 2. **캐릭터별로 Idle에서 무엇이 움직일지 정한다** — 체격·장비·성격에 따라 다르다. 사용자에게 묻고 `{캐릭터}.character.json`의 `idle`에 적는다:
-   - `mode`: `knee`(무릎 굽힘 + 호흡, Knight) / `chest`(다리 고정, 호흡만) / `bob`(쓰지 않는다 — 스프링 인형)
+   - `mode`: `kneebody`(무릎 굽힘 + 경계 없는 몸 전체 호흡 + 가슴 좌우 부풂, Priest 확정) / `knee`(무릎 굽힘 + 허리에서 끊기는 호흡, Knight) /
+     `body`(무릎 없이 몸 전체) / `chest`(쓰지 않는다 — 허리 위 가로 띠만 들려 "가슴만 사진으로 잘라 움직이는 것 같다", Priest) / `bob`(쓰지 않는다 — 스프링 인형)
+     Priest에서 "숨쉬기는 무릎까지 움직여야 어색하지 않다"(사용자). 늘어진 것(긴 머리·코트·소품)이 많은 캐릭터일수록 한 덩어리 워프가 '오려낸' 느낌으로 보인다.
+   - **땅에 짚은 단단한 소품**(지팡이 등)은 몸과 같이 워프하면 휘고 늘어난다. 층으로 나눠 `body_image`(소품 뺀 몸)·`static_layer`(고정 소품)·`hand_layer`(쥔 손)를 쓴다 —
+     앞뒤 순서는 원래 그림대로 몸 → 소품 → 손. 소품 뒤 빈칸은 확산 채우기 말고 옆 픽셀 늘리기(소품이 앞에서 덮는다). Priest는 좌표로 나눴다(`SpriteRegen/Priest_Idle/staff_split/`, Codex 지우기 편집은 용량 부족으로 실패).
+   - AI Idle 8장의 눈 감은 장이 둘 이상이어도 깜빡임은 한 번(`blink_at`). 1초 루프에 두 번은 잦다.
    - 폭: `knee_amp`(엉덩이 하강, 키 대비), `knee_ratio`·`knee_forward`(무릎이 따라 내려가는/앞으로 나오는 비율), `breath_amp`(가슴·어깨)
    - `head_lag`(머리가 몇 프레임 늦는지), `hip`(이 위는 한 덩어리), `face`(무릎이 나오는 방향), `blink_at`
    - `moves`: 부위별로 무엇이 어떻게 움직이는지 사람이 읽는 설명(머리카락·망토·무기가 따로 흔들리는지 포함)
@@ -231,24 +307,33 @@ AI에게 Idle 8장을 그리게 하면 얼굴·세부가 프레임마다 다시 
 3. `python $SK/procedural_idle.py --character <캐릭터> --out SpriteRegen/<캐릭터>_Idle/procN/result.png`
    (인자를 주면 character.json보다 우선. 폭을 바꿔 보고 사용자가 확정하면 character.json에 적는다)
 4. `process_sprite_sheet.py --input <위 결과> --name <캐릭터>_Idle_vN --cols 6 --rows 4 --inbetween 0 --fps 24` 후 Apply.
-5. 처음 캐릭터면 `sheet_check.py set-height --character <캐릭터> --relative-to Archer --sheet <생성 시트>`로 설정 키(height_cm) 비율의 게임 내 크기를 먼저 정한다.
+5. 처음 캐릭터면 적용한 Idle을 기준 시트로 지정한다: `sheet_check.py set-reference Assets/_/Spirte/<캐릭터>/<캐릭터>_Idle_v1.png --keep-height --chin`.
+   `--chin`은 턱~발바닥(`ref_chin_to_sole`)으로 이후 시트 크기를 맞추게 한다 — 다리를 편 키는 바닥까지 내려온 무기를 발로 잡아 틀린 적이 있다(Knight Skill2: 게임 내 81%).
 
 ## F. 새 동작 (원본 시트 없이) — Hit·Skill·Dead
 
 글로만 지시하면 팔이 꼬이고(Knight Skill1 4회), 한 장에 8~12장을 몰아 그리면 칸이 좁아 칼끝이 잘리고 비율이 무너졌다.
 이 순서로 한다 (Knight Skill1 확정본, 2026-10-15):
 
-1. **정의** — 동작 설명이 모호하면 G부터. 정의는 `references/motion.md` 3절 형식(구간·포즈·금지·검사)으로 쓴다.
+시작 전에: 생성은 **사용자가 시작하라고 한 동작만**, 사용자가 정한 순서로 한다(정의가 확정돼 있어도 묻는다 — Priest 2026-10-16 "아직 작업시작하지마셈").
+0절(기준 시트·`design.required`)도 이 시점에 확인한다. 인계 상태는 `references/roadmap.md` 마지막 절.
+
+0. **디렉팅** — "새 캐릭터 전체 순서"의 관문 3. 사용자에게 이 동작의 디렉팅을 받아 `character.json` `actions.{액션}`에 적는다. 없으면 `generate_action.py`가 멈춘다.
+1. **정의** — 동작 설명이 모호하면 G부터. 정의는 `references/motion.md` 3절 형식(구간·포즈·금지·검사)으로 쓰고 `actions.{액션}.definition`에 남긴다.
 2. **레퍼런스** — 무료(CC0) 자료를 먼저 찾는다(motion.md 4절). 자세만 회색 실루엣으로 바꿔 `SpriteRegen/_refs/`에 두고, 후보를 보여 사용자가 고른다.
 3. **spec 작성** — `SpriteRegen/_specs/{캐릭터}_{액션}.json`: title, physics(정의를 영어로), poses(4의 배수 — 8 또는 12), reference, rules.
    포즈 문장에 "더 밀어붙인다"처럼 다시 앞으로 가는 말을 쓰지 않는다 — 모델이 재찌르기로 그렸다.
    rules에 거의 항상 넣는 것 (빠지면 실제로 깨졌다):
-   - 무기 연속성: "the sword stays in her RIGHT hand, pointing down, moving only a little from frame to frame" — 없으면 칼이 장마다 순간이동했다(Knight Hit)
+   - 무기 연속성: "the sword stays in her RIGHT hand, pointing down, moving only a little from frame to frame" — 없으면 칼이 장마다 순간이동했다(Knight Hit).
+     **손은 캐릭터마다 다르다** — `character.json` `design.required`에 적힌 손을 쓴다(Priest는 좌우 반전으로 지팡이 = LEFT hand, 책 = RIGHT hand). 예문을 그대로 옮기지 않는다
+   - rules는 4장마다 같은 문장이 들어간다 — "frames 3-6"처럼 전체 번호를 쓰지 말고 포즈 이름으로 적는다(장 안 번호와 섞인다)
+   - 무기를 머리 위로 드는 동작은 spec에 `"figure_scale": 0.72` — 크기 안내 그림의 위 여백(기본 0.86이면 머리 위 지팡이가 칸에 안 들어간다)
    - 발: "the back foot / both feet stay at exactly the same spot" — 없으면 장마다 보폭이 달라 좌우로 흔들렸다(Skill2 174px)
    - 시점: "3/4 view facing right like #1, never toward the camera" — 없으면 일부 장이 정면을 봤다(Skill3)
    - 감정이 있는 동작은 표정을 명시: Hit = "PAIN … no blush" (처음 Hit가 "부끄러워하는" 지시로 만들어져 어색했다)
    - 레퍼런스가 작은 픽셀 아트나 2등신이라 실루엣으로 자세가 안 읽히면 붙이지 않는다 — 글 정의만으로 생성한다
-4. **생성** — `python $SK/generate_action.py --character Knight --action Skill1 --spec <spec>` (백그라운드, 4장씩 3장을 이어 그림, 수십 분).
+4. **생성** — 먼저 `--dry-run`으로 모든 장의 프롬프트(`SpriteRegen/{캐릭터}_{액션}/dryrun/prompt_partN.md`)와 `character.png`(오른쪽을 보는지, 무기 손)를 확인한다.
+   `python $SK/generate_action.py --character Knight --action Skill1 --spec <spec>` (백그라운드, 4장씩 3장을 이어 그림, 수십 분).
    세트를 두 개 동시에 돌려 고른다. 결과 RESULT의 `sizes`가 다르면 그 세트는 버린다.
 5. **처리** — `process_sprite_sheet.py --input A B C --cols 2 --rows 6 --frames 12 --gap_counts ... --align_x <바닥에 박힌 발>`
    - `--gap_counts`: 구간별 보간 장수. 발사·타격 구간은 0, 회복은 2. 멈춤(`--hold`)은 터프한 동작에 쓰지 않는다

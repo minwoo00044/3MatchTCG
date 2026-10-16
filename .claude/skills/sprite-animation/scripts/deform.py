@@ -2,16 +2,23 @@
 HD 원화 → 데포르메 턴어라운드(앞·3/4·옆·뒤, A포즈). 새 캐릭터 v1 생성의 첫 단계.
 비율·자세는 체형 마네킹(assets/mannequin/), 디자인은 HD 원화, 화풍은 기준 캐릭터에서 가져온다.
 
+  init --character Knight --height-cm 170 --hint tall --required "..." [--required ...] [--profile "..."]
+      [관문 1: 설정 입력] 생성 전에 사용자에게 받은 설정으로 {캐릭터}.character.json을 만든다.
+      키(cm)·체형 힌트·필수 디자인 요소·프로필(체격·성격·무기 쥐는 손). skull_over_L은 추정값.
   generate --character Knight --source HD.png [--hint normal|young|tall] [--design-note "..."]
            [--previous P.png --previous-note "..."] [--fix "..."] [--dry-run]
+      힌트·필수 디자인 요소는 생략하면 character.json에서 읽는다(init이 먼저다).
       작업 폴더 SpriteRegen/{캐릭터}_Deform/try{N}/ (git 무시). 수 분 걸린다 — 백그라운드로 돌린다.
   verify --hint normal RESULT.png
       수치 판정: 4명으로 나뉘는지, 네 방향 세로 키가 같은지(±5%). 0 합격 / 4 불합격.
       가랑이는 참고만 한다 — 다리 틈이 닫히는 줄이라 치마·긴 머리카락이 가리면 그 높이를 잡는다.
       이미지: 마네킹 윤곽을 같은 바닥선·같은 키로 겹친 비교(Temp/SpriteAnimationPipeline/_deform_overlay.png).
       옷을 입은 캐릭터는 실루엣으로 턱을 못 잡는다(머리카락·옷깃이 목을 가린다) — 머리 크기는 비교 이미지로 본다.
+  lineup --character Knight RESULT.png [--with Archer ...]
+      [관문 2: 비교샷] 새 캐릭터 3/4와 기존 캐릭터들을 설정 키(cm) 비율대로 같은 바닥선에 세운 그림
+      (Temp/SpriteAnimationPipeline/_lineup_{캐릭터}.png). 사용자가 이 그림을 보고 확정해야 accept한다.
   accept --character Knight RESULT.png
-      합격본을 Assets/_/Spirte/{캐릭터}/design/{캐릭터}_turnaround.png 로, 원화를 {캐릭터}_source.png 로 둔다.
+      합격본을 Assets/_/Spirte/{캐릭터}/design/{캐릭터}_turnaround.png 로, 원화를 {캐릭터}_source.png 로 둔다. 다음은 idle_base.py.
 
 체형 힌트: 마네킹은 Archer 체형이다. 어리거나 키 큰 캐릭터는 완벽히 맞지 않으므로 목표·허용 폭을 바꾼다
 (사용자 지정 2026-10-14: "최대한 따라간다"). 힌트는 원화를 보고 제안하고 사용자가 정한다.
@@ -109,6 +116,13 @@ def done(ok, code, **kw):
 
 
 def cmd_generate(args):
+    cfg = character_config(args.character)
+    if cfg is None:
+        done(False, 1, error=f"{args.character}.character.json이 없다 — 설정 입력(init)을 먼저 한다: 키·체형 힌트·필수 디자인 요소를 사용자에게 묻는다")
+    args.hint = args.hint or cfg.get("hint", "normal")
+    required = cfg.get("design", {}).get("required", [])
+    if required and not args.design_note:
+        args.design_note = "must keep: " + "; ".join(required)
     if not os.path.exists(args.source):
         done(False, 1, error=f"원화 파일이 없다: {args.source}")
     if len(args.previous_note) not in (0, len(args.previous)):
@@ -217,6 +231,7 @@ def feet_center(fig):
     return float(np.mean([(a0 + b0) / 2 for a0, b0 in runs]))
 
 
+CHEEK_INVALID = 0.60  # 이보다 넓으면 볼이 아니라 머리카락까지 잰 것 (Priest 1차 +142%)
 CHEEK_TOL = 0.10  # 3/4 모습 아래 볼(눈~턱 75%) 폭이 기준 캐릭터보다 이만큼 넘게 넓으면 불합격 (Knight 4차 +13%: 사용자가 "볼이 빵빵"이라 지적)
 
 
@@ -482,7 +497,11 @@ def cmd_verify(args):
             d75 = prof["w"][75] / ref_prof["w"][75] - 1
             print(f"얼굴 폭/L (눈~턱 위치) 3/4 {cells}  — 기준 " + "  ".join(f"{k}% {ref_prof['w'][k]:.3f}" for k in (50, 75, 90))
                   + f"  아래 볼(75%) {d75 * 100:+.0f}%")
-            if d75 > CHEEK_TOL:
+            if d75 > CHEEK_INVALID:
+                # 피부와 머리카락 색이 같으면(Priest: 흰 피부·백금발, 둘 다 h≈20°·s≈0.2) 머리카락까지 얼굴로 잡혀 폭이 머리 전체가 된다.
+                # 진짜 볼 불합격은 +13%(Knight 4차)였다 — 이만큼 크면 측정 실패로 보고 눈으로 판정한다
+                notes.append(f"3/4 얼굴 폭 {d75 * 100:+.0f}% — 피부와 머리카락을 색으로 못 갈랐다(측정 무효). 얼굴 비교 이미지의 노랑 윤곽으로 직접 본다")
+            elif d75 > CHEEK_TOL:
                 fails.append(f"아래 볼 {d75 * 100:+.0f}% — 기준보다 볼이 빵빵하다(U자 턱선). 얼굴 비교 이미지의 노랑 윤곽 밖으로 나간다")
         else:
             print(f"얼굴 폭/L 앞 {cells}  (기준이 3/4라 참고)")
@@ -505,6 +524,8 @@ def cmd_verify(args):
     print("판정:", "합격" if not fails else "불합격 — " + "; ".join(fails))
     print("머리 크기·몸이 마네킹을 따라가는지·디자인이 원화와 같은지는 비교 이미지와 결과를 눈으로 본다")
     done(True, 0 if not fails else 4, **{"pass": not fails, "fails": fails, "notes": notes, "overlay": slash(path)})
+
+
 
 
 def cmd_accept(args):
@@ -530,15 +551,150 @@ def cmd_accept(args):
     done(True, 0, **out)
 
 
+def character_config(character):
+    path = os.path.join(C.SHEET_ROOT, character, f"{character}.character.json")
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as fp:
+        return json.load(fp)
+
+
+def cmd_init(args):
+    """
+    [관문 1: 설정 입력] 새 캐릭터의 {캐릭터}.character.json. 생성 전에 사용자에게 받은 값으로 만든다.
+    이후 단계(generate·lineup·idle_base·set-height·generate_action·파이프라인)가 읽는다.
+    ref_height·reference는 set-height·set-reference가 쓴다(그 전에 시트를 처리하면 파이프라인이 멈춘다).
+    skull_over_L(두개골/턱~발바닥)은 기준 캐릭터 값 × 체형 힌트의 머리 배율로 추정한다 — Knight는 마네킹을 겹쳐 손으로 쟀다(0.304).
+    추정이 틀리면 게임 내 키가 2~3%쯤 어긋난다. 비교샷(lineup)의 파랑 정수리선으로 확인한다.
+    """
+    path = os.path.join(C.SHEET_ROOT, args.character, f"{args.character}.character.json")
+    if os.path.exists(path):
+        done(False, 1, error=f"{args.character}.character.json이 이미 있다 — 바꿀 값은 파일을 직접 고친다")
+    spec = mannequin_spec()
+    ref_char = reference_name(spec).split("_")[0]
+    with open(os.path.join(C.SHEET_ROOT, ref_char, f"{ref_char}.character.json"), encoding="utf-8") as fp:
+        ref_skull = json.load(fp)["skull_over_L"]
+    if args.skull_over_l:
+        skull, note = args.skull_over_l, "사용자/측정 지정"
+    else:
+        skull = round(ref_skull * HINTS[args.hint]["head"], 3)
+        note = f"추정: {ref_char} {ref_skull} × hint {args.hint} 머리 배율 {HINTS[args.hint]['head']} (deform.py init)"
+    cfg = {"height_cm": args.height_cm, "hint": args.hint, "profile": args.profile or "",
+           "skull_over_L": skull, "skull_note": note,
+           "design": {"required": args.required, "props_reference": None, "note": "deform.py init — 사용자 입력"},
+           "align_x": {},
+           "actions": {}}
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fp:
+        json.dump(cfg, fp, ensure_ascii=False, indent=2)
+    print(f"{args.character}.character.json 생성: 키 {args.height_cm}cm, 힌트 {args.hint}, skull_over_L {skull} ({note})")
+    if not args.required:
+        print("  [주의] design.required가 비었다 — 원화에서 꼭 있어야 할 요소를 사용자에게 묻고 적는다")
+    done(True, 0, config=slash(path))
+
+
+LINEUP_H = 600  # 가장 큰 캐릭터의 정수리~발바닥(px)
+
+
+def lineup_figure(character, cfg):
+    """
+    기존 캐릭터를 비교샷에 세울 그림: 턴어라운드 3/4 → design/*_apose.png → 기준 시트 0번 프레임 순.
+    A포즈끼리 세워야 자세 차이가 키 차이로 보이지 않는다.
+    """
+    d = os.path.join(C.SHEET_ROOT, character, "design")
+    tp = os.path.join(d, f"{character}_turnaround.png")
+    if os.path.exists(tp):
+        return M.figures(tp, len(M.VIEWS))[1], "turnaround 3/4"
+    ap = os.path.join(d, f"{character}_apose.png")
+    if os.path.exists(ap):
+        frames, _ = C.load_frames(ap)
+        return frames[0]["image"], "A-pose"
+    if cfg.get("reference"):
+        frames, _ = C.load_frames(os.path.join(C.SHEET_ROOT, character, cfg["reference"] + ".png"))
+        return C.crop_frame(frames[0]["image"]), cfg["reference"]
+    return None, None
+
+
+def cmd_lineup(args):
+    """
+    [관문 2: 비교샷] 새 캐릭터와 기존 캐릭터를 설정 키 비율대로 같은 바닥선에 세운다.
+    키 차이는 비율이 아니라 실제 크기로 보여 준다(사용자 지정 2026-10-14).
+    크기는 정수리(머리카락 제외)~발바닥으로 맞춘다 — sheet_check.py set-height와 같은 잣대라 게임 안 크기와 같다.
+    """
+    import sheet_check as SC
+    me = character_config(args.character)
+    if me is None:
+        done(False, 1, error=f"{args.character}.character.json이 없다 — init을 먼저 한다")
+    figs = M.figures(args.image, len(M.VIEWS))
+    if len(figs) != len(M.VIEWS):
+        done(False, 1, error=f"인물 {len(figs)}명 — 턴어라운드(4명)가 아니다")
+    others = args.with_ or sorted(n for n in os.listdir(C.SHEET_ROOT)
+                                  if n != args.character and os.path.exists(os.path.join(C.SHEET_ROOT, n, f"{n}.character.json")))
+    entries = [(args.character, figs[1], "turnaround 3/4", me)]
+    for n in others:
+        cfg = character_config(n) or {}
+        if not cfg.get("height_cm") or not cfg.get("skull_over_L"):
+            print(f"  [건너뜀] {n}: height_cm·skull_over_L이 없다")
+            continue
+        fig, kind = lineup_figure(n, cfg)
+        if fig is None:
+            print(f"  [건너뜀] {n}: 세울 그림이 없다")
+            continue
+        entries.append((n, fig, kind, cfg))
+    tallest = max(e[3]["height_cm"] for e in entries)
+    tiles = []
+    for name, fig, kind, cfg in entries:
+        # 크기는 다리를 편 키로 보정한 값(set-height와 같음)으로, 정수리선은 그림 속 실제 두개골 꼭대기에 긋는다
+        h, _ = SC.skull_height(fig, cfg["skull_over_L"])
+        target = LINEUP_H * cfg["height_cm"] / tallest
+        s = target / h
+        f = fig.resize((max(1, round(fig.width * s)), max(1, round(fig.height * s))), Image.LANCZOS)
+        chin = face_chin(fig)
+        skull_px = (fig.height - 1 - chin) * (1 + cfg["skull_over_L"]) * s
+        tiles.append((name, kind, cfg["height_cm"], f, skull_px))
+        print(f"{name:10} {cfg['height_cm']}cm  {kind:16} 정수리~발 {h:.0f}px → {target:.0f}px")
+    pad, floor_gap = 40, 30
+    H = max(t[3].height for t in tiles) + 80
+    W = sum(t[3].width for t in tiles) + pad * (len(tiles) + 1)
+    out = Image.new("RGBA", (W, H), (255, 255, 255, 255))
+    d = ImageDraw.Draw(out)
+    floor = H - floor_gap
+    for k in range(10, tallest + 1, 10):  # 10cm 눈금
+        y = floor - LINEUP_H * k / tallest
+        d.line([(0, y), (W, y)], fill=(235, 235, 235))
+    x = pad
+    for name, kind, cm, f, skull_px in tiles:
+        out.alpha_composite(f, (x, floor - f.height))
+        top = floor - skull_px
+        d.line([(x - 10, top), (x + f.width + 10, top)], fill=(0, 120, 230), width=2)
+        d.text((x, 6), f"{name} {cm}cm" + ("  NEW" if name == args.character else ""), fill=(0, 0, 0))
+        d.text((x, 20), kind, fill=(110, 110, 110))
+        x += f.width + pad
+    d.line([(0, floor), (W, floor)], fill=(200, 0, 0), width=2)
+    path = os.path.join(C.PREVIEW_DIR, f"_lineup_{args.character}.png")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    out.convert("RGB").save(path)
+    print("파랑 = 정수리(머리카락 제외), 빨강 = 바닥, 회색 = 10cm. 새 캐릭터 정수리선이 실제 두개골 꼭대기에 오는지 본다(skull_over_L 추정)")
+    print(f"비교샷: {slash(path)} — 사용자에게 보여 주고 확정받은 뒤 accept")
+    done(True, 0, lineup=slash(path), characters=[t[0] for t in tiles])
+
+
 def main():
     C.utf8_stdout()
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
+    i = sub.add_parser("init")
+    i.add_argument("--character", required=True, help="캐릭터 이름 (영문, 대문자 시작)")
+    i.add_argument("--height-cm", type=int, required=True, help="설정 키(cm). 예: Archer 160, Knight 170")
+    i.add_argument("--hint", choices=list(HINTS), required=True)
+    i.add_argument("--required", action="append", default=[], help="필수 디자인 요소 (영어 짧은 문장, 여러 번)")
+    i.add_argument("--profile", help="체격·성격·무기와 쥐는 손 (사람이 읽는 메모 — Idle 움직임·동작 디렉팅의 근거)")
+    i.add_argument("--skull-over-l", type=float, help="두개골/턱~발바닥. 생략하면 기준 캐릭터 값 × 힌트로 추정")
     g = sub.add_parser("generate")
     g.add_argument("--character", required=True, help="캐릭터 이름 (영문, 대문자 시작)")
     g.add_argument("--source", required=True, help="사용자가 준 HD 원화")
-    g.add_argument("--hint", choices=list(HINTS), default="normal")
-    g.add_argument("--design-note", help="원화에서 꼭 지킬 디자인 요소 (영어)")
+    g.add_argument("--hint", choices=list(HINTS), help="생략하면 character.json의 hint")
+    g.add_argument("--design-note", help="원화에서 꼭 지킬 디자인 요소 (영어). 생략하면 character.json의 design.required")
     g.add_argument("--previous", action="append", default=[])
     g.add_argument("--previous-note", action="append", default=[])
     g.add_argument("--fix", action="append", default=[], help="고칠 점 (영어, 측정값 포함)")
@@ -548,11 +704,16 @@ def main():
     v = sub.add_parser("verify")
     v.add_argument("image")
     v.add_argument("--hint", choices=list(HINTS), default="normal")
+    ln = sub.add_parser("lineup")
+    ln.add_argument("image", help="턴어라운드 결과 (accept 전)")
+    ln.add_argument("--character", required=True)
+    ln.add_argument("--with", dest="with_", nargs="+", help="비교할 캐릭터 (기본: 설정이 있는 다른 캐릭터 전부)")
     a = sub.add_parser("accept")
     a.add_argument("image")
     a.add_argument("--character", required=True)
     args = p.parse_args()
-    {"generate": cmd_generate, "verify": cmd_verify, "accept": cmd_accept}[args.cmd](args)
+    {"init": cmd_init, "generate": cmd_generate, "verify": cmd_verify, "lineup": cmd_lineup,
+     "accept": cmd_accept}[args.cmd](args)
 
 
 if __name__ == "__main__":

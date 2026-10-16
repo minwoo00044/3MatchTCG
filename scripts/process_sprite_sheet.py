@@ -918,6 +918,10 @@ def resolve_scale(args, character, anchor_height, analyze):
     if os.path.exists(cfg_path):
         with open(cfg_path, encoding="utf-8") as fp:
             cfg = json.load(fp)
+        if "ref_height" not in cfg:
+            # deform.py accept가 만든 새 캐릭터 설정 — 게임 내 키(ref_height)를 정하기 전이다
+            raise PipelineError(f"{character} 기준 키(ref_height)가 아직 없다 — "
+                                f"sheet_check.py set-height --character {character} --relative-to <캐릭터> --sheet <Idle AI 시트>를 먼저 한다")
         if cfg.get("ref_method") != "standing":
             raise PipelineError(f"{character} 기준 키가 예전 측정 방식(세로 키)이다 — "
                                 f"기준 시트를 지정해 다시 잰다: sheet_check.py set-reference <기준 시트>")

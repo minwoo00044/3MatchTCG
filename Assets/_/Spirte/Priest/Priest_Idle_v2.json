@@ -1,0 +1,72 @@
+{
+  "name": "Priest_Idle_v2",
+  "character": "Priest",
+  "action": "Idle",
+  "version": 2,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Priest_Idle/proc2/result.png",
+  "sources": null,
+  "cols": 6,
+  "rows": 4,
+  "frames": 24,
+  "sourceGrid": {
+    "cols": 6,
+    "rows": 4,
+    "frames": 24
+  },
+  "inbetween": 0,
+  "keyFrames": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  ],
+  "haze": [],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 346,
+  "cellHeight": 571,
+  "pivotX": 0.5,
+  "pivotY": 0.0070052539404553416,
+  "fps": 24,
+  "durations": null,
+  "loop": true,
+  "scale": 1.1253,
+  "sizeFit": {
+    "reference": "Priest_Idle_v1",
+    "factor": 1.0,
+    "iou": 0.987
+  },
+  "partScale": null,
+  "anchorHeight": 491.0,
+  "stance": {
+    "method": "vertical",
+    "reason": "발이 하나로 보인다"
+  },
+  "alignX": "feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 0.0,
+    "right": 0.0
+  },
+  "warnings": []
+}

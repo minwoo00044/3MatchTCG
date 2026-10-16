@@ -45,9 +45,29 @@ def idle_body(character):
     return fr[idle.get("base", 0)]["image"]
 
 
-def size_guide(body):
+def action_direction(character, action):
+    """
+    [관문 3] 사용자에게 받은 동작 디렉팅(character.json actions.{액션}.direction). 없으면 None.
+    spec(영어 포즈 목록)은 이 디렉팅을 번역·구체화한 것이다 — 디렉팅 없이 spec부터 쓰면 짐작으로 그리게 된다
+    (Knight Skill3 "칼 휘두르기"는 짐작으로 두 번 퇴짜, 실제 의장대 동작을 조사한 뒤 확정).
+    """
+    path = os.path.join(C.SHEET_ROOT, character, f"{character}.character.json")
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as fp:
+        return json.load(fp).get("actions", {}).get(action, {}).get("direction")
+
+
+FIGURE_SCALE = 0.86  # 크기 안내 그림에서 인물 키 / 칸 높이 (Knight)
+
+
+def size_guide(body, scale=FIGURE_SCALE):
+    """
+    scale: 머리 위로 무기를 드는 동작은 위 여백이 모자라 "머리 크기 그대로"와 "칸 안에"가 부딪힌다(Priest Skill1 dry-run 점검) —
+    spec "figure_scale"로 인물을 작게(예 0.72) 그려 여백을 둔다. 결과 크기는 파이프라인이 기준 시트에 다시 맞춘다(턱~발바닥, size_fit).
+    """
     g = Image.new("RGBA", (CELL_W * 2, CELL_H * 2), (255, 255, 255, 255))
-    s = (CELL_H * 0.86) / body.height
+    s = (CELL_H * scale) / body.height
     im = body.resize((round(body.width * s), round(body.height * s)), Image.LANCZOS)
     for k in range(4):
         g.alpha_composite(im, ((k % 2) * CELL_W + 60, (k // 2) * CELL_H + CELL_H - 30 - im.height))
@@ -72,7 +92,7 @@ Attached images:
 The animation: {spec['title']}. {spec.get('physics', '')} Draw ONLY these 4 frames of it, as a 2x2 sheet (left-to-right, top-to-bottom):
 {lines}
 
-Proportions (critical, check every frame): the head (with hair) is NOT bigger than in #2; the legs are NOT shorter than in #2 (a wide low stance keeps each leg's full length); the shoes are NOT bigger than in #2. Anatomically correct limbs. Same face in every frame.
+Proportions (critical, check every frame): the head (with hair) is NOT bigger than in #2; the legs are NOT shorter than in #2 (a wide low stance keeps each leg's full length); the shoes are NOT bigger than in #2. Anatomically correct limbs. The same face design in every frame (only the expression changes, as written for each frame).
 {rules}
 Sheet layout (critical): LANDSCAPE canvas, exactly 2 columns x 2 rows, 4 frames, evenly spaced (wide cells). Fully transparent background; no floor line, shadow, text or grid lines. Place the figure so that the whole figure including any extended weapon and effect stays inside its own cell with a clear transparent gap. Nothing touches a neighboring figure or the canvas edge. One baseline per row.
 """
@@ -87,7 +107,16 @@ def main():
     ap.add_argument("--parts", type=int, default=None, help="4장씩 몇 장 (기본 poses 수 / 4)")
     ap.add_argument("--limit", type=float, default=85)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--skip-direction", action="store_true",
+                    help="디렉팅 기록 없이 생성 (디렉팅 관문 이전에 만든 캐릭터를 다시 뽑을 때만)")
     args = ap.parse_args()
+    direction = action_direction(args.character, args.action)
+    if direction is None and not args.skip_direction:
+        print(f"{args.character}.character.json에 actions.{args.action}.direction이 없다 — "
+              "[관문 3: 디렉팅] 사용자에게 이 동작의 디렉팅을 먼저 받는다 (SKILL.md F 0단계)")
+        sys.exit(1)
+    if direction:
+        print(f"디렉팅({args.action}): {direction}")
     spec = json.load(open(args.spec, encoding="utf-8"))
     parts = args.parts or len(spec["poses"]) // 4
     if len(spec["poses"]) < parts * 4:
@@ -95,14 +124,15 @@ def main():
     body = idle_body(args.character)
     job = f"{args.character}_{args.action}"
     done_dirs = []
+    work = CI.dryrun_dir(job) if args.dry_run else None
     for part in range(parts):
         if args.dry_run:
-            work, n = CI.dryrun_dir(job), None
+            pass  # 모든 장의 프롬프트를 한 폴더에 prompt_part{N}.md로 (앞 장 그림은 없으니 partN.png는 안 붙는다)
         else:
             CI.check_usage(args.limit)
             work, n = CI.new_try_dir(job)
         D.on_white(body).save(os.path.join(work, "character.png"))
-        size_guide(body).save(os.path.join(work, "size_guide.png"))
+        size_guide(body, spec.get("figure_scale", FIGURE_SCALE)).save(os.path.join(work, "size_guide.png"))
         images = ["character.png", "size_guide.png"]
         ref = spec.get("reference")
         if ref:
@@ -111,14 +141,16 @@ def main():
         for k, d in enumerate(done_dirs):
             shutil.copy(os.path.join(d, "result.png"), os.path.join(work, f"part{k + 1}.png"))
             images.append(f"part{k + 1}.png")
-        prompt = prompt_for(spec, part, len(done_dirs), bool(ref))
+        prompt = prompt_for(spec, part, part if args.dry_run else len(done_dirs), bool(ref))
         if args.dry_run:
-            open(os.path.join(work, "prompt.md"), "w", encoding="utf-8").write(prompt)
-            print(f"RESULT {json.dumps({'ok': True, 'dry_run': True, 'prompt': work}, ensure_ascii=False)}")
-            return
+            open(os.path.join(work, f"prompt_part{part + 1}.md"), "w", encoding="utf-8").write(prompt)
+            continue
         CI.run(work, prompt, images)
         done_dirs.append(work)
         print(f"  {part + 1}/{parts}: {work}")
+    if args.dry_run:
+        print(f"RESULT {json.dumps({'ok': True, 'dry_run': True, 'prompt': work.replace(os.sep, '/'), 'parts': parts}, ensure_ascii=False)}")
+        return
     sizes = [Image.open(os.path.join(d, "result.png")).size for d in done_dirs]
     warn = [] if len(set(sizes)) == 1 else [f"장마다 캔버스 크기가 다르다 {sizes} — 프레임 크기가 들쭉날쭉해진다. 다시 뽑는다"]
     print(f"RESULT {json.dumps({'ok': not warn, 'parts': [d.replace(os.sep, '/') for d in done_dirs], 'sizes': sizes, 'warnings': warn}, ensure_ascii=False)}")

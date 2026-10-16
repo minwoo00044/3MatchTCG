@@ -1,0 +1,8 @@
+{
+  "character": "Priest",
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/Assets/_/Spirte/Priest/Priest_HD.png",
+  "hint": "tall",
+  "design_note": "must keep: caduceus staff with a glowing blue cross orb, held in her right hand; white nurse cap with a blue cross; very long wavy blonde hair with braids and blue ribbons; long white coat with blue lining, gold trim and blue cross emblems; brown leather belts with a brown leather medical bag with a blue cross on the hip; blue potion vials hanging from the belts; white medical book with a blue cross held in her left hand",
+  "accepted_from": "SpriteRegen/Priest_Deform/try3/result.png",
+  "flipped": "3/4(두 번째 인물)만 좌우 반전 — 왼쪽을 향해 생성됨. 반전 전: SpriteRegen/Priest_Deform/try3/turnaround_before_flip.png"
+}

@@ -1,0 +1,131 @@
+{
+  "height_cm": 174,
+  "hint": "normal",
+  "profile": "치유 성직자(의무관). 차분하고 단정함. 지팡이 왼손, 의료 책 오른손(좌우 반전 후). 큰 키, 긴 다리, 무거운 코트 자락",
+  "skull_over_L": 0.304,
+  "skull_note": "추정: Knight 0.304 (hint normal = Knight 비율, 3차 턴어라운드 기준)",
+  "design": {
+    "required": [
+      "caduceus staff with a glowing blue cross orb, held in her LEFT hand (the far side, on the right of the image)",
+      "white nurse cap with a blue cross",
+      "very long wavy blonde hair with braids and blue ribbons",
+      "long white coat with blue lining, gold trim and blue cross emblems",
+      "brown leather belts with a brown leather medical bag with a blue cross on the hip",
+      "blue potion vials hanging from the belts",
+      "white medical book with a blue cross held in her RIGHT hand"
+    ],
+    "props_reference": "SpriteRegen/Priest_Idle/try1_flip/result.png",
+    "note": "deform.py init — 사용자 입력. 2026-10-16: 3/4 모습이 왼쪽을 향해 생성되어 좌우 반전(사용자 선택) → 지팡이 왼손·책 오른손으로 바뀜"
+  },
+  "align_x": {},
+  "actions": {
+    "Skill1": {
+      "direction": "눈을 감고 지팡이를 높게 들어올린다.",
+      "received": "2026-10-16",
+      "definition": "시전: 준비 → 예비(무릎 살짝·지팡이 조금 낮춤) → 들어 올림 2 → 정점 2(왼팔로 지팡이를 머리 위 수직, 눈 감음, 책은 오른손으로 가슴에, 멈춤 0.3초) → 내려옴 → 정착. 8포즈, 24fps 약 1초",
+      "forbid": "예비 없이 들기, 고른 속도, 정점에서 눈 뜸, 지팡이 순간이동, 발 이동",
+      "align_x": "both_feet",
+      "confirmed": "2026-10-16",
+      "status": "정의 확정, 제작 전",
+      "beats": {
+        "gap_counts": "1 1 1 0 2 2 2",
+        "hold": "4:0.3",
+        "fps": 24,
+        "figure_scale": 0.72
+      }
+    },
+    "Skill2": {
+      "direction": "지팡이를 들어올려 머리 위에서 두세바뀌 손목을 이용해 회전시키고 땅에 내려 찍는다.",
+      "received": "2026-10-16",
+      "hands": "두 손으로 돌린다. 책은 잠시 없어져도 된다 (사용자 2026-10-16)",
+      "definition": "들어 올림 2(책 사라짐, 두 손으로 가운데 잡음) → 머리 위 수평 회전 6(90°씩, 두 손·팔뚝이 지팡이와 함께 머리 둘레를 돎, 3/4 시점 타원) — 회전 장면 재사용으로 3바퀴 → 치켜듦 → 내려찍기(가장 빠름) → 임팩트(지팡이 끝 땅, 무릎 굽고 몸통 접힘) → 정착. 12포즈, 회전·내려찍기 보간 0, 30fps 약 1.2초",
+      "forbid": "지팡이만 평면으로 도는 것(손 고정), 몸 크게 흔들림, 내려찍기 전 긴 멈춤, 임팩트 뒤 튀어오름, 책이 반쯤 남는 것",
+      "align_x": "both_feet",
+      "confirmed": "2026-10-16",
+      "status": "정의 확정, 제작 전",
+      "beats": {
+        "gap_counts": "회전·내려찍기 0, 들어 올림 1, 정착 2 (회전 6장 재사용으로 3바퀴 — 처리 전 장면 목록으로 이어 붙임)",
+        "fps": 30,
+        "figure_scale": 0.72
+      }
+    },
+    "Skill3": {
+      "direction": "지팡이로 전방을 가르킨다.",
+      "received": "2026-10-16",
+      "hands": "한 손(지팡이 든 왼손)으로 가리킨다. 책은 오른손에 그대로 (사용자 2026-10-16)",
+      "definition": "준비 → 예비(지팡이를 몸 쪽으로 살짝) → 뻗기 2(왼팔로 앞으로, 몸통 약간 앞, 앞발에 체중) → 정점 2(지팡이 거의 수평, 장식이 오른쪽 앞, 결연한 표정, 멈춤 0.25초) → 복귀 2. 8포즈, 24fps 약 0.9초",
+      "forbid": "몸 전체가 앞으로 미끄러짐, 지팡이 끝 흔들림, 책 든 오른손이 따라 움직임, 정면으로 돌기",
+      "align_x": "both_feet",
+      "confirmed": "2026-10-16",
+      "status": "정의 확정, 제작 전",
+      "beats": {
+        "gap_counts": "1 0 1 0 2 2 2",
+        "hold": "4:0.25",
+        "fps": 24
+      }
+    },
+    "Hit": {
+      "direction": "아파하지만 견디는 애니메이션",
+      "received": "2026-10-16",
+      "definition": "충격 1(머리 뒤로, 눈 질끈, 이 악묾) → 반동 2(뒤로 밀리고 무릎 굽음, 머리카락·코트가 늦게 휨) → 버팀 3(지팡이를 바닥에 짚고 기대어 버팀, 오른손으로 상처, 가장 김) → 회복 2(고개부터, 결연한 눈빛). 8포즈, gap 0 1 1 2 2 2 2, 30fps 약 0.6초",
+      "forbid": "주저앉기·무릎 꿇기, 무표정·blush, 충격 없이 서서히 기울기, 지팡이가 바닥에서 떨어지거나 순간이동, 발 미끄러짐",
+      "align_x": "both_feet",
+      "confirmed": "2026-10-16",
+      "status": "정의 확정, 제작 전",
+      "beats": {
+        "gap_counts": "0 1 1 2 2 2 2",
+        "fps": 30
+      }
+    },
+    "Dead": {
+      "direction": "지팡이를 부여잡고 미끄러지는 애니메이션",
+      "received": "2026-10-16",
+      "definition": "피격 반동 1 → 비틀 1 → 부여잡음 2(지팡이를 짚고 두 손으로, 책 떨어뜨림) → 미끄러짐 3(무릎이 꺾이며 두 손이 지팡이를 따라 내려감, 지팡이 끝 고정·거의 수직) → 무릎 꿇음 1(지팡이에 이마) → 앞으로 쓰러짐 2(지팡이와 함께) → 정착 2(멈춤 0.4초). 12포즈, 24fps 약 1.4초",
+      "forbid": "반동 없이 주저앉기, 지팡이가 몸보다 먼저 기울기, 통나무처럼 넘어감, 손이 지팡이에서 떨어졌다 붙었다",
+      "align_x": "anchor",
+      "confirmed": "2026-10-16",
+      "status": "정의 확정, 제작 전",
+      "beats": {
+        "gap_counts": "0 1 1 1 1 1 1 0 1 1 2",
+        "hold": "11:0.4",
+        "fps": 24
+      }
+    }
+  },
+  "hint_note": "init 때 tall로 정했으나 4회 생성에서 tall이 안 나와 Knight 비율에 가장 가까운 3차를 사용자가 선택(2026-10-16). 성숙함은 174cm 키(크기)로",
+  "idle": {
+    "method": "procedural",
+    "source": "SpriteRegen/Priest_Idle/try1_flip/result.png",
+    "base": 0,
+    "blink": 2,
+    "mode": "kneebody",
+    "breath_amp": 0.004,
+    "head_lag": 2,
+    "face": "right",
+    "blink_at": [
+      15,
+      16
+    ],
+    "moves": {
+      "knees": "굽힘 — 엉덩이 키의 2% 하강, 무릎 0.55배 하강하며 앞으로",
+      "body": "경계 없이 발목→어깨로 서서히 들림(키의 0.4%) + 가슴 높이 좌우 1.2% 부풂",
+      "head": "어깨를 2프레임 늦게 따라감",
+      "eyes": "15~16번 깜빡임(AI 감은 눈 합성)",
+      "staff": "땅에 고정 — 몸 앞, 손 뒤 층",
+      "hand": "지팡이를 쥔 채 몸과 함께",
+      "feet": "고정"
+    },
+    "note": "사용자 확정 2026-10-16 (H). 거쳐 온 것: chest(가슴 띠만 → \"가슴만 사진으로 잘라 움직이는 것 같다\") → body·AI 8장·얼굴 고정 → \"무릎까지 움직여야\" → kneebody(F) → \"지팡이가 같이 오려진다\" → 지팡이 층 고정(H). 층은 split_staff(좌표 손으로, Codex 편집은 용량 부족으로 실패)",
+    "knee_amp": 0.02,
+    "swell": 0.012,
+    "body_image": "SpriteRegen/Priest_Idle/staff_split/body.png",
+    "static_layer": "SpriteRegen/Priest_Idle/staff_split/staff.png",
+    "hand_layer": "SpriteRegen/Priest_Idle/staff_split/hand.png"
+  },
+  "ref_height": 552.4,
+  "ref_method": "standing",
+  "ref_height_note": "Archer(Archer_Idle_v8) 정수리~발 484.3px × 174/160cm 기준 | ref_height 552.4는 다리를 편 키(파이프라인 잣대), set-height 목표 526.7은 정수리(머리카락 제외)~발바닥 — 잰 것이 달라 숫자가 다르다",
+  "reference": "Priest_Idle_v2",
+  "ref_chin_to_sole": 404,
+  "actions_note": "정의 전문(조사 근거 포함)은 sprite-animation references/motion.md 3절 \"Priest\". 공통: 3/4 오른쪽(Idle_v2 0번과 같은 방향), 지팡이 왼손·책 오른손, 지팡이는 앞 프레임에서 조금씩만. beats는 처리 단계 시작값(안팎) — 결과를 보고 조정한다. figure_scale은 spec에 넣는다(머리 위로 드는 동작의 위 여백)"
+}
