@@ -118,8 +118,8 @@
   - Skill2 "부정확, 원반으로": 조사 결과 smear / blur disc. 사용자 결정: 손은 원반 중심 고정, 원반은 코드.
   - Skill3 "지팡이 부자연": 가는 지팡이 회전 구간 RIFE 보간으로 지팡이가 녹음 + 한 장에서 지팡이가 아래로 꺾였다 올라옴.
   - Dead "같은 프레임 반복": 첫 장이 이미 무릎을 꿇었는데 둘째 장이 다시 높은 자세에서 시작 → 높이가 계속 내려가는 장만 다시 이음.
-- 임시 도구(이 PC `SpriteRegen/_tools/`, 생성 데이터와 함께만 의미 있음): `pose_edit.py`(Idle 편집 생성), `disc.py`(원반), `build_skill2.py`(Skill2 조립),
-  `diag.py`(구슬 크기·몸통 x·이웃 차이), `vs_idle.py`(Idle 0번과 나란히), `priest_v3.ps1`(적용+녹화). 스킬 스크립트로 옮길지는 사용자 판단.
+- 도구: 처음엔 scratchpad·`SpriteRegen/_tools/`에만 있었다 → 2026-10-19 스킬 스크립트로 옮김(`pose_edit.py`, `smear.py`, `source_build.py`, `record_compare.py`, `sheet_check.py frames/side-by-side/portable`). 확정 입력은 `Priest/source~/`(동작별 `process.json`). SKILL.md "PC 간 공유".
+- 아직 공유 안 된 것: Priest `idle.source`(AI 시트 반전본)·`body_image`·`static_layer`·`hand_layer`, Knight `idle.source` — SSAFY PC의 SpriteRegen/에만 있다. 그 PC에서 `{캐릭터}/source~/idle/`로 옮겨 커밋하고 character.json 경로를 바꾼다(`sheet_check.py portable`로 확인).
 - **v3 사용자 피드백 (2026-10-19, 아직 반영 안 함)**:
   - 전반: **누끼(배경 제거)가 덜 따진 부분**이 있다. Idle 편집본은 흰 배경 결과라 `splice_frames`/`disc.cut_white`의 흰색 제거가 가장자리·틈에 흰 테를 남긴 것으로 추정 — 확인 필요.
   - Skill1: **너무 높이 든다** — 팔이 기괴하게 늘어난 것처럼 보인다(정점 장 `peak`·`raise3`).

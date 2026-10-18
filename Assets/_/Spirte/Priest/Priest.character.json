@@ -14,7 +14,7 @@
       "blue potion vials hanging from the belts",
       "white medical book with a blue cross held in her RIGHT hand"
     ],
-    "props_reference": "SpriteRegen/Priest_Idle/try1_flip/result.png",
+    "props_reference": "Assets/_/Spirte/Priest/source~/body.png",
     "note": "deform.py init — 사용자 입력. 2026-10-16: 3/4 모습이 왼쪽을 향해 생성되어 좌우 반전(사용자 선택) → 지팡이 왼손·책 오른손으로 바뀜"
   },
   "align_x": {
@@ -146,12 +146,14 @@
     "swell": 0.012,
     "body_image": "SpriteRegen/Priest_Idle/staff_split/body.png",
     "static_layer": "SpriteRegen/Priest_Idle/staff_split/staff.png",
-    "hand_layer": "SpriteRegen/Priest_Idle/staff_split/hand.png"
+    "hand_layer": "SpriteRegen/Priest_Idle/staff_split/hand.png",
+    "body": "Assets/_/Spirte/Priest/source~/body.png",
+    "body_note": "2026-10-19 PC 간 공유: 몸 기준 한 장(Idle_v2 0번, generate_action·pose_edit 기본). idle.source(AI 시트 반전본)·body_image·static_layer·hand_layer는 SSAFY PC의 SpriteRegen/에만 있다 — 그 PC에서 source~/idle/로 옮겨 커밋하고 경로를 바꾼다"
   },
   "ref_height": 552.4,
   "ref_method": "standing",
   "ref_height_note": "Archer(Archer_Idle_v8) 정수리~발 484.3px × 174/160cm 기준 | ref_height 552.4는 다리를 편 키(파이프라인 잣대), set-height 목표 526.7은 정수리(머리카락 제외)~발바닥 — 잰 것이 달라 숫자가 다르다",
   "reference": "Priest_Idle_v2",
   "ref_chin_to_sole": 404,
-  "actions_note": "정의 전문(조사 근거 포함)은 sprite-animation references/motion.md 3절 \"Priest\". 공통: 3/4 오른쪽(Idle_v2 0번과 같은 방향), 지팡이 왼손·책 오른손, 지팡이는 앞 프레임에서 조금씩만. beats는 처리 단계 시작값(안팎) — 결과를 보고 조정한다. figure_scale은 spec에 넣는다(머리 위로 드는 동작의 위 여백) | 2026-10-18 v1 생성은 몸 기준으로 Priest_Idle_v2 0번(generate_action --body SpriteRegen/_body/priest_idle_v2_f0.png)을 씀 — idle.source(반전본)가 다른 PC에만 있어서. spec: SpriteRegen/_specs/priest_*.json"
+  "actions_note": "정의 전문(조사 근거 포함)은 sprite-animation references/motion.md 3절 \"Priest\". 공통: 3/4 오른쪽(Idle_v2 0번과 같은 방향), 지팡이 왼손·책 오른손, 지팡이는 앞 프레임에서 조금씩만. beats는 처리 단계 시작값(안팎) — 결과를 보고 조정한다. figure_scale은 spec에 넣는다(머리 위로 드는 동작의 위 여백) | 2026-10-18 v1 생성은 몸 기준으로 Priest_Idle_v2 0번(idle.body)을 씀 — idle.source(반전본)가 다른 PC에만 있어서. spec: Assets/_/Spirte/Priest/source~/specs/, 처리 입력·옵션: Assets/_/Spirte/Priest/source~/{액션}/process.json"
 }

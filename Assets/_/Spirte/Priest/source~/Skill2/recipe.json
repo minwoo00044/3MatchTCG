@@ -1,0 +1,48 @@
+{
+ "inputs": "Assets/_/Spirte/Priest/source~/Skill2",
+ "out": "SpriteRegen/Priest_Skill2D",
+ "disc": {
+  "cx": 530,
+  "cy": 488,
+  "rx": 280,
+  "ry": 80,
+  "phases": 3
+ },
+ "frames": [
+  {
+   "copy": "lift1.png"
+  },
+  {
+   "copy": "lift2.png"
+  },
+  {
+   "disc": "spin.png",
+   "arc": 180,
+   "alpha": 0.85
+  },
+  {
+   "disc": "spin.png",
+   "loop": 3
+  },
+  {
+   "disc": "raise.png",
+   "arc": 180,
+   "alpha": 0.45,
+   "cy": 470,
+   "phase": 1
+  },
+  {
+   "copy": "raise.png"
+  },
+  {
+   "ghost": "slam.png",
+   "behind": "raise.png"
+  },
+  {
+   "burst": "impact.png"
+  },
+  {
+   "copy": "settle.png"
+  }
+ ]
+}

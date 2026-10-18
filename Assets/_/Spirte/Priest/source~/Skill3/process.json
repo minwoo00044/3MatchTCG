@@ -1,0 +1,37 @@
+{
+ "applied": "Priest_Skill3_v3",
+ "splice": [
+  "part1.png:2x2:1,2,3",
+  "part2.png:2x2:1,2,3,4"
+ ],
+ "process": [
+  "--cols",
+  "7",
+  "--rows",
+  "1",
+  "--frames",
+  "7",
+  "--align_x",
+  "both_feet",
+  "--gap_counts",
+  "0",
+  "0",
+  "0",
+  "1",
+  "0",
+  "0",
+  "--durations",
+  "0.10",
+  "0.10",
+  "0.08",
+  "0.12",
+  "0.05",
+  "0.24",
+  "0.10",
+  "0.12",
+  "--fps",
+  "8",
+  "--loop",
+  "false"
+ ]
+}

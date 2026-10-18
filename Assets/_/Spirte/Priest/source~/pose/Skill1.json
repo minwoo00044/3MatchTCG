@@ -1,0 +1,35 @@
+{
+ "canvas": [
+  1024,
+  1536
+ ],
+ "figure_h": 900,
+ "foot_margin": 60,
+ "note": "Priest Skill1 v3 (2026-10-19). 몸 기준 = source~/body.png",
+ "poses": {
+  "anticip": {
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image).",
+   "pose": "ANTICIPATION: both knees bend very slightly, she takes a breath, eyes half closed; her LEFT hand (holding the staff) lowers a little so the staff dips slightly and comes a bit closer to her body; the book stays in the right hand at her side."
+  },
+  "raise1": {
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image).",
+   "pose": "RAISING 1: her eyes are CLOSED. The LEFT hand lifts the staff off the ground: the left hand is now at chest height and the staff is still vertical (its foot about knee height). The RIGHT hand holds the book flat against her chest."
+  },
+  "raise2": {
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image).",
+   "pose": "RAISING 2: eyes CLOSED, chin slightly up. The LEFT hand is raised to the height of her face, the staff vertical with its foot at about hip height. The RIGHT hand holds the book against her chest."
+  },
+  "peak": {
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image).",
+   "pose": "PEAK: eyes CLOSED, serene. The LEFT ARM is fully straight and points straight UP; the left hand is clearly ABOVE the top of her nurse cap; the staff is held VERTICALLY so its foot is at about shoulder height and the orb is high above her head, glowing softly. The RIGHT hand holds the book against her chest."
+  },
+  "lower": {
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image).",
+   "pose": "LOWERING: eyes opening. The left arm bends and lowers; the left hand is at the height of her face, the staff vertical with its foot at about hip height. The book is still against her chest with the right hand."
+  },
+  "raise3": {
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image).",
+   "pose": "RAISING 3: eyes CLOSED, chin up. The LEFT arm is raised and almost straight; the left hand is just ABOVE the top of her nurse cap; the staff is vertical with its foot at about chest height and the orb above her head. The RIGHT hand holds the book against her chest."
+  }
+ }
+}

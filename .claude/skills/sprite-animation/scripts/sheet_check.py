@@ -810,6 +810,111 @@ def cmd_masks(args):
     print(f"RESULT {json.dumps({'ok': True, 'image': slash(path)}, ensure_ascii=False)}")
 
 
+def atlas_cells(path):
+    """처리된 시트(아틀라스)의 칸들과 매니페스트."""
+    with open(os.path.splitext(path)[0] + ".json", encoding="utf-8") as fp:
+        m = json.load(fp)
+    at = Image.open(path).convert("RGBA")
+    cw, ch, c = m["cellWidth"], m["cellHeight"], m["cols"]
+    return [at.crop(((i % c) * cw, (i // c) * ch, (i % c + 1) * cw, (i // c + 1) * ch)) for i in range(m["frames"])], m
+
+
+def blue_blob_size(a):
+    """가장 큰 '선명한 파랑' 덩어리의 지름(px) — 손에 든 소품의 파란 구슬처럼 크기가 변하면 안 되는 부분을 재는 데 쓴다(Priest 지팡이)."""
+    r, g, b, al = (a[..., k].astype(int) for k in range(4))
+    mask = (al > 200) & (b > 150) & (b - r > 90) & (b - g > 40)
+    seen = np.zeros_like(mask)
+    best = (0, 0)
+    h, w = mask.shape
+    for y0, x0 in zip(*np.where(mask)):
+        if seen[y0, x0]:
+            continue
+        stack, pts = [(y0, x0)], []
+        seen[y0, x0] = True
+        while stack:
+            y, x = stack.pop()
+            pts.append((y, x))
+            for yy, xx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+                if 0 <= yy < h and 0 <= xx < w and mask[yy, xx] and not seen[yy, xx]:
+                    seen[yy, xx] = True
+                    stack.append((yy, xx))
+        if len(pts) > best[0]:
+            ys, xs = zip(*pts)
+            best = (len(pts), max(max(xs) - min(xs), max(ys) - min(ys)) + 1)
+    return best[1]
+
+
+def cmd_frames(args):
+    """
+    처리된 시트의 프레임별 진단: 파란 소품 크기(prop), 몸통 중심 x(앞뒤 이동), 꼭대기 높이, 이웃 프레임 실루엣 차이(같은 장 반복·끊김).
+    Priest v2 사용자 지적(2026-10-19)의 원인을 좁힐 때 썼다: Skill1 소품 크기·앞뒤 이동, Dead 몸통 x 왕복(같은 동작 반복).
+    몸통 x는 팔·책이 몸통 띠를 지나가면 같이 끌린다 — 이상하면 그림으로 확인한다.
+    """
+    cells, m = atlas_cells(args.sheet)
+    keys = set(m.get("keyFrames") or [])
+    durs = m.get("durations")
+    print(f"{m['name']} frames={m['frames']} fps={m['fps']} (*=원본 프레임)")
+    prev = None
+    for i, cell in enumerate(cells):
+        a = np.asarray(cell)
+        al = a[..., 3] > 128
+        ys, xs = np.where(al)
+        top, h = ys.min(), ys.max() - ys.min()
+        band = (ys > top + 0.45 * h) & (ys < top + 0.70 * h)
+        cx = xs[band].mean() - a.shape[1] / 2
+        diff = (al ^ prev).sum() / max(1, (al | prev).sum()) if prev is not None else 0.0
+        prev = al
+        dur = f" {durs[i]:.3f}s" if durs else ""
+        print(f"  {i:2d}{'*' if i in keys else ' '} prop={blue_blob_size(a):3d} torso_x={cx:+6.1f} top={top:4d} diff={diff:.3f}{dur}")
+
+
+def cmd_side_by_side(args):
+    """
+    처리된 시트의 프레임들을 기준 시트(Idle) 0번과 같은 접지선·같은 px 배율로 나란히 놓는다 (F 6: 시점·크기 확인).
+    초록 = 기준 0번 꼭대기, 파랑 = 칸의 pivot, 빨강 = 접지선. 새 장끼리만 비교하면 다 같이 틀어진 것을 놓친다.
+    """
+    character = character_of(args.sheet)
+    ref = args.reference or os.path.join(C.SHEET_ROOT, character, load_config(character)["reference"] + ".png")
+    ref_cells, rm = atlas_cells(ref)
+    cells, m = atlas_cells(args.sheet)
+    picks = args.frames or list(range(0, len(cells), max(1, len(cells) // 8)))
+    tiles = [(ref_cells[0], rm, "ref0")] + [(cells[i], m, str(i)) for i in picks if i < len(cells)]
+    hh = max(t.height for t, _, _ in tiles)
+    canvas = Image.new("RGBA", (sum(t.width for t, _, _ in tiles), hh + 20), (235, 235, 235, 255))
+    d = ImageDraw.Draw(canvas)
+    x = 0
+    for t, mm, label in tiles:
+        canvas.alpha_composite(t, (x, round(hh - t.height * (1 - mm["pivotY"]))))
+        d.line([(x + round(t.width * mm["pivotX"]), 0), (x + round(t.width * mm["pivotX"]), hh)], fill=(60, 120, 255, 255))
+        d.text((x + 4, hh + 4), label, fill=(0, 0, 0, 255))
+        x += t.width
+    d.line([(0, hh - 1), (canvas.width, hh - 1)], fill=(255, 0, 0, 255))
+    top = np.where(np.asarray(ref_cells[0])[..., 3] > 128)[0].min() + hh - round(ref_cells[0].height * (1 - rm["pivotY"]))
+    d.line([(0, top), (canvas.width, top)], fill=(0, 170, 0, 255))
+    path = args.out or os.path.join(C.PREVIEW_DIR, f"_side_{m['name']}.png")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    canvas.convert("RGB").save(path)
+    print(f"RESULT {json.dumps({'ok': True, 'image': slash(path)}, ensure_ascii=False)}")
+
+
+def cmd_portable(args):
+    """
+    character.json이 다른 PC에 없을 파일(git 무시 SpriteRegen/, 절대 경로, 없는 파일)을 가리키는지. 종료 코드 0 없음 / 4 있음.
+    2026-10-19 사용자 교훈: "PC 간 도구 공유가 안 된다" — 확정 입력은 {캐릭터}/source~/ 로 옮겨 커밋한다.
+    """
+    chars = args.character or sorted(n for n in os.listdir(C.SHEET_ROOT)
+                                     if os.path.exists(os.path.join(C.SHEET_ROOT, n, f"{n}.character.json")))
+    bad = 0
+    for ch in chars:
+        refs = C.P.local_only_refs(ch)
+        bad += len(refs)
+        print(f"{ch}: {'OK' if not refs else f'{len(refs)}건'}")
+        for key, p, why in refs:
+            print(f"  {key} = {p} — {why}")
+    print(f"RESULT {json.dumps({'ok': bad == 0, 'count': bad}, ensure_ascii=False)}")
+    sys.exit(0 if bad == 0 else 4)
+
+
 def main():
     C.utf8_stdout()
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -865,6 +970,18 @@ def main():
     j.add_argument("--limit", type=float, default=JITTER_LIMIT, help="튐 기준 (키 대비 %%)")
     j.add_argument("--loop", type=lambda s: s == "true", default=None, help="true/false. 생략하면 매니페스트")
 
+    f = sub.add_parser("frames")
+    f.add_argument("sheet", help="처리된 시트")
+
+    sb = sub.add_parser("side-by-side")
+    sb.add_argument("sheet", help="처리된 시트")
+    sb.add_argument("--frames", type=int, nargs="*", help="보일 프레임 번호 (기본: 8장 정도 고르게)")
+    sb.add_argument("--reference", help="기준 시트 (기본: character.json reference)")
+    sb.add_argument("--out")
+
+    po = sub.add_parser("portable")
+    po.add_argument("--character", nargs="*", help="기본: 설정이 있는 캐릭터 전부")
+
     for sp in (a, v, m, j):
         sp.add_argument("--palette", help="팔레트 JSON 경로 (기본: character.json의 palette → Archer 기본값)")
 
@@ -872,7 +989,8 @@ def main():
     if args.cmd == "verify":
         THRESHOLDS.update(head=args.head, hair=args.hair, boot=args.boot)
     {"set-reference": cmd_set_reference, "audit": cmd_audit, "verify": cmd_verify, "masks": cmd_masks,
-     "jitter": cmd_jitter, "set-height": cmd_set_height, "coherence": cmd_coherence, "proportions": cmd_proportions}[args.cmd](args)
+     "jitter": cmd_jitter, "set-height": cmd_set_height, "coherence": cmd_coherence, "proportions": cmd_proportions,
+     "frames": cmd_frames, "side-by-side": cmd_side_by_side, "portable": cmd_portable}[args.cmd](args)
 
 
 if __name__ == "__main__":

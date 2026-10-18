@@ -87,6 +87,8 @@ def resolve_original(character, action):
     version, manifest = min(found)
     with open(manifest, encoding="utf-8") as fp:
         src = json.load(fp).get("source")
+    if src and not os.path.isabs(src):
+        src = os.path.join(ROOT, src)  # 매니페스트는 프로젝트 루트 기준 상대 경로로 적는다(PC 간 공유)
     if not src or not os.path.exists(src):
         return None, f"{character}_{action}_v{version}로 넣은 원본 파일이 없다 ({src})"
     return src, None

@@ -1,0 +1,77 @@
+{
+  "reference_face": {
+    "eye_to_chin_over_L": 0.0669,
+    "note": "기준 캐릭터 Knight 9차 3/4의 파란 눈동자 중심~턱 / 턱~발바닥. (v2까지는 Archer 0.0742)"
+  },
+  "source": "Knight_turnaround",
+  "note": "v3 (2026-10-14): Knight 9차 턴어라운드(hint tall, 사용자가 '옳게 된 비율'로 확정)에서 옷·머리카락을 벗긴 편집(Mannequin_v3 try1). 원본 좌표로 겹쳐 두개골·턱·가랑이·다리·발이 Knight와 일치 확인. m1_reference_pose.png = v3의 3/4 모습. v2(Archer 체형)는 SpriteRegen/Mannequin/v2_backup/",
+  "views": [
+    "front",
+    "three_quarter",
+    "side",
+    "back"
+  ],
+  "m1": {
+    "chin": 0.2574,
+    "shoulder": 0.2825,
+    "crotch": 0.6333,
+    "head_w": 0.2394,
+    "shoulder_w": 0.176,
+    "foot_w": 0.2909
+  },
+  "turnaround": {
+    "front": {
+      "chin": 0.257,
+      "shoulder": 0.2821,
+      "crotch": 0.6157,
+      "head_w": 0.2343,
+      "shoulder_w": 0.1973,
+      "foot_w": 0.2319
+    },
+    "three_quarter": {
+      "chin": 0.2574,
+      "shoulder": 0.2825,
+      "crotch": 0.6333,
+      "head_w": 0.2394,
+      "shoulder_w": 0.176,
+      "foot_w": 0.2909
+    },
+    "side": {
+      "chin": 0.2606,
+      "shoulder": 0.3321,
+      "crotch": null,
+      "head_w": 0.2461,
+      "shoulder_w": 0.1467,
+      "foot_w": 0.1624
+    },
+    "back": {
+      "chin": 0.2508,
+      "shoulder": 0.2822,
+      "crotch": 0.6222,
+      "head_w": 0.2351,
+      "shoulder_w": 0.1966,
+      "foot_w": 0.24
+    }
+  },
+  "checks": {
+    "front": {
+      "chin": 0.05,
+      "crotch": 0.05,
+      "shoulder": 0.1
+    },
+    "three_quarter": {
+      "chin": 0.05
+    },
+    "side": {},
+    "back": {
+      "chin": 0.05,
+      "crotch": 0.05,
+      "shoulder": 0.1
+    }
+  },
+  "reference": {
+    "name": "Knight_t9",
+    "turnaround": "Assets/_/Spirte/Knight/design/Knight_turnaround.png",
+    "view": 1
+  }
+}

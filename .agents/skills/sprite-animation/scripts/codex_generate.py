@@ -20,19 +20,16 @@ Codex(codex exec + 이미지 생성)로 스프라이트 시트를 기준 체형�
 오래 걸리므로(수 분) 백그라운드로 돌리고 끝나면 sheet_check.py verify로 검증한다.
 """
 import argparse
-import glob
 import json
 import os
-import re
 import shutil
-import subprocess
 import sys
 
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(__file__))
+import codex_image as CI  # noqa: E402
 import common as C  # noqa: E402
-import codex_usage  # noqa: E402
 import sheet_check as SC  # noqa: E402
 
 TEMPLATE = os.path.join(os.path.dirname(__file__), "..", "assets", "generate_prompt.md")
@@ -77,8 +74,10 @@ def main():
     ap.add_argument("--previous", action="append", default=[], help="이전 시도 이미지")
     ap.add_argument("--previous-note", action="append", default=[], help="--previous 순서대로 무엇이 맞고 틀렸는지 (영어)")
     ap.add_argument("--original")
+    ap.add_argument("--props-reference", help="필수 디자인 요소가 보이는 시트 (기본: character.json design.props_reference)")
     ap.add_argument("--limit", type=float, default=85)
     ap.add_argument("--timeout", type=int, default=900)
+    ap.add_argument("--no-head-ratio", action="store_true", help="머리 비율 줄을 뺀다 (기준 모델과 시트의 자세가 다를 때, 편집 방식)")
     ap.add_argument("--dry-run", action="store_true", help="dryrun/ 폴더에 프롬프트만 만들고 Codex는 호출하지 않는다")
     args = ap.parse_args()
 
@@ -88,25 +87,20 @@ def main():
         done(False, 1, error=f"기준 시트가 없다: {args.reference}")
 
     if not args.dry_run:
-        usage, err = codex_usage.read_usage()
-        if usage is None:
-            done(False, 1, error=f"Codex 사용량 조회 실패: {err}")
-        if usage["primary"] >= args.limit:
-            done(False, 3, error=f"Codex 5시간 사용량 {usage['primary']}% ≥ {args.limit:g}% — 생성 중단", usage=usage)
+        try:
+            CI.check_usage(args.limit)
+        except CI.CodexError as e:
+            done(False, 3 if getattr(e, "over_limit", False) else 1, error=str(e), usage=getattr(e, "usage", None))
 
     character = SC.character_of(args.reference)
     original = resolve_original(character, args.action, args.original)
     cols, rows, frames = grid_of(original)
 
-    base = os.path.join(C.REGEN_ROOT, f"{character}_{args.action}")
+    job = f"{character}_{args.action}"
     if args.dry_run:
-        n = None
-        work = os.path.join(base, "dryrun")
-        shutil.rmtree(work, ignore_errors=True)
+        n, work = None, CI.dryrun_dir(job)
     else:
-        n = len([d for d in glob.glob(os.path.join(base, "try*")) if os.path.isdir(d)]) + 1
-        work = os.path.join(base, f"try{n}")
-    os.makedirs(work)
+        work, n = CI.new_try_dir(job)
 
     SC.check_reference(args.reference)
     palette = SC.load_palette(character, None)
@@ -119,46 +113,52 @@ def main():
 
     images = ["character_reference.png", "original.png"]
     extra = []
-    for i, prev in enumerate(args.previous, start=3):
+    design = SC.load_config(character).get("design", {})
+    required = design.get("required", [])
+    props_sheet = args.props_reference
+    if not props_sheet and design.get("props_reference"):
+        props_sheet = os.path.join(C.SHEET_ROOT, character, design["props_reference"] + ".png")
+    if required and props_sheet:
+        if not os.path.exists(props_sheet):
+            done(False, 1, error=f"소품 참고 시트가 없다: {props_sheet}")
+        pf, _ = C.load_frames(props_sheet)
+        pimg = C.crop_frame(pf[0]["image"])
+        pbg = Image.new("RGBA", pimg.size, (255, 255, 255, 255))
+        pbg.alpha_composite(pimg)
+        pbg.convert("RGB").save(os.path.join(work, "props_reference.png"))
+        images.append("props_reference.png")
+        extra.append(f"{len(images)}. props_reference.png — shows the required design elements ({'; '.join(required)}). "
+                     f"Copy those elements exactly from it; ignore its pose and its body proportions.")
+    first_prev = len(images) + 1
+    for i, prev in enumerate(args.previous, start=first_prev):
         name = f"previous_{i}.png"
         shutil.copy(prev, os.path.join(work, name))
         images.append(name)
-        note = args.previous_note[i - 3] if args.previous_note else "an earlier redraw"
+        note = args.previous_note[i - first_prev] if args.previous_note else "an earlier redraw"
         extra.append(f"{i}. {name} — {note}")
 
     with open(TEMPLATE, encoding="utf-8") as fp:
         prompt = fp.read()
+    if args.no_head_ratio:
+        # 기준 모델과 자세가 다르면(A포즈 모델 → Idle 시트) 머리 비율 지표가 달라져 틀린 지시가 된다(A포즈 38%, Idle 34%)
+        prompt = "\n".join(l for l in prompt.splitlines() if "{HEAD_PCT}" not in l) + "\n"
     prompt = (prompt.replace("{GRID}", f"{cols}x{rows}").replace("{COLS}", str(cols)).replace("{ROWS}", str(rows))
               .replace("{FRAMES}", str(frames)).replace("{ACTION}", args.action_desc)
               .replace("{HEAD_PCT}", str(round(ref_f0["head"] * 100)))
+              .replace("{REQUIRED}", ("- Required design elements — must be visible in every frame, even though #1 does not have them: "
+                                      + "; ".join(required) + "." if required else ""))
               .replace("{EXTRA_REFS}", "\n".join(extra) + ("\n" if extra else ""))
               .replace("{FIXES}", "\n".join(f"- {f}" for f in args.fix) or "- (none measured; match #1)"))
-    with open(os.path.join(work, "prompt.md"), "w", encoding="utf-8") as fp:
-        fp.write(prompt)
-
     info = {"try": n, "workdir": slash(work), "original": slash(original), "reference": slash(args.reference)}
     if args.dry_run:
+        with open(os.path.join(work, "prompt.md"), "w", encoding="utf-8") as fp:
+            fp.write(prompt)
         done(True, 0, dry_run=True, prompt=slash(os.path.join(work, "prompt.md")), **info)
 
-    cmd = ["codex", "exec", "--skip-git-repo-check", "-s", "workspace-write", "-C", work]
-    for img in images:
-        cmd += ["-i", img]
-    cmd += ["-"]
-    with open(os.path.join(work, "log.txt"), "w", encoding="utf-8") as log:
-        try:
-            subprocess.run(cmd, cwd=work, input=prompt, text=True, encoding="utf-8",
-                           stdout=log, stderr=subprocess.STDOUT, timeout=args.timeout)
-        except subprocess.TimeoutExpired:
-            done(False, 1, error=f"{args.timeout}초 안에 끝나지 않았다", **info)
-
-    produced = os.path.join(work, "out", "result.png")
-    if not os.path.exists(produced):
-        pngs = glob.glob(os.path.join(work, "out", "*.png"))
-        produced = pngs[0] if pngs else None
-    if not produced:
-        done(False, 1, error="Codex가 이미지를 저장하지 않았다 (log.txt 확인)", **info)
-    result = os.path.join(work, "result.png")
-    shutil.copy(produced, result)
+    try:
+        result = CI.run(work, prompt, images, args.timeout)
+    except CI.CodexError as e:
+        done(False, 1, error=str(e), **info)
     im = Image.open(result)
     done(True, 0, image=slash(result), size=list(im.size), mode=im.mode, **info)
 

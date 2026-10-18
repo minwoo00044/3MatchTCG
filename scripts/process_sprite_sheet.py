@@ -804,6 +804,64 @@ def character_config(character):
         return json.load(fp)
 
 
+# 캐릭터 폴더 안의 확정 생성 입력 폴더. '~'로 끝나 Unity는 임포트하지 않고 git에는 들어간다.
+# 몸 기준 이미지·spec·현재 버전의 처리 입력처럼 다른 PC에서도 있어야 하는 것을 둔다(시도별 결과는 SpriteRegen/에 남긴다).
+SOURCE_DIR = "source~"
+PATH_SUFFIXES = (".png", ".jpg", ".json")
+
+
+def _path_values(node, key=""):
+    if isinstance(node, dict):
+        for k, v in node.items():
+            yield from _path_values(v, f"{key}.{k}" if key else k)
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from _path_values(v, f"{key}[{i}]")
+    elif (isinstance(node, str) and node.lower().endswith(PATH_SUFFIXES) and "/" in node.replace("\\", "/")
+          and " " not in node.strip()):  # 경로가 든 설명 문장(note)은 빼고 경로 값만
+        yield key, node
+
+
+def _git_ignored(path):
+    import subprocess
+    try:
+        return subprocess.run(["git", "check-ignore", "-q", path], cwd=PROJECT_ROOT).returncode == 0
+    except OSError:
+        return path.replace("\\", "/").startswith("SpriteRegen/")
+
+
+def local_only_refs(character):
+    """
+    {캐릭터}.character.json이 가리키는 파일 중 다른 PC에는 없을 것 — git 무시 폴더(SpriteRegen/), 다른 PC의 절대 경로, 이 PC에도 없는 파일.
+    2026-10-19: Priest의 idle.source(반전본)·지팡이 층이 다른 PC의 SpriteRegen/에만 있어 이 PC에서 대체품을 썼다(사용자: "PC 간 도구 공유가 안 된다").
+    확정 입력은 {캐릭터}/source~/ 로 옮겨 커밋한다. 반환: [(키, 경로, 이유)]
+    """
+    out = []
+    for key, p in _path_values(character_config(character)):
+        full = p if os.path.isabs(p) else os.path.join(PROJECT_ROOT, p)
+        if os.path.isabs(p):
+            out.append((key, p, "절대 경로(다른 PC)"))
+        elif not os.path.exists(full):
+            out.append((key, p, "이 PC에 없음"))
+        elif _git_ignored(p):
+            out.append((key, p, "git 무시 폴더 — 다른 PC에 없다"))
+    return out
+
+
+def portable_path(path):
+    """프로젝트 안 파일이면 루트 기준 상대 경로 — 절대 경로(C:/Users/SSAFY/...)는 다른 PC에서 못 찾는다."""
+    full = os.path.abspath(path)
+    rel = os.path.relpath(full, PROJECT_ROOT)
+    return (full if rel.startswith("..") else rel).replace("\\", "/")
+
+
+def warn_local_only(character):
+    refs = local_only_refs(character)
+    for key, p, why in refs:
+        print(f"  [경고] {character}.character.json {key} = {p} — {why}. 확정 입력이면 {SHEET_ROOT}/{character}/{SOURCE_DIR}/ 로 옮겨 커밋한다")
+    return refs
+
+
 def chin_to_sole(img):
     """얼굴 피부 아래 끝(턱) ~ 발바닥(px). 스킬 스크립트의 deform.face_chin을 쓴다. 못 찾으면 None."""
     sys.path.insert(0, os.path.join(PROJECT_ROOT, ".claude", "skills", "sprite-animation", "scripts"))
@@ -938,6 +996,7 @@ def run(args):
     if not m:
         raise PipelineError(f"이름 규칙 위반: '{args.name}' — {{캐릭터}}_{{Idle|Hit|Skill1~9|Dead}}_v{{N}} (예: Archer_Skill1_v1)")
     character, action, version = m.group(1), m.group(2), int(m.group(3))
+    warn_local_only(character)
     rule = action_rule(action)
     align_x = args.align_x or character_align_x(character, action) or rule["align_x"]
     align_y = args.align_y or rule["align_y"]
@@ -1044,8 +1103,8 @@ def run(args):
         "character": character,
         "action": action,
         "version": version,
-        "source": os.path.abspath(args.input).replace("\\", "/"),
-        "sources": [os.path.abspath(f).replace("\\", "/") for f in inputs] if len(inputs) > 1 else None,
+        "source": portable_path(args.input),
+        "sources": [portable_path(f) for f in inputs] if len(inputs) > 1 else None,
         "cols": out_cols,   # 출력 아틀라스 그리드 (Unity가 이걸로 자른다)
         "rows": out_rows,
         "frames": len(cells),

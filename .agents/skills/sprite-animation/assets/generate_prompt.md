@@ -14,6 +14,7 @@ Always:
 - Same outfit as #1 with the same hem length, same boots exactly the same size as #1 (not bigger, not smaller), same weapon.
 - Colors: keep the exact colors of #1 for hair, outfit, skin, boots and weapon (same hue, saturation and brightness). No color grading, no tinting, no glow, no rim light or lighting effects.
 - Same art style, line weight and shading as #1.
+{REQUIRED}
 
 Sheet layout (critical):
 - Landscape canvas, exactly {COLS} columns x {ROWS} rows, {FRAMES} frames, evenly spaced.

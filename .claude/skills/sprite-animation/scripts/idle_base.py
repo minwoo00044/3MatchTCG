@@ -110,6 +110,8 @@ def motion_reference(character):
         done(False, 1, error=f"{character}에 기준 시트(reference)가 없다 — 모션 참고로 쓸 수 없다")
     with open(os.path.join(C.SHEET_ROOT, character, ref + ".json"), encoding="utf-8") as fp:
         src = json.load(fp).get("source")
+    if src and not os.path.isabs(src):
+        src = os.path.join(C.ROOT, src)  # 매니페스트는 프로젝트 루트 기준 상대 경로
     if not src or not os.path.exists(src):
         done(False, 1, error=f"{ref}의 원본 시트가 없다 ({src}) — --motion-reference로 4x2 Idle 시트를 직접 준다")
     return src

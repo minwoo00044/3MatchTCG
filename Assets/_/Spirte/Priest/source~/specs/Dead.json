@@ -1,0 +1,26 @@
+{
+ "title": "a DEATH: hit hard, she clutches her staff with both hands and slides down it, kneels, then falls forward",
+ "physics": "Order of collapse: the knees give way first, then the hands slide down the vertical staff, then the torso sinks. The staff foot stays fixed and the staff stays almost vertical until she falls; the staff never tilts before the body. Not a stiff log fall.",
+ "poses": [
+  "Recoil: hit; head snaps back in pain, body jolts back; staff in the left hand, book in the right hand.",
+  "Stagger: she staggers, knees wobble, the staff is planted to catch herself.",
+  "Clutch 1: both hands grab the staff; the book drops from the right hand and falls; she leans on the staff.",
+  "Clutch 2: both hands holding the vertical staff, head bowed, the book lying on the ground.",
+  "Slide 1: the knees buckle, her body drops a little, both hands slide down the staff, which stays vertical and fixed at its foot.",
+  "Slide 2: knees bent deeply, body lower, hands lower on the staff.",
+  "Slide 3: almost kneeling, hands near the middle of the staff, head drooping.",
+  "Kneel: kneeling on both knees, forehead resting against the staff, eyes closed.",
+  "Fall 1: she tips forward, the staff tilting forward together with her.",
+  "Fall 2: falling forward toward the ground, the staff falling with her.",
+  "Down: lying face down on the ground toward the right, the staff lying beside her, eyes closed.",
+  "Settle: the same lying pose, completely still."
+ ],
+ "rules": [
+  "3/4 view facing RIGHT exactly like #1 in every frame. Body and face never turn toward the camera.",
+  "Keep every design element of #1 in every frame: white nurse cap with blue cross, very long wavy blonde hair with braids and blue ribbons, long white coat with blue lining and gold trim, brown belts with the medical bag and blue potion vials.",
+  "The caduceus staff is held in her LEFT hand at first, then by both hands; the hands never leave the staff and come back.",
+  "The staff foot stays at the same spot on the ground until the fall poses.",
+  "The book drops in the first clutch pose and then lies on the ground near her feet.",
+  "Facial expression: pain, then fading consciousness. No blush."
+ ]
+}

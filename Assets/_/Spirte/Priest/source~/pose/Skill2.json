@@ -1,0 +1,39 @@
+{
+ "canvas": [
+  1024,
+  1536
+ ],
+ "figure_h": 900,
+ "foot_margin": 60,
+ "note": "Priest Skill2 v3 (2026-10-19). spin = 지팡이 없이 손만 — 원반은 smear.py",
+ "poses": {
+  "lift1": {
+   "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
+   "pose": "LIFT 1: both hands grip the MIDDLE of the staff in front of her chest, the staff tilted almost horizontal (orb end on the right). Determined calm face, eyes open."
+  },
+  "lift2": {
+   "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
+   "pose": "LIFT 2: both arms raised, both hands grip the MIDDLE of the staff just above her head; the staff is HORIZONTAL, running left-right across the image with the orb on the right. Eyes open, focused."
+  },
+  "spin": {
+   "hands": "In this pose there is NO staff and NO book anywhere in the image.",
+   "pose": "SPIN BODY: both arms raised straight up, both hands close together at the center just above the top of her head, fists closed as if gripping the middle of an invisible stick that spins very fast. Draw NO staff, NO stick, NO effect (a spinning disc will be added later). Face focused, eyes open, mouth slightly open. Hair and coat are calm."
+  },
+  "raise": {
+   "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
+   "pose": "RAISE HIGH: both hands hold the staff high above her head, the staff VERTICAL with the orb on top, body stretching up slightly, ready to strike down. Determined face."
+  },
+  "slam": {
+   "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
+   "pose": "SLAM: the staff drives down fast in front of her; the staff is almost vertical, its foot just above the ground in front of her right foot, the orb at about her head height; both hands on the upper part of the staff; her torso leans forward slightly. Feet do not move."
+  },
+  "impact": {
+   "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
+   "pose": "IMPACT: the foot of the staff hits the ground just in front of her feet; the staff is vertical; both knees bent IN PLACE (feet stay exactly where they are, the stance does NOT widen), torso folded forward a little, both hands gripping the staff, strong determined face. No effect, no light burst."
+  },
+  "settle": {
+   "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
+   "pose": "SETTLE: she straightens up, the staff planted vertically on the ground just in front of her feet, both hands resting on it at chest height, calm face, eyes open."
+  }
+ }
+}

@@ -111,6 +111,31 @@ python $SK/deform.py lineup --character Knight SpriteRegen/Knight_Deform/tryN/re
 - 스크립트 경로 `$SK` = `.claude/skills/sprite-animation/scripts`. 프로젝트 루트에서 실행한다.
 - 커밋은 사용자가 요청할 때만. 작업 트리에 무관한 변경(씬, 테스트 프리팹 등)이 섞여 있으면 이번 작업 파일만 스테이징한다.
 
+### PC 간 공유 (2026-10-19 사용자 교훈: "PC 간 도구 공유가 안 된다")
+사용자는 여러 PC에서 작업한다. `SpriteRegen/`(git 무시)과 세션 scratchpad에만 있는 것은 다른 PC에 없다.
+- **도구는 처음부터 이 스킬의 `scripts/`에 만든다.** 결과물에 쓰인 스크립트를 scratchpad에 두지 않는다(Priest v3 때 원반·포즈 편집 도구가 그렇게 한 PC에만 남았다). 경로·캐릭터·포즈를 하드코딩하지 말고 인자·spec(JSON)으로 받는다.
+- **확정된 입력은 `Assets/_/Spirte/{캐릭터}/source~/`에 커밋한다.** `~`로 끝나 Unity는 임포트하지 않는다.
+  - `body.png`: 몸 기준 한 장(`character.json idle.body`) — `generate_action.py`·`pose_edit.py` 기본
+  - `specs/{액션}.json`(generate_action), `pose/{액션}.json`(pose_edit)
+  - `{액션}/`: 현재 적용 버전의 원본 프레임 + `process.json`(이은 순서·처리 옵션) + 필요하면 `recipe.json`(smear)
+  - 시도별 결과(`tryN/`)는 SpriteRegen/에 남긴다. 사용자가 고른 것만 source~로 옮긴다(`pose_edit.py accept`, 또는 복사).
+- **`character.json`이 git 무시 경로를 가리키지 않게 한다.** 파이프라인·generate_action·pose_edit가 경고하고, `sheet_check.py portable`이 전부 검사한다(있으면 종료 코드 4).
+  작업을 이어받을 때 먼저 돌린다. 걸리면 그 파일이 있는 PC에서 source~로 옮겨 커밋해 달라고 사용자에게 말한다.
+- 매니페스트(`{시트}.json`)의 `source`는 프로젝트 루트 기준 상대 경로로 적힌다(예전 시트는 다른 PC의 절대 경로일 수 있다).
+- 다시 만들기: `python $SK/source_build.py --character Priest --action Skill3 --name Priest_Skill3_v4` — process.json대로 조립·처리. `--list`로 목록.
+- `.agents/skills/`는 이 스킬의 사본이다. 직접 고치지 않는다 — 여기를 고친 뒤 `python scripts/sync_agent_skills.py`(차이만 보려면 `--check`)로 맞추고 같이 커밋한다.
+
+### 도구 목록 (이 갈래들 밖에서 추가된 것)
+| 스크립트 | 하는 일 |
+|---|---|
+| `pose_edit.py` | 몸 기준 한 장을 포즈마다 Codex로 편집 — 몸 크기·위치가 모든 장에서 같다. 몸은 그대로, 팔·소품·표정만 바뀌는 동작용(Priest Skill1·2) |
+| `smear.py` | 빠르게 도는 소품을 원반(smear)으로 그리고, 레시피(JSON)로 원본 프레임을 조립(잔상·빛 터짐 포함) |
+| `source_build.py` | `source~/{액션}/process.json`대로 현재 버전을 다시 만든다 |
+| `record_compare.py` | 적용(`--apply`) + 반복 재생 사본 + 기준 Idle과 나란히 녹화 (unity CLI) |
+| `sheet_check.py frames` | 처리된 시트의 프레임별 소품 크기·몸통 x·이웃 차이 (크기 변화·앞뒤 이동·같은 장 반복 원인 찾기) |
+| `sheet_check.py side-by-side` | 기준 시트 0번과 같은 접지선·배율로 나란히 (F 6) |
+| `sheet_check.py portable` | 위 공유 검사 |
+
 ## A. 적용
 
 ```bash
