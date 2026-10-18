@@ -3,6 +3,17 @@
 사용자가 꼽은 부족한 기능 세 가지와, 세션에서 합의 전 단계로 제안한 접근이다.
 **제안 순서: 3 → 2 → 1.** 시작 전에 아래 "정할 것"을 사용자에게 먼저 묻는다.
 
+## ⚠ 먼저 할 일 — SSAFY PC에서 (2026-10-19 기록)
+다른 PC의 `SpriteRegen/`(git 무시)에만 있는 확정 입력 5건이 남아 있다. 그 PC에서 pull한 뒤:
+1. `python .claude/skills/sprite-animation/scripts/sheet_check.py portable` — 아래 5건이 보인다
+   - Priest `idle.source` = `SpriteRegen/Priest_Idle/try1_flip/result.png` (Idle AI 시트 반전본, 몸 0번·눈 감은 2번)
+   - Priest `idle.body_image` / `static_layer` / `hand_layer` = `SpriteRegen/Priest_Idle/staff_split/{body,staff,hand}.png` (지팡이 고정 층)
+   - Knight `idle.source` = `SpriteRegen/Knight_Idle/try2/result.png`
+2. 각 파일을 `Assets/_/Spirte/{캐릭터}/source~/idle/`로 복사한다 (이름 예: `ai_sheet.png`, `staff_body.png`, `staff.png`, `staff_hand.png`)
+3. `{캐릭터}.character.json`의 해당 경로를 `Assets/_/Spirte/{캐릭터}/source~/idle/...`로 바꾼다
+4. `sheet_check.py portable`이 `RESULT ok: true`(종료 코드 0)를 낼 때까지 반복 → `.claude/skills` 를 고쳤다면 `python scripts/sync_agent_skills.py` → 커밋·푸시
+이 일이 끝나면 이 절을 지운다. 규칙은 SKILL.md "PC 간 공유".
+
 ## 현재 상태
 - main `77c5f5b`에 병합됨(브랜치 `feature/archer-idle-animation`, 로컬은 아직 이 브랜치).
 - Archer 6개 액션: Idle_v4(기준, 키 541.5) / Hit_v4 / Skill1_v1 / Skill2_v2 / Skill3_v3 / Dead_v3. 전부 화살통·벨트 포함.
