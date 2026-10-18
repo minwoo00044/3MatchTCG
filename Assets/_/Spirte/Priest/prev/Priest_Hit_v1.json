@@ -1,0 +1,94 @@
+{
+  "name": "Priest_Hit_v1",
+  "character": "Priest",
+  "action": "Hit",
+  "version": 1,
+  "source": "C:/Users/minwo/orca/workspaces/3MatchTCG/3MatchTCG/SpriteRegen/Priest_Hit/try5/result.png",
+  "sources": [
+    "C:/Users/minwo/orca/workspaces/3MatchTCG/3MatchTCG/SpriteRegen/Priest_Hit/try5/result.png",
+    "C:/Users/minwo/orca/workspaces/3MatchTCG/3MatchTCG/SpriteRegen/Priest_Hit/try6/result.png"
+  ],
+  "cols": 5,
+  "rows": 4,
+  "frames": 18,
+  "sourceGrid": {
+    "cols": 2,
+    "rows": 4,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    1,
+    3,
+    5,
+    8,
+    11,
+    14,
+    17
+  ],
+  "haze": [
+    [
+      0.0,
+      null
+    ],
+    [
+      -0.004,
+      0.5
+    ],
+    [
+      -0.002,
+      0.5
+    ],
+    [
+      0.002,
+      0.5
+    ],
+    [
+      -0.004,
+      0.5
+    ],
+    [
+      -0.004,
+      0.25
+    ],
+    [
+      -0.003,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 472,
+  "cellHeight": 540,
+  "pivotX": 0.5,
+  "pivotY": 0.007407407407407408,
+  "fps": 90,
+  "durations": null,
+  "loop": false,
+  "scale": 1.0426,
+  "sizeFit": {
+    "reference": "Priest_Idle_v2",
+    "factor": 0.88,
+    "iou": 0.643
+  },
+  "partScale": [
+    1.0,
+    1.0
+  ],
+  "anchorHeight": 539.0,
+  "stance": {
+    "method": "standing",
+    "vertical": 502,
+    "spread": 172.5,
+    "leg": 82,
+    "crotch": 419
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 9.1,
+    "right": 10.2
+  },
+  "warnings": []
+}

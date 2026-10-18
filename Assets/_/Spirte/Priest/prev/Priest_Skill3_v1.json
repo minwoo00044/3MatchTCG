@@ -1,0 +1,113 @@
+{
+  "name": "Priest_Skill3_v1",
+  "character": "Priest",
+  "action": "Skill3",
+  "version": 1,
+  "source": "C:/Users/minwo/orca/workspaces/3MatchTCG/3MatchTCG/SpriteRegen/Priest_Skill3/try1/result.png",
+  "sources": [
+    "C:/Users/minwo/orca/workspaces/3MatchTCG/3MatchTCG/SpriteRegen/Priest_Skill3/try1/result.png",
+    "C:/Users/minwo/orca/workspaces/3MatchTCG/3MatchTCG/SpriteRegen/Priest_Skill3/try2/result.png"
+  ],
+  "cols": 3,
+  "rows": 6,
+  "frames": 16,
+  "sourceGrid": {
+    "cols": 2,
+    "rows": 4,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    2,
+    3,
+    5,
+    6,
+    9,
+    12,
+    15
+  ],
+  "haze": [
+    [
+      0.002,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      -0.0,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      -0.006,
+      0.25
+    ],
+    [
+      -0.002,
+      0.25
+    ],
+    [
+      0.026,
+      1.0
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 1020,
+  "cellHeight": 591,
+  "pivotX": 0.5,
+  "pivotY": 0.00676818950930626,
+  "fps": 72,
+  "durations": [
+    0.0139,
+    0.0139,
+    0.0139,
+    0.0139,
+    0.0139,
+    0.0139,
+    0.25,
+    0.0139,
+    0.0139,
+    0.0139,
+    0.0139,
+    0.0139,
+    0.0139,
+    0.0139,
+    0.0139,
+    0.0139
+  ],
+  "loop": false,
+  "scale": 1.1336,
+  "sizeFit": {
+    "reference": "Priest_Idle_v2",
+    "factor": 0.94,
+    "iou": 0.867
+  },
+  "partScale": [
+    1.0,
+    1.0
+  ],
+  "anchorHeight": 502.2,
+  "stance": {
+    "method": "standing",
+    "vertical": 485,
+    "spread": 106.5,
+    "leg": 74,
+    "crotch": 410
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 59.8,
+    "right": 60.4
+  },
+  "warnings": [
+    "프레임 1: 발을 -52/+52px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다"
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "name": "Priest_Dead_v3",
+  "character": "Priest",
+  "action": "Dead",
+  "version": 3,
+  "source": "C:/MYNewProject/3MatchTCG/SpriteRegen/Priest_Dead/splice1.png",
+  "sources": null,
+  "cols": 3,
+  "rows": 7,
+  "frames": 19,
+  "sourceGrid": {
+    "cols": 10,
+    "rows": 1,
+    "frames": 10
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    1,
+    3,
+    5,
+    7,
+    9,
+    11,
+    13,
+    15,
+    18
+  ],
+  "haze": [
+    [
+      0.0,
+      null
+    ],
+    [
+      0.005,
+      0.5
+    ],
+    [
+      0.005,
+      0.5
+    ],
+    [
+      0.013,
+      0.5
+    ],
+    [
+      0.004,
+      0.5
+    ],
+    [
+      0.015,
+      1.0
+    ],
+    [
+      0.011,
+      1.0
+    ],
+    [
+      0.024,
+      1.0
+    ],
+    [
+      -0.002,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 1050,
+  "cellHeight": 591,
+  "pivotX": 0.5,
+  "pivotY": 0.00676818950930626,
+  "fps": 24,
+  "durations": [
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.4
+  ],
+  "loop": false,
+  "scale": 1.12,
+  "sizeFit": null,
+  "partScale": null,
+  "anchorHeight": 515.6,
+  "stance": {
+    "method": "standing",
+    "vertical": 488,
+    "spread": 156.5,
+    "leg": 97,
+    "crotch": 390
+  },
+  "alignX": "anchor",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 213.9,
+    "right": 321.4
+  },
+  "warnings": []
+}

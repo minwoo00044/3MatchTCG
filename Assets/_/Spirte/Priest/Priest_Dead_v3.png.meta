@@ -1,0 +1,627 @@
+fileFormatVersion: 2
+guid: 0d992e974c87fdd4c8ab7e6cf3be320f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -9205630053375900062
+    second: Priest_Dead_v3_0
+  - first:
+      213: 5486085838084201325
+    second: Priest_Dead_v3_1
+  - first:
+      213: 7946762234238725909
+    second: Priest_Dead_v3_2
+  - first:
+      213: -8143803039765597000
+    second: Priest_Dead_v3_3
+  - first:
+      213: -9213188721669562726
+    second: Priest_Dead_v3_4
+  - first:
+      213: -5745430144303678402
+    second: Priest_Dead_v3_5
+  - first:
+      213: 5624672255216557195
+    second: Priest_Dead_v3_6
+  - first:
+      213: -6364848220919776755
+    second: Priest_Dead_v3_7
+  - first:
+      213: -6826201057441736768
+    second: Priest_Dead_v3_8
+  - first:
+      213: 8797547034086917746
+    second: Priest_Dead_v3_9
+  - first:
+      213: 1038787809926388255
+    second: Priest_Dead_v3_10
+  - first:
+      213: 4596496118527270598
+    second: Priest_Dead_v3_11
+  - first:
+      213: 3367894652866164128
+    second: Priest_Dead_v3_12
+  - first:
+      213: 1485662245212655230
+    second: Priest_Dead_v3_13
+  - first:
+      213: -4286166816419880442
+    second: Priest_Dead_v3_14
+  - first:
+      213: -3777772665584582870
+    second: Priest_Dead_v3_15
+  - first:
+      213: -6037488233991985069
+    second: Priest_Dead_v3_16
+  - first:
+      213: 8765697709822887870
+    second: Priest_Dead_v3_17
+  - first:
+      213: 8232781780743476069
+    second: Priest_Dead_v3_18
+  - first:
+      213: -413575152697033645
+    second: Priest_Dead_v3_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Priest_Dead_v3_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3546
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2668ede6d380f3080800000000000000
+      internalID: -9205630053375900062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_1
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 3546
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6b5f42d00e722c40800000000000000
+      internalID: 5486085838084201325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_2
+      rect:
+        serializedVersion: 2
+        x: 2100
+        y: 3546
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51fe946f522984e60800000000000000
+      internalID: 7946762234238725909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2955
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b4760678466bfe80800000000000000
+      internalID: -8143803039765597000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_4
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 2955
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9e1044dbad242080800000000000000
+      internalID: -9213188721669562726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_5
+      rect:
+        serializedVersion: 2
+        x: 2100
+        y: 2955
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3c35fe69b12440b0800000000000000
+      internalID: -5745430144303678402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2364
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8c9d268d99de0e40800000000000000
+      internalID: 5624672255216557195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_7
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 2364
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0abcc6f3448ba7a0800000000000000
+      internalID: -6364848220919776755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_8
+      rect:
+        serializedVersion: 2
+        x: 2100
+        y: 2364
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c71ac51e467441a0800000000000000
+      internalID: -6826201057441736768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_9
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1773
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 276ca858a6a271a70800000000000000
+      internalID: 8797547034086917746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_10
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 1773
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1a1ba762048a6e00800000000000000
+      internalID: 1038787809926388255
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_11
+      rect:
+        serializedVersion: 2
+        x: 2100
+        y: 1773
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ce9744ddd80acf30800000000000000
+      internalID: 4596496118527270598
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1182
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a57609c75a2dbe20800000000000000
+      internalID: 3367894652866164128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_13
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 1182
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7e0c1ec0f12e9410800000000000000
+      internalID: 1485662245212655230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_14
+      rect:
+        serializedVersion: 2
+        x: 2100
+        y: 1182
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 602e9335df97484c0800000000000000
+      internalID: -4286166816419880442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_15
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 591
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2f76a1b6c7a29bc0800000000000000
+      internalID: -3777772665584582870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_16
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 591
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 358ae4d6078863ca0800000000000000
+      internalID: -6037488233991985069
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_17
+      rect:
+        serializedVersion: 2
+        x: 2100
+        y: 591
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb7c27adf9306a970800000000000000
+      internalID: 8765697709822887870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Dead_v3_18
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1050
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 563d5821967b04270800000000000000
+      internalID: 8232781780743476069
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: b18a8bde8bb60e94e98714570b40481f
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Priest_Dead_v3_0: -9205630053375900062
+      Priest_Dead_v3_1: 5486085838084201325
+      Priest_Dead_v3_10: 1038787809926388255
+      Priest_Dead_v3_11: 4596496118527270598
+      Priest_Dead_v3_12: 3367894652866164128
+      Priest_Dead_v3_13: 1485662245212655230
+      Priest_Dead_v3_14: -4286166816419880442
+      Priest_Dead_v3_15: -3777772665584582870
+      Priest_Dead_v3_16: -6037488233991985069
+      Priest_Dead_v3_17: 8765697709822887870
+      Priest_Dead_v3_18: 8232781780743476069
+      Priest_Dead_v3_2: 7946762234238725909
+      Priest_Dead_v3_3: -8143803039765597000
+      Priest_Dead_v3_4: -9213188721669562726
+      Priest_Dead_v3_5: -5745430144303678402
+      Priest_Dead_v3_6: 5624672255216557195
+      Priest_Dead_v3_7: -6364848220919776755
+      Priest_Dead_v3_8: -6826201057441736768
+      Priest_Dead_v3_9: 8797547034086917746
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,549 @@
+fileFormatVersion: 2
+guid: f2a7cdaad5b1a6d48a86aea8e4603f5c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8975169680677430323
+    second: Priest_Skill3_v2_0
+  - first:
+      213: -1497136195928498183
+    second: Priest_Skill3_v2_1
+  - first:
+      213: -1179358697774994094
+    second: Priest_Skill3_v2_2
+  - first:
+      213: 178740353193751222
+    second: Priest_Skill3_v2_3
+  - first:
+      213: 6056413366733456745
+    second: Priest_Skill3_v2_4
+  - first:
+      213: -7968643275394207046
+    second: Priest_Skill3_v2_5
+  - first:
+      213: 1262867510537122363
+    second: Priest_Skill3_v2_6
+  - first:
+      213: 6569256259667869233
+    second: Priest_Skill3_v2_7
+  - first:
+      213: 2138700222035359934
+    second: Priest_Skill3_v2_8
+  - first:
+      213: 1215419456590569860
+    second: Priest_Skill3_v2_9
+  - first:
+      213: -2434182670153990712
+    second: Priest_Skill3_v2_10
+  - first:
+      213: 529433637925730570
+    second: Priest_Skill3_v2_11
+  - first:
+      213: -405231996704077084
+    second: Priest_Skill3_v2_12
+  - first:
+      213: 1938738101313094546
+    second: Priest_Skill3_v2_13
+  - first:
+      213: 4163506759446312891
+    second: Priest_Skill3_v2_14
+  - first:
+      213: 2927648811186653450
+    second: Priest_Skill3_v2_15
+  - first:
+      213: 798522467223792716
+    second: Priest_Skill3_v2_16
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2955
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33462a7a5453e8c70800000000000000
+      internalID: 8975169680677430323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_1
+      rect:
+        serializedVersion: 2
+        x: 1020
+        y: 2955
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ff5d4ddf8a193be0800000000000000
+      internalID: -1497136195928498183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_2
+      rect:
+        serializedVersion: 2
+        x: 2040
+        y: 2955
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25daa5c438312afe0800000000000000
+      internalID: -1179358697774994094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2364
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b2342b77630b7200800000000000000
+      internalID: 178740353193751222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_4
+      rect:
+        serializedVersion: 2
+        x: 1020
+        y: 2364
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96543196ed3bc0450800000000000000
+      internalID: 6056413366733456745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_5
+      rect:
+        serializedVersion: 2
+        x: 2040
+        y: 2364
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab2b2542921b96190800000000000000
+      internalID: -7968643275394207046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1773
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3272f35f4b968110800000000000000
+      internalID: 1262867510537122363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_7
+      rect:
+        serializedVersion: 2
+        x: 1020
+        y: 1773
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13eb30443cfaa2b50800000000000000
+      internalID: 6569256259667869233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_8
+      rect:
+        serializedVersion: 2
+        x: 2040
+        y: 1773
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb8777745803ead10800000000000000
+      internalID: 2138700222035359934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_9
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1182
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 481ed236e890ed010800000000000000
+      internalID: 1215419456590569860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_10
+      rect:
+        serializedVersion: 2
+        x: 1020
+        y: 1182
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8cd3f0322cb083ed0800000000000000
+      internalID: -2434182670153990712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_11
+      rect:
+        serializedVersion: 2
+        x: 2040
+        y: 1182
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a09b4b0b61de85700800000000000000
+      internalID: 529433637925730570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 591
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4eac4d065a3506af0800000000000000
+      internalID: -405231996704077084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_13
+      rect:
+        serializedVersion: 2
+        x: 1020
+        y: 591
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29348410808c7ea10800000000000000
+      internalID: 1938738101313094546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_14
+      rect:
+        serializedVersion: 2
+        x: 2040
+        y: 591
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb73cb8a65fb7c930800000000000000
+      internalID: 4163506759446312891
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Skill3_v2_15
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1020
+        height: 591
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0067681894}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0900e9151911a820800000000000000
+      internalID: 2927648811186653450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: e587eaf5fccde834c9fb3cafb24bd48d
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Priest_Skill3_v2_0: 8975169680677430323
+      Priest_Skill3_v2_1: -1497136195928498183
+      Priest_Skill3_v2_10: -2434182670153990712
+      Priest_Skill3_v2_11: 529433637925730570
+      Priest_Skill3_v2_12: -405231996704077084
+      Priest_Skill3_v2_13: 1938738101313094546
+      Priest_Skill3_v2_14: 4163506759446312891
+      Priest_Skill3_v2_15: 2927648811186653450
+      Priest_Skill3_v2_2: -1179358697774994094
+      Priest_Skill3_v2_3: 178740353193751222
+      Priest_Skill3_v2_4: 6056413366733456745
+      Priest_Skill3_v2_5: -7968643275394207046
+      Priest_Skill3_v2_6: 1262867510537122363
+      Priest_Skill3_v2_7: 6569256259667869233
+      Priest_Skill3_v2_8: 2138700222035359934
+      Priest_Skill3_v2_9: 1215419456590569860
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

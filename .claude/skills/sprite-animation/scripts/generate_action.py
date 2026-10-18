@@ -36,7 +36,13 @@ import deform as D  # noqa: E402
 CELL_W, CELL_H = 768, 512   # Codex 기본 1536x1024 캔버스의 2x2 칸
 
 
-def idle_body(character):
+def idle_body(character, override=None):
+    """
+    override: 몸 기준 이미지를 직접 준다(인물 한 장, 투명 배경). idle.source(Idle AI 시트)는 SpriteRegen/에 있어 git에 안 들어가므로
+    다른 PC에서는 없다 — 그때 적용된 Idle 시트의 0번 프레임 같은 것을 넘긴다(Priest 2026-10-18: Idle_v2 0번).
+    """
+    if override:
+        return Image.open(override).convert("RGBA")
     cfg = json.load(open(os.path.join(C.SHEET_ROOT, character, f"{character}.character.json"), encoding="utf-8"))
     idle = cfg.get("idle", {})
     if not idle.get("source"):
@@ -107,6 +113,7 @@ def main():
     ap.add_argument("--parts", type=int, default=None, help="4장씩 몇 장 (기본 poses 수 / 4)")
     ap.add_argument("--limit", type=float, default=85)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--body", default=None, help="몸 기준 이미지(인물 한 장). 없으면 character.json idle.source / base")
     ap.add_argument("--skip-direction", action="store_true",
                     help="디렉팅 기록 없이 생성 (디렉팅 관문 이전에 만든 캐릭터를 다시 뽑을 때만)")
     args = ap.parse_args()
@@ -121,7 +128,7 @@ def main():
     parts = args.parts or len(spec["poses"]) // 4
     if len(spec["poses"]) < parts * 4:
         sys.exit(f"poses가 {parts * 4}개 필요하다 ({len(spec['poses'])}개)")
-    body = idle_body(args.character)
+    body = idle_body(args.character, args.body)
     job = f"{args.character}_{args.action}"
     done_dirs = []
     work = CI.dryrun_dir(job) if args.dry_run else None

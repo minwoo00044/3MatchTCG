@@ -1,0 +1,133 @@
+{
+  "name": "Priest_Dead_v2",
+  "character": "Priest",
+  "action": "Dead",
+  "version": 2,
+  "source": "C:/MYNewProject/3MatchTCG/SpriteRegen/Priest_Dead/try1/result.png",
+  "sources": [
+    "C:/MYNewProject/3MatchTCG/SpriteRegen/Priest_Dead/try1/result.png",
+    "C:/MYNewProject/3MatchTCG/SpriteRegen/Priest_Dead/try2/result.png",
+    "C:/MYNewProject/3MatchTCG/SpriteRegen/Priest_Dead/try3/result.png"
+  ],
+  "cols": 3,
+  "rows": 8,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 2,
+    "rows": 6,
+    "frames": 12
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    1,
+    3,
+    5,
+    7,
+    9,
+    11,
+    13,
+    14,
+    16,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      0.0,
+      null
+    ],
+    [
+      0.045,
+      1.0
+    ],
+    [
+      0.017,
+      1.0
+    ],
+    [
+      0.022,
+      0.5
+    ],
+    [
+      0.007,
+      1.0
+    ],
+    [
+      0.023,
+      0.5
+    ],
+    [
+      0.007,
+      1.0
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.009,
+      0.5
+    ],
+    [
+      0.023,
+      0.5
+    ],
+    [
+      -0.002,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 1030,
+  "cellHeight": 591,
+  "pivotX": 0.5,
+  "pivotY": 0.00676818950930626,
+  "fps": 24,
+  "durations": [
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.4
+  ],
+  "loop": false,
+  "scale": 1.12,
+  "sizeFit": null,
+  "partScale": null,
+  "anchorHeight": 515.6,
+  "stance": {
+    "method": "standing",
+    "vertical": 488,
+    "spread": 156.5,
+    "leg": 97,
+    "crotch": 390
+  },
+  "alignX": "anchor",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 270.5,
+    "right": 346.6
+  },
+  "warnings": [
+    "프레임 11: 원본 시트 오른쪽 가장자리에서 이미 잘려 있다"
+  ]
+}
