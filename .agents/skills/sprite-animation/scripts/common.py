@@ -109,3 +109,67 @@ def crop_frame(img):
     a = np.array(img)[:, :, 3] > 128
     ys, xs = np.where(a)
     return img.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
+
+
+# ---------------------------------------------------------------- 크로마키
+# Codex 편집 결과를 흰 배경으로 받아 '가장자리에서 이어진 흰색'만 지우면, 몸에 둘러싸인 배경(지팡이·팔·몸 사이, 다리 사이)이
+# 흰색으로 남는다. 흰 옷이 넓은 캐릭터는 색 통계로도 못 가른다 — Priest v3 "누끼가 덜 따졌다"(2026-10-19).
+# 그래서 캐릭터에 없는 색 배경으로 받아 그림 전체에서 지운다. 캐릭터별 색은 character.json design.key_color.
+KEY_COLORS = {"green": (0, 255, 0), "magenta": (255, 0, 255)}
+KEY_SOFT = (70.0, 150.0)  # 키 색과의 거리: 이 아래는 투명, 위는 불투명, 사이는 반투명(경계 섞임)
+
+
+def key_color(character):
+    """character.json design.key_color (green|magenta). 기본 green — 초록이 있는 캐릭터(Archer 머리카락)는 magenta."""
+    p = os.path.join(SHEET_ROOT, character, f"{character}.character.json")
+    name = "green"
+    if os.path.exists(p):
+        with open(p, encoding="utf-8") as fp:
+            name = json.load(fp).get("design", {}).get("key_color", "green")
+    if name not in KEY_COLORS:
+        sys.exit(f"{character} design.key_color = '{name}' — {list(KEY_COLORS)} 중 하나")
+    return name
+
+
+def key_out(img, name="green"):
+    """
+    키 색 배경을 그림 전체에서 투명하게(갇힌 칸 포함), 경계는 거리에 따라 반투명, 키 색 번짐(spill)은 뺀다.
+    green: G를 max(R, B)로 누른다. magenta: R·B를 G 쪽으로 누른다(둘 중 큰 쪽을 G + 나머지 차이까지만).
+    """
+    a = np.asarray(img.convert("RGB")).astype(np.float32)
+    key = np.array(KEY_COLORS[name], np.float32)
+    d = np.sqrt(((a - key) ** 2).sum(2))
+    lo, hi = KEY_SOFT
+    alpha = np.clip((d - lo) / (hi - lo), 0, 1)
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    if name == "green":
+        g = np.minimum(g, np.maximum(r, b))
+    else:
+        cap = g + np.abs(r - b)
+        r, b = np.minimum(r, cap), np.minimum(b, cap)
+    out = np.dstack([r, g, b, alpha * 255]).clip(0, 255).astype(np.uint8)
+    out[alpha <= 0] = 0
+    return Image.fromarray(out, "RGBA")
+
+
+def load_rgba(path, white_thr=240):
+    """
+    프레임 그림을 투명 배경 RGBA로. 이미 투명하면 그대로, 키 색 배경이면 key_out, 흰 배경(예전 pose_edit 결과)이면
+    가장자리에서 이어진 흰색만 지운다(갇힌 칸이 남는다 — 예전 결과 호환용).
+    """
+    im = Image.open(path)
+    rgba = np.asarray(im.convert("RGBA"))
+    if rgba[..., 3].min() < 255:
+        return im.convert("RGBA")
+    corners = np.array([rgba[0, 0, :3], rgba[0, -1, :3], rgba[-1, 0, :3], rgba[-1, -1, :3]]).astype(int)
+    for name, kc in KEY_COLORS.items():
+        if (np.abs(corners - np.array(kc)).max(1) < 40).all():
+            return key_out(im, name)
+    a = rgba[..., :3].astype(int)
+    white = a.min(axis=2) >= white_thr
+    lab = P.label_components(white)
+    lab = lab[0] if isinstance(lab, tuple) else lab
+    border = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
+    out = rgba.copy()
+    out[np.isin(lab, list(border)), 3] = 0
+    return Image.fromarray(out, "RGBA")

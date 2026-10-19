@@ -5,7 +5,7 @@
  ],
  "figure_h": 900,
  "foot_margin": 60,
- "note": "Priest Skill2 v3 (2026-10-19). spin = 지팡이 없이 손만 — 원반은 smear.py",
+ "note": "Priest Skill2 v4 (2026-10-19): 초록 키 배경(pose_edit), raise→slam 사이 drop1·drop2 추가(v3 \"내려찍기가 뚝 떨어진다\"). spin = 지팡이 없이 손만 — 원반은 smear.py",
  "poses": {
   "lift1": {
    "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
@@ -22,6 +22,14 @@
   "raise": {
    "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
    "pose": "RAISE HIGH: both hands hold the staff high above her head, the staff VERTICAL with the orb on top, body stretching up slightly, ready to strike down. Determined face."
+  },
+  "drop1": {
+   "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
+   "pose": "DROP 1 (the strike begins, fast): both hands drive the staff DOWN in front of her; the hands are at the height of her face, the staff still VERTICAL with the orb on top, its foot at about her waist height. Torso starts to lean forward a little, determined face. Feet do not move."
+  },
+  "drop2": {
+   "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",
+   "pose": "DROP 2 (fast, almost there): both hands at the height of her chest drive the staff down; the staff VERTICAL with the orb at about her chin height, its foot at about her knee height in front of her feet. Torso leans forward, knees start to bend in place. Feet do not move."
   },
   "slam": {
    "hands": "In this pose she holds the caduceus staff with BOTH hands and the white book is GONE completely (not in her hands, not on the ground).",

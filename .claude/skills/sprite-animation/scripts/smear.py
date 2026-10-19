@@ -37,7 +37,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 import common as C  # noqa: E402
 
 DEFAULT_DISC = {"phases": 3, "fill": [236, 238, 245], "rim": [222, 170, 72], "band": [80, 150, 240],
-                "glint": [140, 200, 255], "fill_min": 25, "fill_max": 120}
+                "glint": [140, 200, 255], "fill_min": 25, "fill_max": 120,
+                "band_w": 14, "band_a": 170, "white_a": 170}  # band_w·band_a: 소품 머리(구슬)가 그리는 바깥 띠, white_a: 안쪽 흰 테
 
 
 def cut_white(img, thr=240):
@@ -82,9 +83,9 @@ def draw_disc(size, d_, phase, arc, half):
     for f, a in ((0.38, 150), (0.58, 170), (0.76, 190)):
         d.ellipse([cx - rx * f, cy - ry * f, cx + rx * f, cy + ry * f], outline=rim + (a,), width=3 * S)
     # 바깥 띠: 소품 머리(구슬·장식)가 그리는 굵은 띠
-    d.ellipse([cx - rx, cy - ry, cx + rx, cy + ry], outline=band + (170,), width=14 * S)
+    d.ellipse([cx - rx, cy - ry, cx + rx, cy + ry], outline=band + (d_.get("band_a", 170),), width=d_.get("band_w", 14) * S)
     d.ellipse([cx - rx, cy - ry, cx + rx, cy + ry], outline=rim + (235,), width=6 * S)
-    d.ellipse([cx - rx * 0.9, cy - ry * 0.9, cx + rx * 0.9, cy + ry * 0.9], outline=(255, 248, 225, 170), width=3 * S)
+    d.ellipse([cx - rx * 0.9, cy - ry * 0.9, cx + rx * 0.9, cy + ry * 0.9], outline=(255, 248, 225, d_.get("white_a", 170)), width=3 * S)
     # 위상만큼 돌아가는 하이라이트 호 + 반짝임 (모양은 고정, 이것만 돈다)
     off = 360 / d_["phases"] * phase
     for j, (sc, ln, wd, col) in enumerate([(0.95, 80, 6, (255, 255, 255, 235)), (0.68, 60, 4, (255, 255, 255, 200)),
@@ -111,23 +112,23 @@ def draw_disc(size, d_, phase, arc, half):
 
 
 def compose_disc(body_path, out, d_, phase=0, arc=360, alpha=1.0):
-    body = cut_white(Image.open(body_path))
+    body = C.load_rgba(body_path)
     back = draw_disc(body.size, d_, phase, arc, "back")
     front = draw_disc(body.size, d_, phase, arc, "front")
     if alpha < 1.0:
         for lay in (back, front):
             lay.putalpha(lay.split()[3].point(lambda v: int(v * alpha)))
-    c = Image.new("RGBA", body.size, (255, 255, 255, 255))
+    c = Image.new("RGBA", body.size, (0, 0, 0, 0))
     c.alpha_composite(back)
     c.alpha_composite(body)
     c.alpha_composite(front)
-    c.convert("RGB").save(out)
+    c.save(out)  # 투명 그대로 (흰 캔버스에 합성하면 splice가 흰색을 다시 지우며 갇힌 칸이 남았다)
 
 
 def ghost(front_path, back_path, out, alpha=0.3):
     """멀티플 스미어: 앞 장 뒤에 이전 장의 '앞 장 꼭대기보다 위' 부분만 흐리게 + 이어지는 속도선 (몸까지 겹치면 흰 덩어리, 끊기면 따로 떠 보였다)."""
-    f = cut_white(Image.open(front_path))
-    b = cut_white(Image.open(back_path))
+    f = C.load_rgba(front_path)
+    b = C.load_rgba(back_path)
     fa = np.asarray(f.split()[3]) > 128
     cut = int(np.where(fa)[0].min())
     keep = np.zeros(fa.shape, bool)
@@ -143,10 +144,10 @@ def ghost(front_path, back_path, out, alpha=0.3):
         for dx, a in ((-14, 120), (0, 170), (14, 120)):
             d.line([(x0 + dx, y0 - 120), (x1 + dx, cut + 30)], fill=(255, 250, 235, a), width=4)
         b.alpha_composite(lines.filter(ImageFilter.GaussianBlur(1.5)))
-    c = Image.new("RGBA", f.size, (255, 255, 255, 255))
+    c = Image.new("RGBA", f.size, (0, 0, 0, 0))
     c.alpha_composite(b.filter(ImageFilter.GaussianBlur(2)))
     c.alpha_composite(f)
-    c.convert("RGB").save(out)
+    c.save(out)  # 투명 그대로 (흰 캔버스에 합성하면 splice가 흰색을 다시 지우며 갇힌 칸이 남았다)
 
 
 def prop_foot(path):
@@ -159,7 +160,7 @@ def prop_foot(path):
 
 
 def burst(path, out):
-    im = cut_white(Image.open(path))
+    im = C.load_rgba(path)
     x, y = prop_foot(path)
     S = 2
     lay = Image.new("RGBA", (im.width * S, im.height * S), (0, 0, 0, 0))
@@ -171,10 +172,10 @@ def burst(path, out):
         d.line([(cx, cy), (cx + ln * math.cos(t), cy + ln * 0.6 * math.sin(t))], fill=(255, 230, 150, 230), width=6 * S)
     d.ellipse([cx - 40 * S, cy - 14 * S, cx + 40 * S, cy + 14 * S], fill=(255, 245, 210, 200))
     lay = lay.filter(ImageFilter.GaussianBlur(2 * S)).resize(im.size, Image.LANCZOS)
-    c = Image.new("RGBA", im.size, (255, 255, 255, 255))
+    c = Image.new("RGBA", im.size, (0, 0, 0, 0))
     c.alpha_composite(im)
     c.alpha_composite(lay)
-    c.convert("RGB").save(out)
+    c.save(out)  # 투명 그대로 (흰 캔버스에 합성하면 splice가 흰색을 다시 지우며 갇힌 칸이 남았다)
 
 
 def rel(p):
@@ -197,7 +198,7 @@ def assemble(recipe_path):
 
     for st in r["frames"]:
         if "copy" in st:
-            emit(lambda dst, s=st: Image.open(os.path.join(src, s["copy"])).convert("RGB").save(dst))
+            emit(lambda dst, s=st: C.load_rgba(os.path.join(src, s["copy"])).save(dst))
         elif "disc" in st:
             d_ = {**disc, **{k: st[k] for k in ("cx", "cy", "rx", "ry") if k in st}}
             if st.get("arc", 360) < 360:

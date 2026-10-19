@@ -11,6 +11,7 @@
 process.json (경로는 이 액션 폴더 기준):
   {"applied": "Priest_Skill3_v3",                    # 이 설정으로 만든 적용 버전 (기록)
    "assemble": "recipe.json",                         # (선택) smear.py 레시피 — 조립 결과가 splice 앞에 온다
+   "keep_canvas": true,                               # (선택) 캔버스째 잇기 — pose_edit 장들. process는 --align_x anchor
    "splice": ["try1.png:2x2:1,2,3", "try2.png:2x2:1,2,3,4"],   # (선택) splice_frames 항목
    "inputs": ["try5.png", "try6.png"],                # splice가 없을 때 process_sprite_sheet --input
    "process": ["--cols", "7", "--rows", "1", ...]}    # --input/--name/--out_dir 를 뺀 처리 옵션
@@ -57,7 +58,8 @@ def build(args):
     if entries:
         joined = os.path.join(C.REGEN_ROOT, f"{args.character}_{args.action}", "source_splice.png")
         os.makedirs(os.path.dirname(joined), exist_ok=True)
-        run([sys.executable, os.path.join(SK, "splice_frames.py"), "--fit", "none", "--out", rel(joined), *entries])
+        keep = ["--keep-canvas"] if spec.get("keep_canvas") else []  # 몸이 캔버스의 같은 자리인 장들(pose_edit) — 위치를 유지
+        run([sys.executable, os.path.join(SK, "splice_frames.py"), "--fit", "none", *keep, "--out", rel(joined), *entries])
         inputs = [rel(joined)]
     else:
         inputs = [rel(os.path.join(d, p)) for p in spec["inputs"]]

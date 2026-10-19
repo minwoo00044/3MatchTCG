@@ -4,9 +4,34 @@
  "disc": {
   "cx": 530,
   "cy": 488,
-  "rx": 280,
-  "ry": 80,
-  "phases": 3
+  "rx": 446,
+  "ry": 125,
+  "phases": 3,
+  "fill": [
+   214,
+   190,
+   130
+  ],
+  "fill_min": 12,
+  "fill_max": 75,
+  "rim": [
+   235,
+   170,
+   40
+  ],
+  "band": [
+   30,
+   90,
+   230
+  ],
+  "band_w": 26,
+  "band_a": 220,
+  "white_a": 60,
+  "glint": [
+   110,
+   180,
+   255
+  ]
  },
  "frames": [
   {
@@ -35,8 +60,15 @@
    "copy": "raise.png"
   },
   {
+   "copy": "drop1.png"
+  },
+  {
+   "ghost": "drop2.png",
+   "behind": "drop1.png"
+  },
+  {
    "ghost": "slam.png",
-   "behind": "raise.png"
+   "behind": "drop2.png"
   },
   {
    "burst": "impact.png"
@@ -44,5 +76,6 @@
   {
    "copy": "settle.png"
   }
- ]
+ ],
+ "note": "v4 (2026-10-19): 원반 D(사용자 선택) — 반지름 = 가로로 든 지팡이 길이의 절반(893/2), 금빛 몸체·굵은 파란 띠. raise→drop1→drop2(잔상)→slam(잔상)→impact. 입력은 초록 키 배경 → load_rgba"
 }

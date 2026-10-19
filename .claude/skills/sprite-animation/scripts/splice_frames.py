@@ -30,6 +30,8 @@ from PIL import Image, ImageFilter
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 import process_sprite_sheet as P  # noqa: E402
+sys.path.insert(0, os.path.dirname(__file__))
+import common as C  # noqa: E402
 
 GAP = 60
 FACE_RANGE = (0.6, 1.6)   # 얼굴 측정은 이 밖이면 틀린 것으로 본다
@@ -95,8 +97,29 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--fit", choices=["silhouette", "face", "none"], default="silhouette")
     ap.add_argument("--scales", type=float, nargs="+", default=None, help="항목별 배율을 직접 준다(--fit보다 우선)")
+    ap.add_argument("--keep-canvas", action="store_true", help="자르지 않고 캔버스째 잇는다(모든 장의 몸이 같은 자리일 때, 처리는 --align_x anchor)")
     ap.add_argument("items", nargs="+")
     args = ap.parse_args()
+    if args.keep_canvas:
+        # 포즈 편집(pose_edit)·원반 조립처럼 모든 장의 몸이 같은 캔버스의 같은 자리에 그려진 경우: 자르지 않고 캔버스째 잇는다.
+        # 경계 상자를 칸 가운데에 맞추면 지팡이·원반이 뻗은 장마다 몸이 반대로 밀렸다(Priest Skill2 v4, 발 미끄러짐 48px).
+        # 처리는 --align_x anchor (기준 장의 발 위치 하나로 — 칸 좌표가 그대로라 캔버스 위치가 유지된다)
+        ims = []
+        for it in args.items:
+            path, grid, _ = it.rsplit(":", 2)
+            if grid.lower() != "1x1":
+                sys.exit(f"--keep-canvas는 한 장짜리(1x1) 항목만: {it}")
+            ims.append(C.load_rgba(path))
+        if len({im.size for im in ims}) != 1:
+            sys.exit(f"--keep-canvas: 캔버스 크기가 다르다 {sorted({im.size for im in ims})}")
+        cw, ch = ims[0].width + GAP, ims[0].height
+        out = Image.new("RGBA", (cw * len(ims), ch))
+        for k, im in enumerate(ims):
+            out.alpha_composite(im, (k * cw + GAP // 2, 0))
+        os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+        out.save(args.out)
+        print(f"RESULT {json.dumps({'ok': True, 'out': args.out, 'frames': len(ims), 'keep_canvas': True}, ensure_ascii=False)}")
+        return
     groups = [load(it) for it in args.items]
     paths = [it.rsplit(":", 2)[0] for it in args.items]
     base = [im for g, p in zip(groups, paths) if p == paths[0] for im in g]

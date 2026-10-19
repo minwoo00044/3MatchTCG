@@ -61,7 +61,11 @@ LOOP_COPY = """
 if (!UnityEditor.AssetDatabase.IsValidFolder("Assets/_/_Compare")) UnityEditor.AssetDatabase.CreateFolder("Assets/_", "_Compare");
 string dst = "Assets/_/_Compare/{name}_loop.anim";
 UnityEditor.AssetDatabase.DeleteAsset(dst);
-if (!UnityEditor.AssetDatabase.CopyAsset("{src}", dst)) return "copy failed: {src}";
+// 적용 안 한 시트(비교용 새 버전)는 클립이 없다 — 시트에서 바로 반복 클립을 만든다
+if (UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.AnimationClip>("{src}") == null) {
+    UnityEditor.AssetDatabase.Refresh();
+    SpriteAnimationPipeline.BuildClipAt("{sheet}", dst, true);
+} else if (!UnityEditor.AssetDatabase.CopyAsset("{src}", dst)) return "copy failed: {src}";
 var clip = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.AnimationClip>(dst);
 var s = UnityEditor.AnimationUtility.GetAnimationClipSettings(clip);
 s.loopTime = true;
@@ -93,7 +97,7 @@ def main():
         with open(os.path.join(C.SHEET_ROOT, character, f"{character}.character.json"), encoding="utf-8") as fp:
             ref = json.load(fp)["reference"]
         src = f"Assets/_/_Anim/{character}/{name}.anim"
-        print(eval_code(f"loop_{name}", LOOP_COPY.replace("{name}", name).replace("{src}", src)))
+        print(eval_code(f"loop_{name}", LOOP_COPY.replace("{name}", name).replace("{src}", src).replace("{sheet}", sheet)))
         if not scene_opened:
             wait_ready()
             unity("cmd", "open_scene", "--path", args.scene, "--result-only")
