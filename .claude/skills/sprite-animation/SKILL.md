@@ -135,6 +135,7 @@ python $SK/deform.py lineup --character Knight SpriteRegen/Knight_Deform/tryN/re
 | `sheet_check.py frames` | 처리된 시트의 프레임별 소품 크기·몸통 x·이웃 차이 (크기 변화·앞뒤 이동·같은 장 반복 원인 찾기) |
 | `sheet_check.py side-by-side` | 기준 시트 0번과 같은 접지선·배율로 나란히 (F 6) |
 | `sheet_check.py portable` | 위 공유 검사 |
+| `prop_split.py` | 몸 프레임을 몸·고정 소품·쥔 손 세 층으로 (반자동 Idle에서 지팡이 고정, 좌표는 spec) |
 
 ## A. 적용
 
@@ -320,7 +321,7 @@ AI에게 Idle 8장을 그리게 하면 얼굴·세부가 프레임마다 다시 
      `body`(무릎 없이 몸 전체) / `chest`(쓰지 않는다 — 허리 위 가로 띠만 들려 "가슴만 사진으로 잘라 움직이는 것 같다", Priest) / `bob`(쓰지 않는다 — 스프링 인형)
      Priest에서 "숨쉬기는 무릎까지 움직여야 어색하지 않다"(사용자). 늘어진 것(긴 머리·코트·소품)이 많은 캐릭터일수록 한 덩어리 워프가 '오려낸' 느낌으로 보인다.
    - **땅에 짚은 단단한 소품**(지팡이 등)은 몸과 같이 워프하면 휘고 늘어난다. 층으로 나눠 `body_image`(소품 뺀 몸)·`static_layer`(고정 소품)·`hand_layer`(쥔 손)를 쓴다 —
-     앞뒤 순서는 원래 그림대로 몸 → 소품 → 손. 소품 뒤 빈칸은 확산 채우기 말고 옆 픽셀 늘리기(소품이 앞에서 덮는다). Priest는 좌표로 나눴다(`SpriteRegen/Priest_Idle/staff_split/`, Codex 지우기 편집은 용량 부족으로 실패).
+     앞뒤 순서는 원래 그림대로 몸 → 소품 → 손. 소품 뒤 빈칸은 확산 채우기 말고 옆 픽셀 늘리기(소품이 앞에서 덮는다). 층 나누기는 `prop_split.py --spec <캐릭터>/source~/idle/{소품}_split.json`(좌표 spec). Priest는 좌표로 나눴다(`Priest/source~/idle/staff_split.json`, Codex 지우기 편집은 용량 부족으로 실패).
    - AI Idle 8장의 눈 감은 장이 둘 이상이어도 깜빡임은 한 번(`blink_at`). 1초 루프에 두 번은 잦다.
    - 폭: `knee_amp`(엉덩이 하강, 키 대비), `knee_ratio`·`knee_forward`(무릎이 따라 내려가는/앞으로 나오는 비율), `breath_amp`(가슴·어깨)
    - `head_lag`(머리가 몇 프레임 늦는지), `hip`(이 위는 한 덩어리), `face`(무릎이 나오는 방향), `blink_at`

@@ -121,7 +121,7 @@
   "hint_note": "init 때 tall로 정했으나 4회 생성에서 tall이 안 나와 Knight 비율에 가장 가까운 3차를 사용자가 선택(2026-10-16). 성숙함은 174cm 키(크기)로",
   "idle": {
     "method": "procedural",
-    "source": "SpriteRegen/Priest_Idle/try1_flip/result.png",
+    "source": "Assets/_/Spirte/Priest/source~/idle/ai_sheet.png",
     "base": 0,
     "blink": 2,
     "mode": "kneebody",
@@ -144,9 +144,9 @@
     "note": "사용자 확정 2026-10-16 (H). 거쳐 온 것: chest(가슴 띠만 → \"가슴만 사진으로 잘라 움직이는 것 같다\") → body·AI 8장·얼굴 고정 → \"무릎까지 움직여야\" → kneebody(F) → \"지팡이가 같이 오려진다\" → 지팡이 층 고정(H). 층은 split_staff(좌표 손으로, Codex 편집은 용량 부족으로 실패)",
     "knee_amp": 0.02,
     "swell": 0.012,
-    "body_image": "SpriteRegen/Priest_Idle/staff_split/body.png",
-    "static_layer": "SpriteRegen/Priest_Idle/staff_split/staff.png",
-    "hand_layer": "SpriteRegen/Priest_Idle/staff_split/hand.png",
+    "body_image": "Assets/_/Spirte/Priest/source~/idle/staff_body.png",
+    "static_layer": "Assets/_/Spirte/Priest/source~/idle/staff.png",
+    "hand_layer": "Assets/_/Spirte/Priest/source~/idle/staff_hand.png",
     "body": "Assets/_/Spirte/Priest/source~/body.png",
     "body_note": "2026-10-19 PC 간 공유: 몸 기준 한 장(Idle_v2 0번, generate_action·pose_edit 기본). idle.source(AI 시트 반전본)·body_image·static_layer·hand_layer는 SSAFY PC의 SpriteRegen/에만 있다 — 그 PC에서 source~/idle/로 옮겨 커밋하고 경로를 바꾼다"
   },

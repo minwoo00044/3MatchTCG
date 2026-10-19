@@ -27,7 +27,7 @@
   "ref_height_note": "Archer(Archer_Idle_v8) 정수리~발 484.3px × 170/160cm 기준",
   "idle": {
     "method": "procedural",
-    "source": "SpriteRegen/Knight_Idle/try2/result.png",
+    "source": "Assets/_/Spirte/Knight/source~/idle/ai_sheet.png",
     "base": 0,
     "blink": 2,
     "blink_at": [
