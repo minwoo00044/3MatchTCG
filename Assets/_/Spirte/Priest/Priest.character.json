@@ -20,7 +20,7 @@
   "align_x": {
     "Skill1": "mid",
     "Skill2": "mid",
-    "Skill3": "both_feet",
+    "Skill3": "left_foot",
     "Hit": "both_feet",
     "Dead": "anchor"
   },

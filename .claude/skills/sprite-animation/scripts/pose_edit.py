@@ -11,7 +11,8 @@
 pose spec(JSON, 확정되면 {캐릭터}/source~/pose/{액션}.json 에 커밋):
   {"canvas": [1024, 1536], "figure_h": 900, "foot_margin": 60,      # 세로 캔버스, 위를 비워 머리 위 소품이 들어가게
    "common": "모든 포즈에 붙는 문장(손에 든 소품 규칙 등)",
-   "poses": {"peak": {"hands": "소품을 어느 손에 드는지", "pose": "이 장에서 바꿀 것만"}}}
+   "poses": {"peak": {"hands": "소품을 어느 손에 드는지", "pose": "이 장에서 바꿀 것만",
+                      "legs_keep": "(선택) 다리를 쓰는 장: 고정할 발만 — 예 'her RIGHT foot ... at the same pixels'"}}}
 몸 기준: --body → character.json idle.body → idle.source의 base 프레임.
 결과: SpriteRegen/{캐릭터}_{액션}E_{포즈}/try{N}/result.png (키 색 배경). 고른 장은 accept로 키 색을 지운 투명 PNG를 source~/{액션}/{포즈}.png 에 둔다.
 배경: 캐릭터에 없는 키 색(character.json design.key_color, 기본 green). 예전엔 흰 배경이라 몸에 둘러싸인 배경(지팡이·몸 사이, 다리 사이)이
@@ -37,11 +38,11 @@ including every gap between the arms, the body, the legs and the held prop — n
 The character itself contains NO {key_name}.
 
 KEEP EXACTLY THE SAME as base.png (critical): the figure's size and position on the canvas, the head size and position, the face design,
-the hair, the clothes and accessories, the legs, the stance and BOTH FEET at the same pixels, the art style and colors.
+the hair, the clothes and accessories, {legs_keep}, the art style and colors.
 If a held prop is visible it keeps EXACTLY the same length, thickness and ornament size as in base.png — it never grows or shrinks.
 The body stays in the 3/4 view facing right; it never turns toward the camera.
 
-CHANGE ONLY what is written here (arms, hands, held props, face expression):
+CHANGE ONLY what is written here ({change_scope}):
 {common}
 {hands}
 {pose}
@@ -84,8 +85,11 @@ def prompt_for(spec, key, key_name):
     w, h = spec.get("canvas", [1024, 1536])
     p = spec["poses"][key]
     hexv = "#%02X%02X%02X" % C.KEY_COLORS[key_name]
+    # 다리를 쓰는 동작(내딛기)은 spec/포즈의 "legs_keep"으로 고정할 발만 적는다 — 기본은 두 발 고정
+    legs_keep = p.get("legs_keep", spec.get("legs_keep", "the legs, the stance and BOTH FEET at the same pixels"))
+    scope = "arms, hands, held props, face expression" + (", and the leg written below" if "legs_keep" in p or "legs_keep" in spec else "")
     return PROMPT.format(w=w, h=h, common=spec.get("common", ""), hands=p.get("hands", ""), pose=p["pose"],
-                         key_name=key_name, key_hex=hexv)
+                         key_name=key_name, key_hex=hexv, legs_keep=legs_keep, change_scope=scope)
 
 
 def generate_one(character, action, spec, key, body, limit, dry_run):

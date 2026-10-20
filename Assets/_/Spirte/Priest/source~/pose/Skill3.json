@@ -1,0 +1,62 @@
+{
+ "canvas": [
+  1024,
+  1536
+ ],
+ "figure_h": 900,
+ "foot_margin": 60,
+ "note": "Priest Skill3 v4 (2026-10-19): v3 피드백 — 장면 늘리기(보간 대신), 캐릭터의 왼다리(화면 오른쪽 발) 한 걸음 내딛기, 가리킬 때 작은 함성. pose_edit(초록 키), 처리는 keep_canvas + anchor",
+ "common": "3/4 view facing RIGHT exactly like base.png in every pose; the body and face never turn toward the camera.",
+ "poses": {
+  "ready": {
+   "pose": "READY: no change at all — exactly base.png.",
+   "legs_keep": "the legs, the stance and BOTH FEET at the same pixels",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  },
+  "anticip": {
+   "pose": "ANTICIPATION: she draws the staff a little back toward her body (staff tilted back about 15 degrees), shoulders turn slightly back, knees bend a little, eyes narrow with focus, mouth closed.",
+   "legs_keep": "the legs, the stance and BOTH FEET at the same pixels",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  },
+  "swing1": {
+   "pose": "SWING 1: the LEFT arm starts to swing the staff forward; the staff is tilted forward about 30 degrees from vertical (orb toward the right). Her LEFT heel lifts off the ground (toes still touching). Torso starts to lean forward. Mouth closed, determined.",
+   "legs_keep": "her RIGHT foot (the near foot, on the LEFT of the image) stays planted at exactly the same pixels; her LEFT foot (on the RIGHT of the image) moves only as written; the right leg stays as in base.png",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  },
+  "swing2": {
+   "pose": "SWING 2: the staff is tilted forward about 55 degrees from vertical, the left arm rising forward. Her LEFT foot is in the air, moving forward (to the right) about half a step. Torso leans forward, mouth starting to open.",
+   "legs_keep": "her RIGHT foot (the near foot, on the LEFT of the image) stays planted at exactly the same pixels; her LEFT foot (on the RIGHT of the image) moves only as written; the right leg stays as in base.png",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  },
+  "step": {
+   "pose": "STEP: her LEFT foot lands one step forward (to the right, about one shoe length ahead of where it was), knee slightly bent, weight moving onto it. The staff is about 75 degrees from vertical, almost horizontal, the left arm almost straight. Mouth opening.",
+   "legs_keep": "her RIGHT foot (the near foot, on the LEFT of the image) stays planted at exactly the same pixels; her LEFT foot (on the RIGHT of the image) moves only as written; the right leg stays as in base.png",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  },
+  "point": {
+   "pose": "POINT: the LEFT arm fully extended forward to the right, the staff HORIZONTAL pointing right with the orb at the front. Weight on the forward LEFT foot (it stays one step forward), the right leg straight behind. Face: a small battle shout — mouth open in a short 'Ha!', eyebrows down, eyes wide and fierce.",
+   "legs_keep": "her RIGHT foot (the near foot, on the LEFT of the image) stays planted at exactly the same pixels; her LEFT foot (on the RIGHT of the image) moves only as written; the right leg stays as in base.png",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  },
+  "hold": {
+   "pose": "POINT HOLD: same as POINT (arm extended, staff horizontal pointing right, LEFT foot one step forward), mouth closing to a firm determined line, coat and hair settle slightly.",
+   "legs_keep": "her RIGHT foot (the near foot, on the LEFT of the image) stays planted at exactly the same pixels; her LEFT foot (on the RIGHT of the image) moves only as written; the right leg stays as in base.png",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  },
+  "return1": {
+   "pose": "RETURN 1: the staff comes back up to about 55 degrees from vertical, the left arm bending; the LEFT foot still one step forward. Calm determined face, mouth closed.",
+   "legs_keep": "her RIGHT foot (the near foot, on the LEFT of the image) stays planted at exactly the same pixels; her LEFT foot (on the RIGHT of the image) moves only as written; the right leg stays as in base.png",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  },
+  "return2": {
+   "pose": "RETURN 2: the staff about 25 degrees from vertical, moving back beside her; her LEFT foot lifts and moves back halfway toward its original place. Calm face.",
+   "legs_keep": "her RIGHT foot (the near foot, on the LEFT of the image) stays planted at exactly the same pixels; her LEFT foot (on the RIGHT of the image) moves only as written; the right leg stays as in base.png",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  },
+  "return3": {
+   "pose": "RETURN 3: her LEFT foot is back exactly where it is in base.png; the staff almost vertical beside her, slightly tilted. Calm face.",
+   "legs_keep": "the legs, the stance and BOTH FEET at the same pixels",
+   "hands": "The caduceus staff stays in her LEFT hand (the far side, on the right of the image). The white book stays in her RIGHT hand, held still at her side; it does not follow the pointing."
+  }
+ }
+}
