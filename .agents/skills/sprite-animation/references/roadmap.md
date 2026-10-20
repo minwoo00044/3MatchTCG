@@ -120,7 +120,11 @@
   - Dead "같은 프레임 반복": 첫 장이 이미 무릎을 꿇었는데 둘째 장이 다시 높은 자세에서 시작 → 높이가 계속 내려가는 장만 다시 이음.
 - 도구: 처음엔 scratchpad·`SpriteRegen/_tools/`에만 있었다 → 2026-10-19 스킬 스크립트로 옮김(`pose_edit.py`, `smear.py`, `source_build.py`, `record_compare.py`, `sheet_check.py frames/side-by-side/portable`). 확정 입력은 `Priest/source~/`(동작별 `process.json`). SKILL.md "PC 간 공유".
 - 공유 완료(2026-10-19, SSAFY PC): Priest `idle.source`·지팡이 층 3장, Knight `idle.source`를 `{캐릭터}/source~/idle/`로 옮김 — `sheet_check.py portable` 통과, `procedural_idle.py --character`로 다시 만든 Idle이 적용본과 픽셀까지 같음. 지팡이 층 도구는 `prop_split.py` + `Priest/source~/idle/staff_split.json`(기존 층과 픽셀까지 같음)
-- **v3 사용자 피드백 (2026-10-19, 아직 반영 안 함)**:
+- **v3 사용자 피드백 (2026-10-19) → 2026-10-20 모두 반영 (SSAFY PC)**: 적용 Skill1_v6 / Skill2_v4 / Skill3_v4 (Hit_v2·Dead_v3·Idle_v2 그대로).
+  누끼 = pose_edit 초록 키, Skill2 = 원반 D(지팡이 길이, 금빛+파란 띠)·drop1/2, Skill3 = pose_edit 10장·왼다리·함성,
+  Skill1 = 정점 손 모자 높이 → raise3 제외·보간(v5) → lock_static(v6). 규칙은 SKILL.md "pose_edit 장으로 만드는 동작의 처리 규칙".
+  남은 것: Hit·Dead는 generate_action(투명) 그대로 — 사용자 지적이 오면 같은 방식 검토. 도구 빈칸(방향·머리 크기 검사)은 그대로.
+- 원래 피드백:
   - 전반: **누끼(배경 제거)가 덜 따진 부분**이 있다. Idle 편집본은 흰 배경 결과라 `splice_frames`/`disc.cut_white`의 흰색 제거가 가장자리·틈에 흰 테를 남긴 것으로 추정 — 확인 필요.
   - Skill1: **너무 높이 든다** — 팔이 기괴하게 늘어난 것처럼 보인다(정점 장 `peak`·`raise3`).
   - Skill2: **원반이 너무 작다**(지금 rx 280 = 가로로 든 지팡이 길이의 절반 근처), **너무 하얗다**(지팡이는 흰 막대만이 아니다 — 금 마디·파란 구슬·은색),

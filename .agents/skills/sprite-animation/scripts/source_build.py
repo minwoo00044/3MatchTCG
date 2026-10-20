@@ -12,6 +12,7 @@ process.json (경로는 이 액션 폴더 기준):
   {"applied": "Priest_Skill3_v3",                    # 이 설정으로 만든 적용 버전 (기록)
    "assemble": "recipe.json",                         # (선택) smear.py 레시피 — 조립 결과가 splice 앞에 온다
    "keep_canvas": true,                               # (선택) 캔버스째 잇기 — pose_edit 장들. process는 --align_x anchor
+   "lock_static": {"base": "base.png", "thr": 60},    # (선택) 기준 장과 거의 같은 곳은 기준 픽셀로 — pose_edit 반짝임 제거
    "splice": ["try1.png:2x2:1,2,3", "try2.png:2x2:1,2,3,4"],   # (선택) splice_frames 항목
    "inputs": ["try5.png", "try6.png"],                # splice가 없을 때 process_sprite_sheet --input
    "process": ["--cols", "7", "--rows", "1", ...]}    # --input/--name/--out_dir 를 뺀 처리 옵션
@@ -54,7 +55,19 @@ def build(args):
     entries = []
     if spec.get("assemble"):
         entries += smear.assemble(os.path.join(d, spec["assemble"]))
-    entries += [f"{rel(os.path.join(d, e.split(':', 1)[0]))}:{e.split(':', 1)[1]}" for e in spec.get("splice", [])]
+    lock = spec.get("lock_static")  # {"base": "base.png", "thr": 60, ...} — 정지 영역을 기준 장 픽셀로 (반짝임 제거)
+    locked_dir = os.path.join(C.REGEN_ROOT, f"{args.character}_{args.action}", "locked")
+    base_img = C.load_rgba(os.path.join(d, lock["base"])) if lock else None
+    for e in spec.get("splice", []):
+        name, grid = e.split(":", 1)
+        path = os.path.join(d, name)
+        if lock and name != lock["base"] and grid.startswith("1x1"):
+            os.makedirs(locked_dir, exist_ok=True)
+            out, info = C.lock_static(C.load_rgba(path), base_img, **{k: v for k, v in lock.items() if k != "base"})
+            path = os.path.join(locked_dir, name)
+            out.save(path)
+            print(f"  고정 {name}: {info}")
+        entries.append(f"{rel(path)}:{grid}")
     if entries:
         joined = os.path.join(C.REGEN_ROOT, f"{args.character}_{args.action}", "source_splice.png")
         os.makedirs(os.path.dirname(joined), exist_ok=True)

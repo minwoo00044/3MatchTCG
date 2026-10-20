@@ -3,6 +3,7 @@
 
     python pose_edit.py generate --character Priest --action Skill1 --spec <pose spec> [--pose peak raise3] [--body <png>] [--dry-run]
     python pose_edit.py accept   --character Priest --action Skill1 --pose peak SpriteRegen/Priest_Skill1E_peak/try2/result.png
+    python pose_edit.py base     --character Priest --action Skill1 --spec <pose spec> [--pose base]   # 준비 장면 = 몸 기준 그대로
 
 언제 쓰나 (2026-10-19 Priest Skill1·Skill2):
   generate_action.py로 4장씩 나눠 생성하면 장마다 몸 크기·위치가 달라 "부위 크기가 계속 변하고 앞뒤로 이동"(사용자 지적).
@@ -138,6 +139,23 @@ def cmd_accept(args):
     print(f"RESULT {json.dumps({'ok': True, 'saved': os.path.relpath(dst, C.ROOT).replace(os.sep, '/')}, ensure_ascii=False)}")
 
 
+def cmd_base(args):
+    """준비 장면 = 몸 기준을 편집 없이 같은 캔버스·배치로 (투명). Codex로 '변화 없음'을 그리면 몸이 미세하게 달라진다."""
+    with open(args.spec, encoding="utf-8") as fp:
+        spec = json.load(fp)
+    body = body_image(args.character, args.body)
+    w, h = spec.get("canvas", [1024, 1536])
+    fig_h = spec.get("figure_h", 900)
+    s = fig_h / body.height
+    body = body.resize((round(body.width * s), fig_h), Image.LANCZOS)
+    c = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    c.alpha_composite(body, ((w - body.width) // 2, h - spec.get("foot_margin", 60) - body.height))
+    dst = source_dir(args.character, args.action, f"{args.pose}.png")
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    c.save(dst)
+    print(f"RESULT {json.dumps({'ok': True, 'saved': os.path.relpath(dst, C.ROOT).replace(os.sep, '/')}, ensure_ascii=False)}")
+
+
 def main():
     C.utf8_stdout()
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -156,9 +174,15 @@ def main():
     a.add_argument("--action", required=True)
     a.add_argument("--pose", required=True)
     a.add_argument("result")
+    b = sub.add_parser("base", help="준비 장면(몸 기준 그대로)을 source~/{액션}/{포즈}.png로")
+    b.add_argument("--character", required=True)
+    b.add_argument("--action", required=True)
+    b.add_argument("--spec", required=True)
+    b.add_argument("--pose", default="base")
+    b.add_argument("--body")
     args = ap.parse_args()
     C.P.warn_local_only(args.character)
-    {"generate": cmd_generate, "accept": cmd_accept}[args.cmd](args)
+    {"generate": cmd_generate, "accept": cmd_accept, "base": cmd_base}[args.cmd](args)
 
 
 if __name__ == "__main__":

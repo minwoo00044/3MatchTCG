@@ -173,3 +173,45 @@ def load_rgba(path, white_thr=240):
     out = rgba.copy()
     out[np.isin(lab, list(border)), 3] = 0
     return Image.fromarray(out, "RGBA")
+
+
+# ---------------------------------------------------------------- 정지 영역 고정
+# pose_edit은 장마다 그림 전체를 새로 그려서 움직이지 않는 곳(다리·코트·모자)도 선·무늬가 1~2px씩 달라진다 →
+# 재생하면 픽셀이 반짝거려 "AI 티"가 난다(Priest Skill1, 사용자 2026-10-20). 기준 장(준비 자세)에 위치를 맞춘 뒤
+# 기준과 거의 같은 곳은 기준 픽셀로 바꾸고, 실제로 바뀐 곳(팔·소품·표정)만 새 그림을 쓴다.
+
+def lock_static(frame, base, thr=60, max_shift=8, grow=6, legs_from=0.62, max_legs_diff=30.0):
+    """
+    반환: (고정한 그림, 정보 dict). 다리 띠(키의 legs_from 아래)로 ±max_shift px 이동을 찾아 맞춘 뒤 비교한다.
+    맞춰도 다리 차이가 max_legs_diff보다 크면(다리를 크게 움직인 장) 고정하지 않는다. 기준과 '거의 같은' 픽셀만 바꾸므로
+    어긋난 곳은 새 그림 그대로 남아 경계가 생기지 않는다 — 12로 두었더니 가장 반짝이는 장(차이 15~18)을 건너뛰었다.
+    """
+    from PIL import ImageFilter
+    B = np.asarray(base).astype(int)
+    F0 = np.asarray(frame).astype(int)
+    al = B[..., 3] > 128
+    ys = np.where(al.any(1))[0]
+    top, bot = ys.min(), ys.max()
+    legs = slice(int(top + legs_from * (bot - top)), bot + 1)
+    best = (1e18, 0, 0)
+    for dy in range(-max_shift, max_shift + 1):
+        for dx in range(-max_shift, max_shift + 1):
+            d = np.abs(np.roll(np.roll(F0, dy, 0), dx, 1)[legs] - B[legs]).mean()
+            if d < best[0]:
+                best = (d, dx, dy)
+    d0, dx, dy = best
+    info = {"shift": [dx, dy], "legs_diff": round(float(d0), 1)}
+    if d0 > max_legs_diff:
+        info["skipped"] = True
+        return frame, info
+    fr = Image.fromarray(np.roll(np.roll(F0, dy, 0), dx, 1).astype(np.uint8), "RGBA")
+    a = np.asarray(base.filter(ImageFilter.GaussianBlur(1.5))).astype(int)
+    f = np.asarray(fr.filter(ImageFilter.GaussianBlur(1.5))).astype(int)
+    d = np.maximum(np.abs(a[..., :3] - f[..., :3]).max(2), np.abs(a[..., 3] - f[..., 3]))
+    m = Image.fromarray(((d > thr) * 255).astype(np.uint8))
+    m = m.filter(ImageFilter.MinFilter(5)).filter(ImageFilter.MaxFilter(5))          # 다시 그린 잡음 점은 버린다
+    m = m.filter(ImageFilter.MaxFilter(2 * grow + 1)).filter(ImageFilter.GaussianBlur(3))  # 바뀐 곳 둘레 여유 + 부드러운 경계
+    M = np.asarray(m)
+    fig = (np.asarray(fr)[..., 3] > 128) | al
+    info["changed"] = round(float((M > 128)[fig].mean()), 3)
+    return Image.composite(fr, base, m), info

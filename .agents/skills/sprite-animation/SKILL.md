@@ -128,7 +128,8 @@ python $SK/deform.py lineup --character Knight SpriteRegen/Knight_Deform/tryN/re
 ### 도구 목록 (이 갈래들 밖에서 추가된 것)
 | 스크립트 | 하는 일 |
 |---|---|
-| `pose_edit.py` | 몸 기준 한 장을 포즈마다 Codex로 편집 — 몸 크기·위치가 모든 장에서 같다. 몸은 그대로, 팔·소품·표정만 바뀌는 동작용(Priest Skill1·2) |
+| `pose_edit.py` | 몸 기준 한 장을 포즈마다 Codex로 편집 — 몸 크기·위치가 모든 장에서 같다. 몸은 그대로, 팔·소품·표정만 바뀌는 동작용(Priest Skill1·2·3).
+  **초록 키 배경**(`design.key_color`)으로 받고 `accept`가 투명 PNG로 — 흰 배경은 몸에 둘러싸인 배경 칸이 남았다. 다리를 쓰는 장은 포즈별 `legs_keep`, 준비 장면은 `base`(몸 기준 그대로) |
 | `smear.py` | 빠르게 도는 소품을 원반(smear)으로 그리고, 레시피(JSON)로 원본 프레임을 조립(잔상·빛 터짐 포함) |
 | `source_build.py` | `source~/{액션}/process.json`대로 현재 버전을 다시 만든다 |
 | `record_compare.py` | 적용(`--apply`) + 반복 재생 사본 + 기준 Idle과 나란히 녹화 (unity CLI) |
@@ -136,6 +137,16 @@ python $SK/deform.py lineup --character Knight SpriteRegen/Knight_Deform/tryN/re
 | `sheet_check.py side-by-side` | 기준 시트 0번과 같은 접지선·배율로 나란히 (F 6) |
 | `sheet_check.py portable` | 위 공유 검사 |
 | `prop_split.py` | 몸 프레임을 몸·고정 소품·쥔 손 세 층으로 (반자동 Idle에서 지팡이 고정, 좌표는 spec) |
+
+pose_edit 장으로 만드는 동작의 처리 규칙 (Priest v4, 2026-10-19~20):
+- `process.json` `"keep_canvas": true` + `--align_x anchor`: 장을 자르지 않고 캔버스째 잇는다. 경계 상자 가운데 맞춤은 지팡이·원반 쪽으로 몸을 밀었다.
+  다리를 내딛는 동작은 Codex가 몸 위치를 못 지켜 `--align_x left_foot`(고정 발) — Skill3.
+- `"lock_static": {"base": "base.png", "thr": 60}`: 장마다 몸 위치를 준비 장면에 맞추고(±8px) 거의 같은 픽셀은 준비 장면으로 — 장마다 다시 그린
+  다리·코트가 반짝여 "AI 티"(사용자). 바뀐 곳(팔·소품·표정)만 새 그림.
+- 휘두르는·도는 가는 소품 구간은 보간 0 대신 **장면을 더 그린다**. 세로로 든 소품이 위아래로만 움직이는 구간은 보간해도 녹지 않았다(Skill1 v5).
+- 장면 높이가 순서대로 이어지는지 `sheet_check.py frames`의 `top`으로 본다 — Skill1 raise3가 정점보다 높게 그려져 올랐다 내렸다 했다.
+- 발 미끄러짐(`footSlide`)은 소품 끝이 발 옆 바닥에 닿으면 소품을 발로 잡아 부풀려진다. 미리보기 겹쳐보기로 실제 발을 본다.
+- 비교 녹화: 에디터가 플레이 모드에서 몇 시간 멈춘 적이 있다(완료 표시 없이). `EditorApplication.isPlaying`을 보고 꺼진 뒤 다시 녹화. 이름표는 영문(한글이 안 그려진다).
 
 ## A. 적용
 
