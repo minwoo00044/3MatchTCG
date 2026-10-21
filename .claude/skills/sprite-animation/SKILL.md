@@ -146,7 +146,10 @@ pose_edit 장으로 만드는 동작의 처리 규칙 (Priest v4, 2026-10-19~20)
 - 휘두르는·도는 가는 소품 구간은 보간 0 대신 **장면을 더 그린다**. 세로로 든 소품이 위아래로만 움직이는 구간은 보간해도 녹지 않았다(Skill1 v5).
 - 장면 높이가 순서대로 이어지는지 `sheet_check.py frames`의 `top`으로 본다 — Skill1 raise3가 정점보다 높게 그려져 올랐다 내렸다 했다.
 - 발 미끄러짐(`footSlide`)은 소품 끝이 발 옆 바닥에 닿으면 소품을 발로 잡아 부풀려진다. 미리보기 겹쳐보기로 실제 발을 본다.
-- 비교 녹화: 에디터가 플레이 모드에서 몇 시간 멈춘 적이 있다(완료 표시 없이). `EditorApplication.isPlaying`을 보고 꺼진 뒤 다시 녹화. 이름표는 영문(한글이 안 그려진다).
+- 녹화는 `record_compare.py`로 한다(시트별 Idle 비교 / `--clips … --labels … --name …` 여러 클립 한 영상 / `--showcase 캐릭터` 전체 동작).
+  에디터 창이 다른 창 뒤에 있으면 Unity가 플레이 모드 갱신을 2초에 5프레임 정도로 낮춰 녹화가 끝나지 않는 것처럼 보였다(6시간 멈춤, 2026-10-20).
+  도구가 기다리는 동안 `EditorApplication.QueuePlayerLoopUpdate`를 계속 불러 밀어 넣는다(창이 뒤에 있어도 Priest 전체 녹화 약 5분).
+  C#(`AnimationCompareRecorder`·`AnimationShowcaseRecorder`)를 직접 부르면 이 밀어 넣기가 없다. 이름표는 영문(한글이 안 그려진다).
 
 ## A. 적용
 
