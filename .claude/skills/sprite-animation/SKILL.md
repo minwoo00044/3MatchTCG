@@ -39,6 +39,18 @@ Knight(2026-10-14~15)가 이 순서로 원화에서 6개 동작까지 갔다. **
 | 7 | 동작별 생성 (F) | 정의 → 레퍼런스 → spec → `generate_action.py` → 처리 → 검사 → 비교 녹화 → Apply | Hit·Skill1~3·Dead |
 | 8 | 감사 (B) | `sheet_check.py audit --reference <Idle>` | 크기·디자인이 동작끼리 맞는지 |
 
+### 적 캐릭터 (team: enemy)
+순서는 위와 같다. 다른 점은 둘이고, 규칙은 `process_sprite_sheet.py`의 `TEAMS` 한 곳에 있다.
+- **액션**: Idle(반자동, 대기용)·Hit·Skill1·Dead만. 다른 액션은 `generate_action`·`pose_edit`·`codex_generate`·파이프라인이 거부한다. 관문 3 디렉팅도 Hit·Skill1·Dead 셋.
+- **방향**: 아군과 마주 보도록 왼쪽을 본다. **생성·검증은 아군과 똑같이 오른쪽으로** 하고(마네킹·참고 시트·프롬프트가 전부 오른쪽 기준, 왼쪽으로 그리게 하면 방향을 자주 틀린다),
+  파이프라인이 출력 셀만 좌우 반전해 시트에 굽는다(매니페스트 `mirrored: true`). 게임 쪽 flipX는 쓰지 않는다.
+  - 원화·턴어라운드·`body.png`·Codex 결과·`source~` 원본 프레임은 전부 오른쪽을 보는 그림이다. 처리된 시트(`Spirte/{캐릭터}/*.png`)만 왼쪽.
+  - 비대칭 디자인(무기를 쥔 손, 한쪽 어깨 장식, 글자)도 같이 뒤집힌다. 손은 **그린 그림 기준**으로 `design.required`·spec에 적고, 게임에서는 반대 손이 된다고 관문 1에서 사용자에게 말한다. 글자·문양은 피한다.
+  - `align_x`의 `left_foot`/`right_foot`과 `footSlide`는 **반전 전(그린 그림) 기준** 화면 왼쪽/오른쪽이다 — 미리보기 1칸(원본+분할선)을 보고 정한다. 아틀라스·겹쳐보기 칸은 반전된 모습이다.
+  - 처리된 시트를 Codex 참고로 붙일 때(`codex_generate` 기준·소품 참고)는 `common.as_drawn`이 오른쪽으로 되돌려 붙인다. 측정(키·머리 비율·색·sizeFit)은 좌우 대칭이라 그대로.
+  - **처리된(반전된) 시트를 다시 파이프라인 `--input`으로 넣지 않는다** — 두 번 뒤집혀 오른쪽을 보게 된다. 다시 만들 땐 원본(`source~`, `source_build.py`)에서.
+- 설정: `deform.py init ... --team enemy` → `character.json` `"team": "enemy"`(없으면 ally). 키 비교(`lineup`·`set-height --relative-to`)는 아군과 같이 한다.
+
 ### 관문 1 — 설정 입력 (생성 전에)
 원화를 보고 후보를 제안하고, AskUserQuestion으로 받는다. 짐작으로 채우지 않는다.
 - **이름**(영문, 대문자 시작), **키(cm)** — 기존 캐릭터를 함께 보여 준다(Archer 160, Knight 170). 키 차이는 게임 안에서 실제 크기 차이로 보인다.

@@ -210,6 +210,7 @@ def main():
     args = ap.parse_args()
     # 캐릭터마다 Idle에서 움직일 부분·폭이 다르다 — character.json "idle"에 기록하고 여기서 읽는다(사용자 지시 2026-10-14)
     if args.character:
+        D.use_skin(args.character)
         cfg_path = os.path.join(C.SHEET_ROOT, args.character, f"{args.character}.character.json")
         with open(cfg_path, encoding="utf-8") as fp:
             idle = json.load(fp).get("idle", {})

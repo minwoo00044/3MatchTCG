@@ -179,6 +179,7 @@ def cmd_generate(args):
 
 
 def cmd_verify(args):
+    D.use_skin(args.character)
     figs = turnaround_views(args.character)
     target = chin_ratio(figs[1])
     if target is None:

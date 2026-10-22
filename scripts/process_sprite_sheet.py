@@ -48,6 +48,17 @@ ACTIONS = {
     "Dead":  {"fps": 8,  "loop": False, "align_x": "anchor", "align_y": "ground"},
 }
 
+# 팀별 규칙 — {캐릭터}.character.json "team"(없으면 ally). 액션 집합·방향은 여기 한 곳에서만 정한다.
+# actions: 만들 수 있는 액션(None = 전부). 적은 GDD상 스킬이 하나라 Hit·Skill1·Dead + 대기용 반자동 Idle.
+# mirror : 적은 아군과 마주 보도록 왼쪽을 본다. 마네킹·참고 시트·프롬프트·발 정렬이 전부 '오른쪽을 보는 3/4'이라
+#          생성·검증은 아군과 똑같이 오른쪽으로 하고, 이 파이프라인이 출력 셀만 좌우 반전해 시트에 굽는다.
+#          (처음부터 왼쪽으로 그리면 Codex가 방향을 자주 틀린다 — Priest 3/4가 반대로 나와 반전했다.)
+#          그래서 align_x의 left_foot/right_foot과 footSlide는 반전 전, 즉 '그린 그림' 기준 화면 왼쪽/오른쪽이다.
+TEAMS = {
+    "ally":  {"actions": None, "mirror": False},
+    "enemy": {"actions": ("Idle", "Hit", "Skill1", "Dead"), "mirror": True},
+}
+
 ALPHA_THRESHOLD = 30
 SEAM_MARGIN = 70          # 셀 경계 ±px 안에서 분할선을 찾는다
 SEAM_OPAQUE_WARN = 40     # 분할선이 이만큼 불투명 픽셀을 지나가면 실제 겹침으로 본다
@@ -77,6 +88,26 @@ class PipelineError(Exception):
 
 def action_rule(action):
     return ACTIONS["Skill" if action.startswith("Skill") else action]
+
+
+def character_team(character):
+    """TEAMS 규칙. character.json "team"이 없으면 ally."""
+    team = character_config(character).get("team", "ally")
+    if team not in TEAMS:
+        raise PipelineError(f"{character}.character.json team = '{team}' — {list(TEAMS)} 중 하나여야 한다")
+    return TEAMS[team]
+
+
+def check_team_action(character, action):
+    """그 팀에 없는 액션이면 PipelineError (적의 Skill2 같은 것을 만들지 않게 생성·처리 입구에서 막는다)."""
+    allowed = character_team(character)["actions"]
+    if allowed is not None and action not in allowed:
+        raise PipelineError(f"{character}는 {action}이 없는 팀이다 — 만들 수 있는 액션: {', '.join(allowed)}")
+
+
+def mirror(img):
+    """적 시트용 좌우 반전. pivot이 셀 가로 가운데(cell_w / 2.0)라 반전해도 발 자리는 그대로다."""
+    return img.transpose(Image.FLIP_LEFT_RIGHT)
 
 
 # ---------------------------------------------------------------- 분할
@@ -862,6 +893,13 @@ def warn_local_only(character):
     return refs
 
 
+def use_character_skin(character):
+    """턱 찾기(deform.face_chin)가 이 캐릭터의 피부색을 쓰게 한다 — 사람이 아닌 캐릭터(Goblin)는 character.json palette.skin."""
+    sys.path.insert(0, os.path.join(PROJECT_ROOT, ".claude", "skills", "sprite-animation", "scripts"))
+    import deform
+    deform.use_skin(character)
+
+
 def chin_to_sole(img):
     """얼굴 피부 아래 끝(턱) ~ 발바닥(px). 스킬 스크립트의 deform.face_chin을 쓴다. 못 찾으면 None."""
     sys.path.insert(0, os.path.join(PROJECT_ROOT, ".claude", "skills", "sprite-animation", "scripts"))
@@ -948,6 +986,8 @@ def size_fit(img, scale, character, name):
         rm = json.load(fp)
     ref = Image.open(ref_png).convert("RGBA").crop((0, 0, rm["cellWidth"], rm["cellHeight"]))
     ref = ref.crop(ref.getbbox())
+    if rm.get("mirrored"):
+        ref = mirror(ref)  # 기준 시트는 반전되어 저장돼 있고, 맞출 프레임은 아직 그린 방향이다
     half = 0.5  # 반 크기로 비교 (속도)
     W, H = round(max(ref.width, img.width * scale) * 1.4 * half), round(max(ref.height, img.height * scale) * 1.3 * half)
     rmask = _fit_mask(ref, half, W, H)
@@ -997,6 +1037,9 @@ def run(args):
         raise PipelineError(f"이름 규칙 위반: '{args.name}' — {{캐릭터}}_{{Idle|Hit|Skill1~9|Dead}}_v{{N}} (예: Archer_Skill1_v1)")
     character, action, version = m.group(1), m.group(2), int(m.group(3))
     warn_local_only(character)
+    check_team_action(character, action)
+    use_character_skin(character)
+    flip = character_team(character)["mirror"]
     rule = action_rule(action)
     align_x = args.align_x or character_align_x(character, action) or rule["align_x"]
     align_y = args.align_y or rule["align_y"]
@@ -1092,6 +1135,10 @@ def run(args):
                     warnings.append(f"보간 {i}→{j} 번짐 {g:.3f} (기준 {HAZE_CUT}) — 미리보기 아래 칸에서 두 겹으로 보이는지 확인한다")
                 strips.append((f"haze {i}->{j}  {g:.3f}" + ("  (cut)" if i in cut else ""),
                                [cells[keys[i]]] + mids + [cells[keys[j]]]))
+    if flip:
+        # 정렬·증강·측정은 그린 방향에서 끝냈다. 출력 셀과 미리보기 셀만 반전한다(원본+분할선 칸은 그린 그림 그대로)
+        cells = [mirror(c) for c in cells]
+        strips = [(label, [mirror(c) for c in seq]) for label, seq in strips]
     out_cols, out_rows = atlas_grid(len(cells), cell_w, cell_h)
 
     preview = os.path.join(PROJECT_ROOT, PREVIEW_DIR, f"{args.name}_preview.png")
@@ -1129,6 +1176,7 @@ def run(args):
         "stance": stance,
         "alignX": align_x,
         "alignY": align_y,
+        "mirrored": flip,  # 적: 셀을 좌우 반전해 저장했다(왼쪽을 본다). alignX·footSlide의 왼쪽/오른쪽은 반전 전 기준
         "footSlide": slide,  # 정렬 후 발별 미끄러짐 폭(출력 px, 화면 왼쪽/오른쪽 발). 고정한 발은 0에 가까워야 한다
         "warnings": warnings,
     }
@@ -1166,7 +1214,7 @@ def run(args):
         "sheet": None if args.analyze else sheet_rel,
         "preview": preview.replace("\\", "/"),
         "next": None if args.analyze else f"unity cmd eval 'return SpriteAnimationPipeline.Apply(\"{sheet_rel}\");'",
-        **{k: manifest[k] for k in ("cellWidth", "cellHeight", "pivotX", "pivotY", "fps", "loop", "scale", "alignX", "alignY", "footSlide", "frames", "haze", "warnings")},
+        **{k: manifest[k] for k in ("cellWidth", "cellHeight", "pivotX", "pivotY", "fps", "loop", "scale", "alignX", "alignY", "mirrored", "footSlide", "frames", "haze", "warnings")},
     }
 
 

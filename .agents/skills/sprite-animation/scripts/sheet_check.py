@@ -393,19 +393,22 @@ def reference_chin_to_sole(path):
     if not os.path.exists(src):
         sys.exit(f"원본 시트가 없어 턱~발바닥을 못 잰다: {src}")
     fr, _ = C.load_frames(src, g["cols"], g["rows"], g["frames"])
+    C.P.use_character_skin(character_of(path))
     raw = C.P.chin_to_sole(fr[m.get("anchor", 0)]["image"])
     if raw is None:
         sys.exit("원본 기준 프레임에서 턱을 못 찾았다 — ref_chin_to_sole을 손으로 잰다")
     return round(raw * m["scale"])
 
 
-def skull_height(img, skull_over_L):
+def skull_height(img, skull_over_L, character=None):
     """
     정수리~발바닥 키(머리카락 제외, 다리를 벌린 만큼 보정). 정수리는 얼굴 턱에서 두개골 높이(턱~발바닥 × skull_over_L)만큼 위.
     skull_over_L은 캐릭터마다 잰 값(character.json): Archer 0.312(사용자가 그린 두개골 선), Knight 0.304(맞춰 겹친 마네킹 v3).
     """
     sys.path.insert(0, os.path.dirname(__file__))
     import deform as D
+    if character:
+        D.use_skin(character)
     a = np.array(img)[:, :, 3] > 128
     ys = np.where(a.any(1))[0]
     top, sole = ys.min(), ys.max()
@@ -429,9 +432,9 @@ def cmd_set_height(args):
             sys.exit(f"{name}.character.json에 height_cm, skull_over_L이 필요하다")
     ref_sheet = os.path.join(C.SHEET_ROOT, args.relative_to, other["reference"] + ".png")
     of, _ = C.load_frames(ref_sheet)
-    other_h, _ = skull_height(C.crop_frame(of[0]["image"]), other["skull_over_L"])
+    other_h, _ = skull_height(C.crop_frame(of[0]["image"]), other["skull_over_L"], args.relative_to)
     mf, _ = C.load_frames(args.sheet, 4, 2, 8)
-    my_h, my_s = skull_height(mf[0]["image"], me["skull_over_L"])
+    my_h, my_s = skull_height(mf[0]["image"], me["skull_over_L"], args.character)
     target = other_h * me["height_cm"] / other["height_cm"]
     scale = target / my_h
     me.update(ref_height=round(scale * my_s, 1), ref_method="standing",

@@ -14,7 +14,10 @@ pose spec(JSON, 확정되면 {캐릭터}/source~/pose/{액션}.json 에 커밋):
    "common": "모든 포즈에 붙는 문장(손에 든 소품 규칙 등)",
    "poses": {"peak": {"hands": "소품을 어느 손에 드는지", "pose": "이 장에서 바꿀 것만",
                       "legs_keep": "(선택) 다리를 쓰는 장: 고정할 발만 — 예 'her RIGHT foot ... at the same pixels'"}}}
-몸 기준: --body → character.json idle.body → idle.source의 base 프레임.
+몸 기준: 포즈의 "body" → --body → character.json idle.body → idle.source의 base 프레임.
+  포즈마다 "body"(프로젝트 루트 기준 경로)를 주면 그 그림을 편집한다 — 이미 생성한 동작의 장을 하나씩 고칠 때
+  (Goblin Skill1 2026-10-22: 2~10장만 단검이 반대 손 → 그 장들을 '앞쪽 손으로' 편집). 모든 장이 같은 배율이어야
+  잇기가 맞으니 원본 시트의 칸을 그대로(같은 칸 크기) 잘라 body로 쓰고 figure_h = 캔버스 높이로 둔다.
 결과: SpriteRegen/{캐릭터}_{액션}E_{포즈}/try{N}/result.png (키 색 배경). 고른 장은 accept로 키 색을 지운 투명 PNG를 source~/{액션}/{포즈}.png 에 둔다.
 배경: 캐릭터에 없는 키 색(character.json design.key_color, 기본 green). 예전엔 흰 배경이라 몸에 둘러싸인 배경(지팡이·몸 사이, 다리 사이)이
 흰색으로 남았다 — Priest v3 "누끼가 덜 따졌다"(2026-10-19). 흰 옷이 넓으면 색으로도 못 가른다.
@@ -93,7 +96,13 @@ def prompt_for(spec, key, key_name):
                          key_name=key_name, key_hex=hexv, legs_keep=legs_keep, change_scope=scope)
 
 
+def pose_body(spec, key, body):
+    p = spec["poses"][key].get("body")
+    return Image.open(os.path.join(C.ROOT, p)).convert("RGBA") if p else body
+
+
 def generate_one(character, action, spec, key, body, limit, dry_run):
+    body = pose_body(spec, key, body)
     job = f"{character}_{action}E_{key}"
     if dry_run:
         work = CI.dryrun_dir(job)
@@ -143,7 +152,7 @@ def cmd_base(args):
     """준비 장면 = 몸 기준을 편집 없이 같은 캔버스·배치로 (투명). Codex로 '변화 없음'을 그리면 몸이 미세하게 달라진다."""
     with open(args.spec, encoding="utf-8") as fp:
         spec = json.load(fp)
-    body = body_image(args.character, args.body)
+    body = pose_body(spec, args.pose, body_image(args.character, args.body)) if args.pose in spec.get("poses", {})         else body_image(args.character, args.body)
     w, h = spec.get("canvas", [1024, 1536])
     fig_h = spec.get("figure_h", 900)
     s = fig_h / body.height
@@ -182,6 +191,8 @@ def main():
     b.add_argument("--body")
     args = ap.parse_args()
     C.P.warn_local_only(args.character)
+    if getattr(args, "action", None):
+        C.check_team_action(args.character, args.action)
     {"generate": cmd_generate, "accept": cmd_accept, "base": cmd_base}[args.cmd](args)
 
 

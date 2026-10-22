@@ -66,6 +66,10 @@ public static class AnimationCompareRecorder
         var bounds = all ?? new Bounds(Vector3.up * 2.5f, new Vector3(5f, 5f, 0f));
         float slot = bounds.size.x * 1.05f;
 
+        // _Compare/는 커밋하지 않는 폴더라 새 PC에는 없다 — 없으면 CreateAnimatorControllerAtPath가 실패한다
+        if (!AssetDatabase.IsValidFolder(CompareRoot))
+            AssetDatabase.CreateFolder(Path.GetDirectoryName(CompareRoot).Replace('\\', '/'), Path.GetFileName(CompareRoot));
+
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
         for (int i = 0; i < clips.Length; i++)
         {

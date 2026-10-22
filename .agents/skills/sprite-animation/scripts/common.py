@@ -60,6 +60,32 @@ def load_frames(path, cols=None, rows=None, frames=None):
     return fr, warnings
 
 
+def sheet_mirrored(path):
+    """처리된 시트가 좌우 반전되어 저장됐는지(적, 매니페스트 mirrored). 매니페스트가 없으면(원본·생성 결과) False."""
+    manifest = os.path.splitext(path)[0] + ".json"
+    if not os.path.exists(manifest):
+        return False
+    with open(manifest, encoding="utf-8") as fp:
+        return bool(json.load(fp).get("mirrored"))
+
+
+def as_drawn(img, path):
+    """
+    처리된 시트에서 뽑은 그림을 '그린 방향'(오른쪽을 보는 3/4)으로 돌려놓는다.
+    적 시트는 반전되어 저장되지만 Codex 프롬프트·마네킹은 전부 오른쪽 기준이라, 참고 이미지로 붙이기 전에 되돌린다.
+    측정(키·머리 비율·색)은 좌우 대칭이라 되돌릴 필요가 없다.
+    """
+    return img.transpose(Image.FLIP_LEFT_RIGHT) if sheet_mirrored(path) else img
+
+
+def check_team_action(character, action):
+    """팀에 없는 액션(적의 Skill2 등)이면 생성 전에 멈춘다. 규칙은 파이프라인 TEAMS 한 곳."""
+    try:
+        P.check_team_action(character, action)
+    except P.PipelineError as e:
+        sys.exit(str(e))
+
+
 def latest_sheet(character, action):
     """Spirte/{캐릭터}/ 에서 해당 액션의 최신 버전 시트 (prev/ 제외)."""
     pat = re.compile(rf"^{character}_{action}_v(\d+)\.png$")

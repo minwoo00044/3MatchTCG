@@ -119,6 +119,7 @@ def main():
     ap.add_argument("--skip-direction", action="store_true",
                     help="디렉팅 기록 없이 생성 (디렉팅 관문 이전에 만든 캐릭터를 다시 뽑을 때만)")
     args = ap.parse_args()
+    C.check_team_action(args.character, args.action)
     direction = action_direction(args.character, args.action)
     if direction is None and not args.skip_direction:
         print(f"{args.character}.character.json에 actions.{args.action}.direction이 없다 — "

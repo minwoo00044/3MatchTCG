@@ -93,6 +93,7 @@ def main():
             done(False, 3 if getattr(e, "over_limit", False) else 1, error=str(e), usage=getattr(e, "usage", None))
 
     character = SC.character_of(args.reference)
+    C.check_team_action(character, args.action)
     original = resolve_original(character, args.action, args.original)
     cols, rows, frames = grid_of(original)
 
@@ -105,7 +106,7 @@ def main():
     SC.check_reference(args.reference)
     palette = SC.load_palette(character, None)
     ref_frames, ref_f0, _ = SC.reference(args.reference, palette)
-    ref = C.crop_frame(ref_frames[0]["image"])
+    ref = C.as_drawn(C.crop_frame(ref_frames[0]["image"]), args.reference)
     bg = Image.new("RGBA", ref.size, (255, 255, 255, 255))
     bg.alpha_composite(ref)
     bg.convert("RGB").save(os.path.join(work, "character_reference.png"))
@@ -122,7 +123,7 @@ def main():
         if not os.path.exists(props_sheet):
             done(False, 1, error=f"소품 참고 시트가 없다: {props_sheet}")
         pf, _ = C.load_frames(props_sheet)
-        pimg = C.crop_frame(pf[0]["image"])
+        pimg = C.as_drawn(C.crop_frame(pf[0]["image"]), props_sheet)
         pbg = Image.new("RGBA", pimg.size, (255, 255, 255, 255))
         pbg.alpha_composite(pimg)
         pbg.convert("RGB").save(os.path.join(work, "props_reference.png"))

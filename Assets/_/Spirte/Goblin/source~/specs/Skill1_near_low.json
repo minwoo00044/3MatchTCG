@@ -1,0 +1,23 @@
+{
+  "title": "a FAST, VICIOUS DASHING SLASH with a short dagger in the NEAR hand to the front (right)",
+  "physics": "Physics: a savage goblin attack. A short low crouch, then the back leg explodes straight and the front foot takes ONE big step forward so the whole body shoots low and forward. The dagger in the NEAR hand cuts in one stroke and leaves a bold pale crescent smear trail bigger than the goblin's body. No pauses, no second cut. Exaggerate the poses about 25%.",
+  "poses": [
+    "Anticipation: crouching lower, weight on the back leg; the NEAR arm is pulled back LOW along the near side of the body, the dagger trailing behind the hip, blade pointing back; the empty far hand claws forward.",
+    "Dash start: the back leg pushes, the front foot lifts and moves forward, the body leans low and forward; the NEAR arm is pulled back LOW along the near side of the body, the dagger trailing behind the hip, blade pointing back.",
+    "Dash: the front foot lands one big step forward, the body low and stretched over the front knee; the NEAR arm is pulled back LOW along the near side of the body, the dagger trailing behind the hip, blade pointing back, at its furthest point.",
+    "SLASH: the NEAR arm sweeps forward from low behind the hip in a rising-then-forward arc; draw a bold pale crescent smear arc along the whole path, larger than the body; the empty far hand pulled back.",
+    "IMPACT: the NEAR arm fully extended forward and down at the end of the arc holding the dagger, deep wide stance, torso over the front knee, ears and scarf whipping forward; the fading tail of the smear.",
+    "Follow-through: the dagger in the NEAR hand continues low past the front knee, the body sinks slightly lower; no smear.",
+    "Recovery start: pushing back from the front leg, the NEAR hand brings the dagger up to hip level in front of the body, blade forward-down.",
+    "Recovery: the front foot pulled halfway back, the NEAR hand holds the dagger low in front of the hip like character.png."
+  ],
+  "reference": "SpriteRegen/_refs/goblin_skill1_A_motion.png",
+  "reference_note": "12 frames of an earlier version of THIS animation, read left-to-right, top-to-bottom",
+  "rules": [
+    "The dagger is ALWAYS in the goblin's NEAR hand: the hand that holds it in character.png (the arm on the RIGHT side of the figure in the image, attached to the shoulder closest to the camera). The other hand (the arm on the LEFT side of the image, behind the body) is ALWAYS empty with open claws and never touches the dagger.",
+    "The back (left side of the image) foot stays at EXACTLY the same spot in every frame; only the front foot steps forward and back.",
+    "3/4 view facing right like #1 in every frame, never toward the camera.",
+    "Expression: a fierce snarl with bared teeth; no smile, no blush.",
+    "pose_reference.png shows the body and leg motion and the smear that the user liked — copy the body lean, the legs, the step and the smear arc from it, BUT in it the dagger is in the WRONG (far) hand: do NOT copy which hand holds the dagger."
+  ]
+}

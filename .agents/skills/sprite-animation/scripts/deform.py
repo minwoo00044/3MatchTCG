@@ -2,7 +2,7 @@
 HD 원화 → 데포르메 턴어라운드(앞·3/4·옆·뒤, A포즈). 새 캐릭터 v1 생성의 첫 단계.
 비율·자세는 체형 마네킹(assets/mannequin/), 디자인은 HD 원화, 화풍은 기준 캐릭터에서 가져온다.
 
-  init --character Knight --height-cm 170 --hint tall --required "..." [--required ...] [--profile "..."]
+  init --character Knight --height-cm 170 --hint tall --required "..." [--required ...] [--profile "..."] [--team enemy]
       [관문 1: 설정 입력] 생성 전에 사용자에게 받은 설정으로 {캐릭터}.character.json을 만든다.
       키(cm)·체형 힌트·필수 디자인 요소·프로필(체격·성격·무기 쥐는 손). skull_over_L은 추정값.
   generate --character Knight --source HD.png [--hint normal|young|tall] [--design-note "..."]
@@ -235,11 +235,30 @@ CHEEK_INVALID = 0.60  # 이보다 넓으면 볼이 아니라 머리카락까지 
 CHEEK_TOL = 0.10  # 3/4 모습 아래 볼(눈~턱 75%) 폭이 기준 캐릭터보다 이만큼 넘게 넓으면 불합격 (Knight 4차 +13%: 사용자가 "볼이 빵빵"이라 지적)
 
 
+# 얼굴(턱) 찾기에 쓰는 피부색. 기본은 애니풍 밝은 사람 피부. 사람이 아닌 캐릭터(Goblin: 온몸 올리브색)는
+# character.json "palette".skin으로 바꾼다 — 기본 범위로는 고블린의 베이지 천·붕대를 피부로 잡아 턱~발바닥이 틀렸고,
+# 같은 준비 자세 두 세트의 배율이 0.60/0.82로 갈렸다(2026-10-22).
+# face_chin을 부르는 곳이 측정 함수 안쪽 깊이 15곳이라 인자로 넘기지 않고, 진입점이 use_skin(캐릭터)로 한 번 정한다.
+DEFAULT_SKIN = {"h": [[0, 35], [345, 360]], "s": [0.12, 0.45], "v": [0.75, 1.0]}
+_skin = DEFAULT_SKIN
+
+
+def use_skin(character):
+    """그 캐릭터의 피부색 범위(character.json palette.skin)를 쓴다. 없으면 기본."""
+    global _skin
+    path = os.path.join(C.SHEET_ROOT, character, f"{character}.character.json")
+    cfg = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+    _skin = cfg.get("palette", {}).get("skin", DEFAULT_SKIN)
+
+
 def skin_mask(fig):
     hsv = np.asarray(fig.convert("RGB").convert("HSV")).astype(float)
     alpha = np.asarray(fig)[:, :, 3] > 128
     h, s, v = hsv[..., 0] * 360 / 255, hsv[..., 1] / 255, hsv[..., 2] / 255
-    return alpha & ((h < 35) | (h > 345)) & (s > 0.12) & (s < 0.45) & (v > 0.75)
+    hue = np.zeros_like(alpha)
+    for lo, hi in _skin["h"]:
+        hue |= (h >= lo) & (h <= hi)
+    return alpha & hue & (s > _skin["s"][0]) & (s < _skin["s"][1]) & (v > _skin["v"][0]) & (v <= _skin["v"][1])
 
 
 def face_profile(fig, eye_ratio):
@@ -418,6 +437,10 @@ def compare_with_reference(spec, figs, path):
 
 
 def cmd_verify(args):
+    # SpriteRegen/{캐릭터}_Deform/tryN/result.png → 그 캐릭터의 피부색으로 턱을 찾는다
+    who = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(args.image))))
+    if who.endswith("_Deform"):
+        use_skin(who[:-len("_Deform")])
     spec = mannequin_spec()
     hint = HINTS[args.hint]
     figs = M.figures(args.image, len(M.VIEWS))
@@ -579,7 +602,7 @@ def cmd_init(args):
     else:
         skull = round(ref_skull * HINTS[args.hint]["head"], 3)
         note = f"추정: {ref_char} {ref_skull} × hint {args.hint} 머리 배율 {HINTS[args.hint]['head']} (deform.py init)"
-    cfg = {"height_cm": args.height_cm, "hint": args.hint, "profile": args.profile or "",
+    cfg = {"team": args.team, "height_cm": args.height_cm, "hint": args.hint, "profile": args.profile or "",
            "skull_over_L": skull, "skull_note": note,
            "design": {"required": args.required, "props_reference": None, "note": "deform.py init — 사용자 입력"},
            "align_x": {},
@@ -587,7 +610,10 @@ def cmd_init(args):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as fp:
         json.dump(cfg, fp, ensure_ascii=False, indent=2)
-    print(f"{args.character}.character.json 생성: 키 {args.height_cm}cm, 힌트 {args.hint}, skull_over_L {skull} ({note})")
+    print(f"{args.character}.character.json 생성: 팀 {args.team}, 키 {args.height_cm}cm, 힌트 {args.hint}, skull_over_L {skull} ({note})")
+    rule = C.P.TEAMS[args.team]
+    if rule["mirror"]:
+        print(f"  적: 생성·검증은 오른쪽을 보게, 처리 단계에서 좌우 반전(왼쪽을 본다). 액션은 {', '.join(rule['actions'])}만")
     if not args.required:
         print("  [주의] design.required가 비었다 — 원화에서 꼭 있어야 할 요소를 사용자에게 묻고 적는다")
     done(True, 0, config=slash(path))
@@ -645,7 +671,8 @@ def cmd_lineup(args):
     tiles = []
     for name, fig, kind, cfg in entries:
         # 크기는 다리를 편 키로 보정한 값(set-height와 같음)으로, 정수리선은 그림 속 실제 두개골 꼭대기에 긋는다
-        h, _ = SC.skull_height(fig, cfg["skull_over_L"])
+        h, _ = SC.skull_height(fig, cfg["skull_over_L"], name)
+        use_skin(name)  # 이 파일을 직접 실행하면 SC가 가져간 deform과 모듈이 따로라 여기서도 정한다
         target = LINEUP_H * cfg["height_cm"] / tallest
         s = target / h
         f = fig.resize((max(1, round(fig.width * s)), max(1, round(fig.height * s))), Image.LANCZOS)
@@ -687,6 +714,8 @@ def main():
     i.add_argument("--character", required=True, help="캐릭터 이름 (영문, 대문자 시작)")
     i.add_argument("--height-cm", type=int, required=True, help="설정 키(cm). 예: Archer 160, Knight 170")
     i.add_argument("--hint", choices=list(HINTS), required=True)
+    i.add_argument("--team", choices=["ally", "enemy"], default="ally",
+                   help="enemy = 왼쪽을 보고(처리 단계 반전) Idle·Hit·Skill1·Dead만 (규칙: process_sprite_sheet.py TEAMS)")
     i.add_argument("--required", action="append", default=[], help="필수 디자인 요소 (영어 짧은 문장, 여러 번)")
     i.add_argument("--profile", help="체격·성격·무기와 쥐는 손 (사람이 읽는 메모 — Idle 움직임·동작 디렉팅의 근거)")
     i.add_argument("--skull-over-l", type=float, help="두개골/턱~발바닥. 생략하면 기준 캐릭터 값 × 힌트로 추정")
