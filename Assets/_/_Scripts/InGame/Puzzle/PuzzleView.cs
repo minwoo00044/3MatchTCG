@@ -15,12 +15,18 @@ public enum EBubbleHighlight
 public class PuzzleView : MonoBehaviour,
     IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, IPoolable<PuzzleView>
 {
-    private static readonly int GrayscaleAmountId = Shader.PropertyToID("_GrayscaleAmount");
-
     [SerializeField]
     private SpriteRenderer bubbleShell;
     [SerializeField]
     private SpriteRenderer inBubble;
+
+    [Header("Dead")]
+    // 죽은 캐릭터의 버블 표시. 예전엔 회색조(쉘·아이콘의 색을 뺌)였는데 색이 빠지면 누구 버블인지 알 수 없어서
+    // 원래 색은 두고 둘레만 회색 테두리로 바꿨다 - 사용자(기획) 테스트 결정 2026-10-23.
+    // GDD §3.2.1 "시각적 구별"은 아직 회색조로 적혀 있다(문서 갱신은 기획자 몫).
+    [Tooltip("죽은 캐릭터의 버블에 보일 테두리. 쉘 뒤에 조금 크게 깐 원이라 둘레만 보입니다")]
+    [SerializeField]
+    private SpriteRenderer deadRim;
 
     [Header("Highlight")]
     [Tooltip("선택/호버/힌트 표시용 링. 비워두면 쉘 색을 밝게 하는 방식으로 대체됩니다.")]
@@ -59,9 +65,9 @@ public class PuzzleView : MonoBehaviour,
     private int baseShellOrder;
     private int baseInBubbleOrder;
     private int baseRingOrder;
+    private int baseDeadRimOrder;
     private bool sortingCaptured;
     private EBubbleHighlight highlight = EBubbleHighlight.None;
-    private MaterialPropertyBlock grayscaleProperties;
 
     public Bubble Data { get => _data; set => _data = value; }
 
@@ -81,6 +87,7 @@ public class PuzzleView : MonoBehaviour,
         if (bubbleShell != null) baseShellOrder = bubbleShell.sortingOrder;
         if (inBubble != null) baseInBubbleOrder = inBubble.sortingOrder;
         if (highlightRing != null) baseRingOrder = highlightRing.sortingOrder;
+        if (deadRim != null) baseDeadRimOrder = deadRim.sortingOrder;
     }
     // shellColor는 뷰가 스스로 판단하지 않습니다. 버블 색의 원천은 CharacterSO.mainColor이고
     // 그 매핑은 PuzzleManager가 소유하므로 여기서는 받은 색을 칠하기만 합니다. (GDD §2.2, AGENTS.md §1)
@@ -88,8 +95,8 @@ public class PuzzleView : MonoBehaviour,
     {
         _data = data;
 
-        // 풀에서 사망 버블에 쓰였던 뷰가 정상 버블로 돌아올 때 회색조가 남지 않게 합니다.
-        SetGrayscale(false);
+        // 풀에서 사망 버블에 쓰였던 뷰가 정상 버블로 돌아올 때 사망 표시가 남지 않게 합니다.
+        SetDead(false);
 
         baseShellColor = shellColor;
         bubbleShell.color = baseShellColor;
@@ -106,19 +113,9 @@ public class PuzzleView : MonoBehaviour,
         ForceClearHighlight();
     }
 
-    public void SetGrayscale(bool enabled)
+    public void SetDead(bool dead)
     {
-        if (grayscaleProperties == null) grayscaleProperties = new MaterialPropertyBlock();
-        grayscaleProperties.SetFloat(GrayscaleAmountId, enabled ? 1f : 0f);
-
-        ApplyGrayscale(bubbleShell);
-        ApplyGrayscale(inBubble);
-    }
-
-    private void ApplyGrayscale(SpriteRenderer renderer)
-    {
-        if (renderer == null) return;
-        renderer.SetPropertyBlock(grayscaleProperties);
+        if (deadRim != null) deadRim.gameObject.SetActive(dead);
     }
 
     // ===================== 하이라이트 =====================
@@ -212,6 +209,7 @@ public class PuzzleView : MonoBehaviour,
         if (bubbleShell != null) bubbleShell.sortingOrder = baseShellOrder + bump;
         if (inBubble != null) inBubble.sortingOrder = baseInBubbleOrder + bump;
         if (highlightRing != null) highlightRing.sortingOrder = baseRingOrder + bump;
+        if (deadRim != null) deadRim.sortingOrder = baseDeadRimOrder + bump;
     }
 
     // scale: 버블 전체 크기 배율 / glow: 강조 세기(0~1)
@@ -281,7 +279,7 @@ public class PuzzleView : MonoBehaviour,
     {
         // 무한 루프 하이라이트 트윈이 풀에 살아 남으면 재사용된 뷰에서 계속 돕니다.
         ForceClearHighlight();
-        SetGrayscale(false);
+        SetDead(false);
         _returnAction?.Invoke(this); // 풀의 반납 로직 실행
     }
 

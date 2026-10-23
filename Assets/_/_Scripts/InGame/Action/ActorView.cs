@@ -96,6 +96,9 @@ public class ActorView : MonoBehaviour
     // 상태 이름 -> 클립 길이(초). 끝나고 Idle로 돌아갈 시점을 계산하는 데만 씁니다.
     private readonly Dictionary<string, float> clipLengths = new Dictionary<string, float>();
     private Tween idleReturn;
+    // 쓰러진 뒤에는 어떤 동작도 틀지 않습니다. Dead 클립의 마지막 장면(누운 자세)이 끝까지 남아야 합니다.
+    // 죽은 대상이 다시 맞는 경로는 지금 없지만, 생기면 Hit 클립이 시체를 일으켜 세웁니다(직접 강제 피격으로 확인).
+    private bool isDown;
 
     // 파이프라인 클립 이름: {캐릭터}_{액션}_v{N}. 상태 이름 = 액션 (SpriteAnimationPipeline.LinkController)
     private static readonly Regex ClipAction = new Regex(@"_(Idle|Hit|Skill[1-9]|Dead)_v[0-9]+$");
@@ -136,6 +139,7 @@ public class ActorView : MonoBehaviour
     {
         if (animator == null) return;
 
+        if (isDown) return;
         if (!animator.HasState(0, Animator.StringToHash(state)))
         {
             if (!state.StartsWith("Skill") || !animator.HasState(0, Animator.StringToHash("Skill1"))) return;
@@ -244,7 +248,11 @@ public class ActorView : MonoBehaviour
         if (animated)
         {
             // 쓰러지는 모습은 Dead 클립에 있고, 마지막 장면(누운 자세)에 머뭅니다. 흐리게·눕히기는 하지 않습니다.
-            seq.AppendCallback(() => PlayState("Dead", returnToIdle: false));
+            seq.AppendCallback(() =>
+            {
+                PlayState("Dead", returnToIdle: false);
+                isDown = true;
+            });
             seq.AppendInterval(deathDuration);
             bodyTween = seq;
             return seq;

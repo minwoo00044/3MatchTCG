@@ -43,8 +43,9 @@ T_O 증폭(복합 `SkillEffect`)과 사망 버블 회색조가 `main`에 들어�
 - 독립 `AmplifyAction`(`Assets/_/_SO/ActionData/AmplifyAction.asset`); 상한은 액션 에셋의 직렬화 값(기본 2.0)
 - 일반 효과 수치와 효과별 위협도 실행 경로
 - 적 스킬은 `skillPower = 1`, 증폭 기본 1.0으로 기존 고정 수치 유지
-- `PuzzleManager → PuzzleMatrixView → PuzzleView` 사망 버블 회색조 경로
-- `PuzzleGrayscale.shader` + `Assets/_/_Material/PuzzleGrayscale.mat` (`shell.prefab`의 SpriteRenderer 2곳에 배선)
+- `PuzzleManager → PuzzleMatrixView → PuzzleView` 사망 버블 표시 경로 (`SetDead`)
+- 사망 표시는 2026-10-23부터 **원래 색 + 회색 테두리**(`shell.prefab`의 `deadRim` — 쉘 뒤에 조금 크게 깐 회색 원). 회색조는 누구 버블인지 안 보여 바꿨다.
+  `PuzzleGrayscale.shader`/`.mat`은 쉘 재질로 남아 있지만 코드는 더 이상 `_GrayscaleAmount`를 켜지 않는다
 - 임시 `SkillEffectMigration` 도구는 역할을 마치고 **삭제됨**
 
 ### 회귀 기준 (테스트 사양 기준)
@@ -53,8 +54,8 @@ T_O 증폭(복합 `SkillEffect`)과 사망 버블 회색조가 `main`에 들어�
 - 5매치 T_O도 증폭 증가는 `+0.2` 한 번. 최대 2.0배, 다음 스왑은 1.0배로 리셋
 - 같은 차수 선배치, 앞 차수 증폭은 뒤 차수 유지, 뒤 차수 효과는 앞 차수로 소급하지 않음
 - 적 공격은 기존 `value` 고정. 증폭된 회복 요청량 기준 위협도
-- 사망 즉시 기존 버블 회색조, 매치·파괴 가능, 스킬은 무효
-- 풀 재사용 시 정상 색 복구, 하이라이트와 회색조 동시 동작
+- 사망 즉시 기존 버블에 회색 테두리(색은 유지), 매치·파괴 가능, 스킬은 무효
+- 풀 재사용 시 테두리 제거, 하이라이트와 사망 표시 동시 동작
 
 ### 남은 미결
 

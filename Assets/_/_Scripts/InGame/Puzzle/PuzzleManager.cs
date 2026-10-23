@@ -206,8 +206,8 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
             if (pair.Value == character) deadSpecs.Add(pair.Key);
         }
 
-        // 보드에 이미 남은 버블은 파괴 가능 상태로 유지하고 표현만 즉시 회색조로 바꿉니다.
-        puzzleMatrixView.SetGrayscale(deadSpecs);
+        // 보드에 이미 남은 버블은 파괴 가능 상태로 유지하고 표현만 즉시 사망 표시(회색 테두리)로 바꿉니다.
+        puzzleMatrixView.SetDead(deadSpecs);
 
         // 현재 스왑의 리필은 MoveReceipt에 이미 확정돼 있습니다. 전투 실행 중 들어온 이 갱신은
         // 다음 스왑이 새 버블을 요청할 때부터 적용됩니다. (GDD §3.2.1, AGENTS.md §3)

@@ -119,7 +119,7 @@ public class PuzzleMatrixView : MonoBehaviour
 
     // 어떤 스펙이 사망 캐릭터 소유인지는 PuzzleManager가 판단합니다.
     // 이 뷰는 현재 보드의 데이터-뷰 짝을 찾아 표현만 바꿉니다. (GDD §3.2.1, AGENTS.md §1)
-    public void SetGrayscale(HashSet<BubbleSO> specs)
+    public void SetDead(HashSet<BubbleSO> specs)
     {
         if (specs == null || specs.Count == 0) return;
 
@@ -128,7 +128,7 @@ public class PuzzleMatrixView : MonoBehaviour
             Bubble data = pair.Key;
             if (data?.Spec == null || !specs.Contains(data.Spec)) continue;
 
-            pair.Value.SetGrayscale(true);
+            pair.Value.SetDead(true);
         }
     }
 
