@@ -1,0 +1,58 @@
+{
+  "reference": "Knight_Idle_v10",
+  "height_cm": 170,
+  "skull_over_L": 0.304,
+  "skull_note": "두개골(턱~정수리)/턱~발바닥. 원본 좌표로 겹쳐 맞춘 마네킹 v3 정수리와 Knight 9차 앞모습 얼굴 턱에서 잼(2026-10-14)",
+  "align_x": {
+    "Idle": "both_feet",
+    "Hit": "both_feet",
+    "Skill1": "left_foot",
+    "Skill2": "left_foot",
+    "Skill3": "mid",
+    "Dead": "anchor"
+  },
+  "design": {
+    "required": [
+      "white-and-gold plate armor with gold cross ornaments",
+      "long white cape with navy-blue lining and gold trim",
+      "brown leather waist belts with buckles",
+      "longsword with a gold cross-guard",
+      "flat armored shoes (no heels)"
+    ],
+    "props_reference": "Knight_Idle_v1",
+    "note": "사용자 지정 2026-10-14 (벨트, 갑옷 장식, 망토, 검). 원화의 하이힐은 오류로 판단해 평평한 갑옷 신발"
+  },
+  "ref_height": 517.5,
+  "ref_method": "standing",
+  "ref_height_note": "Archer(Archer_Idle_v8) 정수리~발 484.3px × 170/160cm 기준",
+  "idle": {
+    "method": "procedural",
+    "source": "Assets/_/Spirte/Knight/source~/idle/ai_sheet.png",
+    "base": 0,
+    "blink": 2,
+    "blink_at": [
+      15,
+      16
+    ],
+    "mode": "knee",
+    "knee_amp": 0.02,
+    "knee_ratio": 0.55,
+    "knee_forward": 0.35,
+    "breath_amp": 0.004,
+    "head_lag": 2,
+    "hip": 0.55,
+    "face": "right",
+    "moves": {
+      "knees": "굽힘 — 엉덩이 키의 2% 하강, 무릎 0.55배 하강하며 앞으로",
+      "chest_shoulders": "호흡 — 키의 0.4% 상승",
+      "head": "어깨를 2프레임 늦게 따라감",
+      "eyes": "15~16번 프레임 깜빡임(AI 감은 눈 합성)",
+      "feet": "고정",
+      "hair_cape_sword": "몸과 함께만 움직임(따로 흔들리지 않음)"
+    },
+    "note": "사용자 확정 2026-10-14 ('딱 좋다'). 거쳐 온 것: AI 8장 생성(v1~v5, 얼굴 재작화로 불쾌) → 상체 통째 하강(v6 스프링 인형) → 가슴만 0.9%(v7 너무 큼) → 0.4%(v9 만족) → 무릎 추가(v10 확정)"
+  },
+  "align_x_note": "Hit·Skill3 발 고정 → 두 발, Skill1 앞(오른)발을 내딛으므로 뒷(왼)발 고정, Skill2 보폭이 바뀌어 중점, Dead 넘어짐(anchor). 2026-10-14 첫 생성 기준. Skill3은 2~3번 프레임에서 보폭을 넓혀 두 발 고정이 다리를 56px 끌어당겨 mid로 바꿈. Skill1(런지)은 뒷발이 바닥에 박힌 동작이라 left_foot — 앞발 고정이면 회복 중 앞발이 돌아오며 몸이 앞뒤로 흔들렸다(2026-10-15)",
+  "ref_chin_to_sole": 386,
+  "ref_chin_note": "Knight_Idle_v10 출력 0번 프레임 턱~발바닥(px). 있으면 파이프라인이 ref_height 대신 이걸로 크기를 맞춘다(2026-10-15, 검 때문에 다리 편 키가 틀려서)"
+}

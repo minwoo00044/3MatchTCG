@@ -1,0 +1,69 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "figure_h": 1024,
+  "foot_margin": 0,
+  "common": "Fierce snarl with bared teeth (keep the expression of base.png). The dagger keeps exactly the same size and shape.",
+  "legs_keep": "the legs, the stance and BOTH FEET at the same pixels, the torso lean and the head position",
+  "poses": {
+    "f02": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f02.png",
+      "hands": "HAND FIX (the reason for this edit): the rusty dagger must be held in the goblin's LEFT hand = the NEAR hand, the one on the camera side (in the ready pose it is the hand on the right side of the image, in front of the body). The far (RIGHT) hand is EMPTY, with open clawed fingers. In base.png the dagger is in the wrong (far) hand — move the dagger to the near hand by swapping what the two arms do, as written below.",
+      "pose": "Anticipation: the NEAR (left) arm is raised high and pulled back over the shoulder, gripping the dagger with the blade pointing up-back, exactly where the dagger is in base.png; the FAR (right) arm reaches forward with open claws."
+    },
+    "f03": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f03.png",
+      "hands": "HAND FIX (the reason for this edit): the rusty dagger must be held in the goblin's LEFT hand = the NEAR hand, the one on the camera side (in the ready pose it is the hand on the right side of the image, in front of the body). The far (RIGHT) hand is EMPTY, with open clawed fingers. In base.png the dagger is in the wrong (far) hand — move the dagger to the near hand by swapping what the two arms do, as written below.",
+      "pose": "Dash: the NEAR (left) arm is cocked high back over the shoulder gripping the dagger (same dagger place as base.png); the FAR (right) arm reaches forward with open claws."
+    },
+    "f04": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f04.png",
+      "hands": "HAND FIX (the reason for this edit): the rusty dagger must be held in the goblin's LEFT hand = the NEAR hand, the one on the camera side (in the ready pose it is the hand on the right side of the image, in front of the body). The far (RIGHT) hand is EMPTY, with open clawed fingers. In base.png the dagger is in the wrong (far) hand — move the dagger to the near hand by swapping what the two arms do, as written below.",
+      "pose": "Dash landing: the NEAR (left) arm is cocked high back over the shoulder gripping the dagger (same dagger place as base.png); the FAR (right) arm reaches forward with open claws."
+    },
+    "f05": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f05.png",
+      "hands": "HAND FIX (the reason for this edit): the rusty dagger must be held in the goblin's LEFT hand = the NEAR hand, the one on the camera side (in the ready pose it is the hand on the right side of the image, in front of the body). The far (RIGHT) hand is EMPTY, with open clawed fingers. In base.png the dagger is in the wrong (far) hand — move the dagger to the near hand by swapping what the two arms do, as written below.",
+      "pose": "SLASH start: the NEAR (left) arm whips the dagger from high behind; the dagger stays at the start of the crescent smear exactly as in base.png and the crescent smear trail stays EXACTLY the same; the FAR (right) arm is pulled in toward the chest, empty."
+    },
+    "f06": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f06.png",
+      "hands": "HAND FIX (the reason for this edit): the rusty dagger must be held in the goblin's LEFT hand = the NEAR hand, the one on the camera side (in the ready pose it is the hand on the right side of the image, in front of the body). The far (RIGHT) hand is EMPTY, with open clawed fingers. In base.png the dagger is in the wrong (far) hand — move the dagger to the near hand by swapping what the two arms do, as written below.",
+      "pose": "IMPACT: the NEAR (left) arm is fully extended forward and down holding the dagger at the end of the arc, exactly where it is in base.png; keep the smear tail exactly; the FAR (right) arm is pulled back, empty claws. If base.png already shows this, keep it unchanged."
+    },
+    "f07": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f07.png",
+      "hands": "HAND FIX (the reason for this edit): the rusty dagger must be held in the goblin's LEFT hand = the NEAR hand, the one on the camera side (in the ready pose it is the hand on the right side of the image, in front of the body). The far (RIGHT) hand is EMPTY, with open clawed fingers. In base.png the dagger is in the wrong (far) hand — move the dagger to the near hand by swapping what the two arms do, as written below.",
+      "pose": "Follow-through: the NEAR (left) arm extended low in front holding the dagger exactly where it is in base.png; the FAR (right) arm back, empty claws. If base.png already shows this, keep it unchanged."
+    },
+    "f08": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f08.png",
+      "hands": "HAND FIX (the reason for this edit): the rusty dagger must be held in the goblin's LEFT hand = the NEAR hand, the one on the camera side (in the ready pose it is the hand on the right side of the image, in front of the body). The far (RIGHT) hand is EMPTY, with open clawed fingers. In base.png the dagger is in the wrong (far) hand — move the dagger to the near hand by swapping what the two arms do, as written below.",
+      "pose": "Recovery start: the NEAR (left) hand holds the dagger at hip level in front of the body, blade pointing forward-down; the FAR (right) arm is relaxed back, empty claws."
+    },
+    "f09": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f09.png",
+      "hands": "HAND FIX (the reason for this edit): the rusty dagger must be held in the goblin's LEFT hand = the NEAR hand, the one on the camera side (in the ready pose it is the hand on the right side of the image, in front of the body). The far (RIGHT) hand is EMPTY, with open clawed fingers. In base.png the dagger is in the wrong (far) hand — move the dagger to the near hand by swapping what the two arms do, as written below.",
+      "pose": "Recovery: the NEAR (left) hand holds the dagger low in front of the hip, blade pointing forward-down like the ready pose; the FAR (right) hand hangs by the side, empty claws."
+    },
+    "f10": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f10.png",
+      "hands": "HAND FIX (the reason for this edit): the rusty dagger must be held in the goblin's LEFT hand = the NEAR hand, the one on the camera side (in the ready pose it is the hand on the right side of the image, in front of the body). The far (RIGHT) hand is EMPTY, with open clawed fingers. In base.png the dagger is in the wrong (far) hand — move the dagger to the near hand by swapping what the two arms do, as written below.",
+      "pose": "Recovery: the NEAR (left) hand holds the dagger low in front of the hip, blade pointing forward-down like the ready pose; the FAR (right) hand hangs by the side, empty claws."
+    },
+    "f01": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f01.png",
+      "pose": "(kept as drawn — base only)"
+    },
+    "f11": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f11.png",
+      "pose": "(kept as drawn — base only)"
+    },
+    "f12": {
+      "body": "Assets/_/Spirte/Goblin/source~/Skill1/cells/f12.png",
+      "pose": "(kept as drawn — base only)"
+    }
+  }
+}

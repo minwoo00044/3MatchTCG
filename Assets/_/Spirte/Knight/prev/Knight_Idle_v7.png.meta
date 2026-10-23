@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: ec3c6adb3cccf5f48bad24a985f66034
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1404293278879953336
+    second: Knight_Idle_v7_0
+  - first:
+      213: 2844808054652313077
+    second: Knight_Idle_v7_1
+  - first:
+      213: 942946749662379963
+    second: Knight_Idle_v7_2
+  - first:
+      213: -6965813962114497199
+    second: Knight_Idle_v7_3
+  - first:
+      213: -7612368342127941132
+    second: Knight_Idle_v7_4
+  - first:
+      213: -3889974678346168916
+    second: Knight_Idle_v7_5
+  - first:
+      213: 6613678083239980106
+    second: Knight_Idle_v7_6
+  - first:
+      213: 8061557219391134358
+    second: Knight_Idle_v7_7
+  - first:
+      213: 4074542567599464271
+    second: Knight_Idle_v7_8
+  - first:
+      213: -4636940931715918448
+    second: Knight_Idle_v7_9
+  - first:
+      213: 8001107509867688969
+    second: Knight_Idle_v7_10
+  - first:
+      213: -1227754720549562384
+    second: Knight_Idle_v7_11
+  - first:
+      213: -5371401061205898770
+    second: Knight_Idle_v7_12
+  - first:
+      213: -3051266668509241675
+    second: Knight_Idle_v7_13
+  - first:
+      213: 484540466888902544
+    second: Knight_Idle_v7_14
+  - first:
+      213: 5275035571179535863
+    second: Knight_Idle_v7_15
+  - first:
+      213: -8583991496142826363
+    second: Knight_Idle_v7_16
+  - first:
+      213: -7499373508538419349
+    second: Knight_Idle_v7_17
+  - first:
+      213: -6283552848578024970
+    second: Knight_Idle_v7_18
+  - first:
+      213: -5415695623094433284
+    second: Knight_Idle_v7_19
+  - first:
+      213: -3045042189626045249
+    second: Knight_Idle_v7_20
+  - first:
+      213: -3463281881320024400
+    second: Knight_Idle_v7_21
+  - first:
+      213: 2883828809699757780
+    second: Knight_Idle_v7_22
+  - first:
+      213: -3021290836902333926
+    second: Knight_Idle_v7_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Knight_Idle_v7_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1575
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84e44eff3b2f28ce0800000000000000
+      internalID: -1404293278879953336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_1
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 1575
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fd98bf6ad9ca7720800000000000000
+      internalID: 2844808054652313077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_2
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 1575
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bbf3cb7a215061d00800000000000000
+      internalID: 942946749662379963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_3
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 1575
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15585b0ab15745f90800000000000000
+      internalID: -6965813962114497199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_4
+      rect:
+        serializedVersion: 2
+        x: 1384
+        y: 1575
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f9e80c235f6b5690800000000000000
+      internalID: -7612368342127941132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_5
+      rect:
+        serializedVersion: 2
+        x: 1730
+        y: 1575
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca589e7d3a8040ac0800000000000000
+      internalID: -3889974678346168916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1050
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4c2e4a0d2188cb50800000000000000
+      internalID: 6613678083239980106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_7
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 1050
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69a5b4e349760ef60800000000000000
+      internalID: 8061557219391134358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_8
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 1050
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4f59fb90eeab8830800000000000000
+      internalID: 4074542567599464271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_9
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 1050
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0959a984ac646afb0800000000000000
+      internalID: -4636940931715918448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_10
+      rect:
+        serializedVersion: 2
+        x: 1384
+        y: 1050
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 904bf5773e4a90f60800000000000000
+      internalID: 8001107509867688969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_11
+      rect:
+        serializedVersion: 2
+        x: 1730
+        y: 1050
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f7955a269326fee0800000000000000
+      internalID: -1227754720549562384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 525
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee98aa89133f475b0800000000000000
+      internalID: -5371401061205898770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_13
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 525
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5be548c9129b7a5d0800000000000000
+      internalID: -3051266668509241675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_14
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 525
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0970738ccfe69b600800000000000000
+      internalID: 484540466888902544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_15
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 525
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7fdb4b557e0b43940800000000000000
+      internalID: 5275035571179535863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_16
+      rect:
+        serializedVersion: 2
+        x: 1384
+        y: 525
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 584de65d6398fd880800000000000000
+      internalID: -8583991496142826363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_17
+      rect:
+        serializedVersion: 2
+        x: 1730
+        y: 525
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b67b791078fdce790800000000000000
+      internalID: -7499373508538419349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_18
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f9ec15d9f55cc8a0800000000000000
+      internalID: -6283552848578024970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_19
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 0
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf981dd368597d4b0800000000000000
+      internalID: -5415695623094433284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_20
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 0
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbc03490346ddb5d0800000000000000
+      internalID: -3045042189626045249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_21
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 0
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b69fda6a73ffefc0800000000000000
+      internalID: -3463281881320024400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_22
+      rect:
+        serializedVersion: 2
+        x: 1384
+        y: 0
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4de0133f50b650820800000000000000
+      internalID: 2883828809699757780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Knight_Idle_v7_23
+      rect:
+        serializedVersion: 2
+        x: 1730
+        y: 0
+        width: 346
+        height: 525
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0076190475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a123b47cdf73216d0800000000000000
+      internalID: -3021290836902333926
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: e7b42810bf7e0b5449e66233f82880f2
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Knight_Idle_v7_0: -1404293278879953336
+      Knight_Idle_v7_1: 2844808054652313077
+      Knight_Idle_v7_10: 8001107509867688969
+      Knight_Idle_v7_11: -1227754720549562384
+      Knight_Idle_v7_12: -5371401061205898770
+      Knight_Idle_v7_13: -3051266668509241675
+      Knight_Idle_v7_14: 484540466888902544
+      Knight_Idle_v7_15: 5275035571179535863
+      Knight_Idle_v7_16: -8583991496142826363
+      Knight_Idle_v7_17: -7499373508538419349
+      Knight_Idle_v7_18: -6283552848578024970
+      Knight_Idle_v7_19: -5415695623094433284
+      Knight_Idle_v7_2: 942946749662379963
+      Knight_Idle_v7_20: -3045042189626045249
+      Knight_Idle_v7_21: -3463281881320024400
+      Knight_Idle_v7_22: 2883828809699757780
+      Knight_Idle_v7_23: -3021290836902333926
+      Knight_Idle_v7_3: -6965813962114497199
+      Knight_Idle_v7_4: -7612368342127941132
+      Knight_Idle_v7_5: -3889974678346168916
+      Knight_Idle_v7_6: 6613678083239980106
+      Knight_Idle_v7_7: 8061557219391134358
+      Knight_Idle_v7_8: 4074542567599464271
+      Knight_Idle_v7_9: -4636940931715918448
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

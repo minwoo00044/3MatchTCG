@@ -1,0 +1,101 @@
+{
+  "name": "Priest_Skill1_v4",
+  "character": "Priest",
+  "action": "Skill1",
+  "version": 4,
+  "source": "SpriteRegen/Priest_Skill1/source_splice.png",
+  "sources": null,
+  "cols": 5,
+  "rows": 3,
+  "frames": 14,
+  "sourceGrid": {
+    "cols": 9,
+    "rows": 1,
+    "frames": 9
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    2,
+    4,
+    6,
+    7,
+    8,
+    9,
+    10,
+    13
+  ],
+  "haze": [
+    [
+      0.003,
+      0.5
+    ],
+    [
+      0.009,
+      1.0
+    ],
+    [
+      0.01,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.01,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 352,
+  "cellHeight": 789,
+  "pivotX": 0.5,
+  "pivotY": 0.005069708491761723,
+  "fps": 24,
+  "durations": [
+    0.06,
+    0.06,
+    0.08,
+    0.06,
+    0.06,
+    0.05,
+    0.06,
+    0.06,
+    0.3,
+    0.05,
+    0.08,
+    0.05,
+    0.05,
+    0.12
+  ],
+  "loop": false,
+  "scale": 0.6168,
+  "sizeFit": null,
+  "partScale": null,
+  "anchorHeight": 896.0,
+  "stance": {
+    "method": "vertical",
+    "reason": "발이 하나로 보인다"
+  },
+  "alignX": "anchor",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 32.7,
+    "right": 22.5
+  },
+  "warnings": []
+}

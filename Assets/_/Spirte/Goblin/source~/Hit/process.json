@@ -1,0 +1,25 @@
+{
+  "note": "Goblin Hit_v1 (사용자 적용 2026-10-23). 모든 장 = Idle 몸 pose_edit(pose/Hit.json). h1b·h2~h4는 앞 장에서 이어서 편집 + --match-color source~/body.png. h1·h1b는 손목 편집(h1w·h1bw) 결과.",
+  "splice": {
+    "tool": "splice_frames.py --pin-foot left",
+    "items": [
+      "h0.png:1x1:1",
+      "h1.png:1x1:1",
+      "h1b.png:1x1:1",
+      "h2.png:1x1:1",
+      "h3.png:1x1:1",
+      "h4.png:1x1:1",
+      "h5.png:1x1:1",
+      "h6.png:1x1:1",
+      "h7.png:1x1:1",
+      "h8.png:1x1:1",
+      "h0.png:1x1:1"
+    ]
+  },
+  "process": "--input splice.png --cols 11 --rows 1 --frames 11 --gap_counts 1 1 1 1 2 2 2 2 2 2 --align_x anchor --scale 0.4814",
+  "feedback": [
+    "단검 팔이 휘청임에 맞지 않게 고정 → 단검 팔이 몸을 늦게 따라가게(이어서 편집)",
+    "차렷에서 젖혀진 자세로 갑자기 → 사이 장면 h1b + 시작에 h0",
+    "뒤로 넘어갈 때 칼날이 앞을 향함 → 손목이 끌려 칼날이 뒤로"
+  ]
+}

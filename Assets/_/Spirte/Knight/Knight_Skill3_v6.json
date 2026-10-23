@@ -1,0 +1,137 @@
+{
+  "name": "Knight_Skill3_v6",
+  "character": "Knight",
+  "action": "Skill3",
+  "version": 6,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill3/splice_w8.png",
+  "sources": null,
+  "cols": 4,
+  "rows": 5,
+  "frames": 18,
+  "sourceGrid": {
+    "cols": 14,
+    "rows": 1,
+    "frames": 14
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    15,
+    17
+  ],
+  "haze": [
+    [
+      0.01,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.011,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.006,
+      0.5
+    ],
+    [
+      -0.006,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 830,
+  "cellHeight": 607,
+  "pivotX": 0.5,
+  "pivotY": 0.006589785831960461,
+  "fps": 30,
+  "durations": [
+    0.0333,
+    0.0333,
+    0.2,
+    0.0333,
+    0.0333,
+    0.0333,
+    0.0333,
+    0.0333,
+    0.0333,
+    0.0333,
+    0.25,
+    0.0333,
+    0.0333,
+    0.0333,
+    0.0333,
+    0.0333,
+    0.0333,
+    0.4
+  ],
+  "loop": false,
+  "scale": 1.1312,
+  "sizeFit": {
+    "reference": "Knight_Idle_v10",
+    "factor": 0.97,
+    "iou": 0.836
+  },
+  "partScale": null,
+  "anchorHeight": 453.7,
+  "stance": {
+    "method": "standing",
+    "vertical": 438,
+    "spread": 109.0,
+    "leg": 87,
+    "crotch": 350
+  },
+  "alignX": "mid",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 28.0,
+    "right": 28.0
+  },
+  "warnings": []
+}

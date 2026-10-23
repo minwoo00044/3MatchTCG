@@ -1,0 +1,31 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "figure_h": 700,
+  "foot_margin": 70,
+  "common": "Fierce snarl with bared teeth. The dagger keeps exactly the same size and shape as in base.png.",
+  "poses": {
+    "w02": {
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. Do NOT move the dagger to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY with open claws.",
+      "pose": "Anticipation: crouch a little lower; lift THE DAGGER ARM (the same arm, on the right side of the figure) up and back so the dagger is cocked high above its own shoulder, blade pointing up-back; the arm passes beside the head. The empty arm reaches forward with open claws.",
+      "legs_keep": "both feet at the same pixels (knees may bend a little more)"
+    },
+    "w03": {
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. Do NOT move the dagger to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY with open claws.",
+      "pose": "Dash start: the dagger arm stays cocked high above its shoulder as in an overhead wind-up; the body leans low and forward; the FRONT foot (right side of the image) lifts off the ground and moves forward. The empty arm reaches forward.",
+      "legs_keep": "the back foot (the foot on the LEFT side of the image) at exactly the same pixels"
+    },
+    "w04": {
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. Do NOT move the dagger to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY with open claws.",
+      "pose": "Dash landing: the FRONT foot (right side of the image) lands one big step forward, the body is low and stretched forward over the front knee; the dagger arm stays cocked high above its shoulder, at its furthest point back. The empty arm reaches forward.",
+      "legs_keep": "the back foot (the foot on the LEFT side of the image) at exactly the same pixels"
+    },
+    "w05": {
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. Do NOT move the dagger to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY with open claws.",
+      "pose": "SLASH: deep wide stance with the front foot one big step forward (same as a lunge); the dagger arm whips down and forward from above the head; draw a bold pale-yellow crescent smear arc along the path, from above the head down to the ground in front, larger than the body. The empty arm pulled back.",
+      "legs_keep": "the back foot (the foot on the LEFT side of the image) at exactly the same pixels"
+    }
+  }
+}

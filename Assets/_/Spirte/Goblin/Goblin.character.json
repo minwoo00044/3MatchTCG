@@ -1,0 +1,147 @@
+{
+  "team": "enemy",
+  "height_cm": 140,
+  "hint": "young",
+  "profile": "고블린(적), 140cm. 사납고 공격적 — 이를 드러내고 으르렁, 앞으로 숙인 공격 자세. 녹슨 단검: 게임에서 오른손(왼쪽을 보므로 앞쪽 손), 그릴 때는 LEFT hand(반전). 원화에 칼 없음 — 반드시 추가. 원화 옷은 전부 유지.",
+  "skull_over_L": 0.392,
+  "skull_note": "측정: 턴어라운드 3/4, 민머리 꼭대기~턱 233px / 턱~발바닥 594px = 0.392 (고블린 피부색 palette로 턱을 찾은 뒤, 2026-10-22). 이전 0.60은 사람 피부색 범위로 목천 아래를 턱으로 잡은 값에 맞춘 것",
+  "design": {
+    "required": [
+      "a short rusty notched dagger held in the LEFT hand (the near hand when facing right) in every frame — not in the HD art, must always be added",
+      "torn beige cloth scarf wrapped around the neck and shoulders",
+      "two brown leather straps crossing in an X over the bare chest, with a metal buckle",
+      "brown leather belt with an iron buckle plus a braided rope belt",
+      "small animal skull hanging on the hip of the belt",
+      "brown leather pouches on the belt",
+      "torn brown loincloth over a tattered beige cloth skirt",
+      "bandaged forearms with brown leather wraps and dark fingerless gloves",
+      "bandaged ankles with criss-cross brown leather straps, bare clawed feet",
+      "long pointed ears with small notches, yellow-orange eyes, long hooked nose, green skin"
+    ],
+    "props_reference": "Goblin_Idle_v2",
+    "note": "deform.py init — 사용자 입력"
+  },
+  "align_x": {
+    "Skill1": "anchor",
+    "Hit": "anchor"
+  },
+  "actions": {
+    "Skill1": {
+      "direction": "돌진 베기",
+      "feel": [
+        "사나움",
+        "빠름"
+      ],
+      "definition": "구간(12포즈): 준비(Idle 자세) → 웅크림 예비 1(몸을 더 낮추고 단검을 뒤로 당김, 이를 드러냄) → 돌진 2(뒷다리가 펴지며 앞발이 크게 한 걸음 나가 몸이 낮게 앞으로 쏠림) → 베기: 보간 0, 단검이 뒤-위에서 앞-아래로 가로질러 지나가며 몸보다 큰 반달 궤적 1 → 임팩트 1(팔이 앞으로 다 뻗음, 궤적 꼬리) → 팔로스루 1(단검이 반대쪽 아래까지, 몸이 앞무릎 위로 숙여짐) → 회복 3(앞발을 거둬 Idle 자세로) + 준비. 0.6초 안팎. 금지: 중간 멈춤, 임팩트 뒤 다시 앞으로 가는 프레임, 두 번 베기, 단검이 손을 바꿈. 정렬: 뒷발 고정(그린 그림 기준 화면 왼쪽 발 = left_foot).",
+      "confirmed": "2026-10-22"
+    },
+    "Hit": {
+      "direction": "크게 휘청",
+      "feel": [
+        "아픔",
+        "큰 반동"
+      ],
+      "definition": "구간(8포즈): 충격 1(머리가 뒤로 젖혀지고 눈 질끈·이를 악문 고통 표정, 귀는 아직 제자리) → 휘청 3(상체가 크게 뒤로 밀리고 앞발이 반 걸음 뒤로 물러남, 빈손 팔이 균형을 잡으려 벌어짐, 귀가 늦게 뒤로 휨, 키 10% 안팎 낮아짐) → 버팀 2(무릎을 굽혀 버티며 노려봄) → 회복 2(물러난 발을 되돌려 Idle 자세). 0.6초 안팎. 금지: 무표정·엉뚱한 감정, 충격 없이 서서히 기울기, 단검을 놓치거나 손이 바뀜, 뒷발 미끄러짐. 정렬: 뒷발 고정(뒤로 물러나는 건 앞발).",
+      "confirmed": "2026-10-22"
+    },
+    "Dead": {
+      "direction": "뒤로 나자빠짐",
+      "feel": [
+        "인과가 보이게"
+      ],
+      "definition": "구간(12포즈): 피격 반동 2(머리·상체가 뒤로 튕김) → 비틀 2(뒤로 한두 걸음 물러나며 버티려다 실패, 빈손이 가슴으로) → 뒤로 넘어감 2(발이 앞으로 들리며 등부터 떨어짐 — 가장 빠름, 단검이 손에서 빠져나감) → 착지·작은 튐 2(등이 바닥에 닿고 팔다리가 한 번 튐, 단검은 옆 바닥에) → 정착 2(누운 채 축 늘어짐, 마지막 장 길게). 빠르게 시작해 느리게 끝, 약 1.2초. 금지: 반동 없이 바로 기울기, 통나무처럼 뻣뻣하게 넘어감, 앞으로 엎어짐. 정렬: anchor(쓰러지며 이동을 보존).",
+      "confirmed": "2026-10-22"
+    }
+  },
+  "idle": {
+    "method": "procedural",
+    "source": "Assets/_/Spirte/Goblin/source~/idle/ai_sheet.png",
+    "base": 0,
+    "blink": 4,
+    "body": "Assets/_/Spirte/Goblin/source~/body.png",
+    "mode": "kneebody",
+    "knee_amp": 0.03,
+    "breath_amp": 0.008,
+    "head_lag": 2,
+    "face": "right",
+    "process": "--cols 6 --rows 4 --inbetween 0 --fps 30 (루프 0.8초)",
+    "moves": "거친 숨: 무릎 굽힘 3% + 몸 전체 호흡 0.8%(Knight의 1.5~2배), 머리 2프레임 지연. 단검·옷은 몸과 함께만",
+    "note": "사용자 확정 2026-10-22 (Idle_v1). 웅크린 공격 자세 AI 시트 0번 몸, 4번 눈 감음"
+  },
+  "ref_height": 376.9,
+  "ref_method": "standing",
+  "ref_height_note": "Archer(Archer_Idle_v8) 정수리~발 484.3px × 140/160cm 기준 × 웅크림 보정 0.848 (Idle 0번 턱 31.6% vs 턴어라운드 3/4 28.1% — 머리 크기가 같다고 보고 웅크린 턱~발바닥을 편 키로 환산. 고블린 피부색으로 다시 잼 2026-10-22. 사용자 확정: 편 키 = 140cm)",
+  "reference": "Goblin_Idle_v2",
+  "ref_chin_to_sole": 230,
+  "palette": {
+    "hair": {
+      "h": [
+        [
+          55,
+          150
+        ]
+      ],
+      "s": [
+        0.3,
+        1.0
+      ],
+      "v": [
+        0.3,
+        1.0
+      ]
+    },
+    "coat": {
+      "h": [
+        [
+          0,
+          22
+        ],
+        [
+          340,
+          360
+        ]
+      ],
+      "s": [
+        0.6,
+        1.0
+      ],
+      "v": [
+        0.55,
+        1.0
+      ]
+    },
+    "skin": {
+      "h": [
+        [
+          36,
+          62
+        ]
+      ],
+      "s": [
+        0.35,
+        0.8
+      ],
+      "v": [
+        0.4,
+        0.92
+      ]
+    },
+    "boot": {
+      "h": [
+        [
+          5,
+          45
+        ]
+      ],
+      "s": [
+        0.35,
+        1.0
+      ],
+      "v": [
+        0.0,
+        0.45
+      ]
+    },
+    "note": "고블린 올리브색 피부(body.png 표본: 색조 44°, 채도 0.53, 명도 0.7). 기본 피부 범위는 베이지 천·붕대를 잡았다(2026-10-22)"
+  }
+}

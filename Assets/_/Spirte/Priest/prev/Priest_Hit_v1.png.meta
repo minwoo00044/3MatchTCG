@@ -1,0 +1,598 @@
+fileFormatVersion: 2
+guid: 94b62a6df77698d4b81adf80235ce437
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8915403600110935308
+    second: Priest_Hit_v1_0
+  - first:
+      213: -19406243237721955
+    second: Priest_Hit_v1_1
+  - first:
+      213: 4287555328697526205
+    second: Priest_Hit_v1_2
+  - first:
+      213: -2900394882357904565
+    second: Priest_Hit_v1_3
+  - first:
+      213: 765683384765830800
+    second: Priest_Hit_v1_4
+  - first:
+      213: 5663001323049932837
+    second: Priest_Hit_v1_5
+  - first:
+      213: 6527025320881671135
+    second: Priest_Hit_v1_6
+  - first:
+      213: -5648439327003879490
+    second: Priest_Hit_v1_7
+  - first:
+      213: 391366554062643704
+    second: Priest_Hit_v1_8
+  - first:
+      213: 4345954911598691760
+    second: Priest_Hit_v1_9
+  - first:
+      213: -8134039244129635359
+    second: Priest_Hit_v1_10
+  - first:
+      213: -852888897597120309
+    second: Priest_Hit_v1_11
+  - first:
+      213: -1357141126051336944
+    second: Priest_Hit_v1_12
+  - first:
+      213: -4628396705082055456
+    second: Priest_Hit_v1_13
+  - first:
+      213: -7571984923997873037
+    second: Priest_Hit_v1_14
+  - first:
+      213: -8245535391788889264
+    second: Priest_Hit_v1_15
+  - first:
+      213: -6546214351081814041
+    second: Priest_Hit_v1_16
+  - first:
+      213: -8882635056296372385
+    second: Priest_Hit_v1_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Priest_Hit_v1_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1620
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f2262a59af164480800000000000000
+      internalID: -8915403600110935308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_1
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 1620
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d980465ef1e0bbff0800000000000000
+      internalID: -19406243237721955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_2
+      rect:
+        serializedVersion: 2
+        x: 944
+        y: 1620
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db769d1ead4708b30800000000000000
+      internalID: 4287555328697526205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_3
+      rect:
+        serializedVersion: 2
+        x: 1416
+        y: 1620
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4b32b0b83abfb7d0800000000000000
+      internalID: -2900394882357904565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_4
+      rect:
+        serializedVersion: 2
+        x: 1888
+        y: 1620
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 096d26f4bf040aa00800000000000000
+      internalID: 765683384765830800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1080
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52855fe03b5079e40800000000000000
+      internalID: 5663001323049932837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_6
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 1080
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdbc12b92f6a49a50800000000000000
+      internalID: 6527025320881671135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_7
+      rect:
+        serializedVersion: 2
+        x: 944
+        y: 1080
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb7569adb56bc91b0800000000000000
+      internalID: -5648439327003879490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_8
+      rect:
+        serializedVersion: 2
+        x: 1416
+        y: 1080
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f16fdfaec96e6500800000000000000
+      internalID: 391366554062643704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_9
+      rect:
+        serializedVersion: 2
+        x: 1888
+        y: 1080
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b544bb57feef4c30800000000000000
+      internalID: 4345954911598691760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 540
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e3f09847661e1f80800000000000000
+      internalID: -8134039244129635359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_11
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 540
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc069d1011ee924f0800000000000000
+      internalID: -852888897597120309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_12
+      rect:
+        serializedVersion: 2
+        x: 944
+        y: 540
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01de2a716577a2de0800000000000000
+      internalID: -1357141126051336944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_13
+      rect:
+        serializedVersion: 2
+        x: 1416
+        y: 540
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e4eef118b1a4cfb0800000000000000
+      internalID: -4628396705082055456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_14
+      rect:
+        serializedVersion: 2
+        x: 1888
+        y: 540
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37c5e7864d7eae690800000000000000
+      internalID: -7571984923997873037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_15
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05b03857f39f19d80800000000000000
+      internalID: -8245535391788889264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_16
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 0
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e744342bbc2725a0800000000000000
+      internalID: -6546214351081814041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Hit_v1_17
+      rect:
+        serializedVersion: 2
+        x: 944
+        y: 0
+        width: 472
+        height: 540
+      alignment: 9
+      pivot: {x: 0.5, y: 0.0074074073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f57d5008a7a8ab480800000000000000
+      internalID: -8882635056296372385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 997beae8604136641b4366435bf04f37
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Priest_Hit_v1_0: -8915403600110935308
+      Priest_Hit_v1_1: -19406243237721955
+      Priest_Hit_v1_10: -8134039244129635359
+      Priest_Hit_v1_11: -852888897597120309
+      Priest_Hit_v1_12: -1357141126051336944
+      Priest_Hit_v1_13: -4628396705082055456
+      Priest_Hit_v1_14: -7571984923997873037
+      Priest_Hit_v1_15: -8245535391788889264
+      Priest_Hit_v1_16: -6546214351081814041
+      Priest_Hit_v1_17: -8882635056296372385
+      Priest_Hit_v1_2: 4287555328697526205
+      Priest_Hit_v1_3: -2900394882357904565
+      Priest_Hit_v1_4: 765683384765830800
+      Priest_Hit_v1_5: 5663001323049932837
+      Priest_Hit_v1_6: 6527025320881671135
+      Priest_Hit_v1_7: -5648439327003879490
+      Priest_Hit_v1_8: 391366554062643704
+      Priest_Hit_v1_9: 4345954911598691760
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

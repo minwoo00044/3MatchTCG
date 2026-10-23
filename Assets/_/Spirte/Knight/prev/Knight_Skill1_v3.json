@@ -1,0 +1,89 @@
+{
+  "name": "Knight_Skill1_v3",
+  "character": "Knight",
+  "action": "Skill1",
+  "version": 3,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill1/once_try21_23_25.png",
+  "sources": null,
+  "cols": 2,
+  "rows": 9,
+  "frames": 18,
+  "sourceGrid": {
+    "cols": 2,
+    "rows": 5,
+    "frames": 9
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    2,
+    4,
+    5,
+    6,
+    8,
+    11,
+    14,
+    17
+  ],
+  "haze": [
+    [
+      0.006,
+      0.5
+    ],
+    [
+      0.021,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.018,
+      0.5
+    ],
+    [
+      0.013,
+      0.25
+    ],
+    [
+      0.028,
+      0.25
+    ],
+    [
+      -0.004,
+      0.25
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 1572,
+  "cellHeight": 600,
+  "pivotX": 0.5,
+  "pivotY": 0.006666666666666667,
+  "fps": 30,
+  "durations": null,
+  "loop": false,
+  "scale": 1.1988,
+  "anchorHeight": 459.6,
+  "stance": {
+    "method": "standing",
+    "vertical": 436,
+    "spread": 146.5,
+    "leg": 102,
+    "crotch": 333
+  },
+  "alignX": "left_foot",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 0.0,
+    "right": 535.2
+  },
+  "warnings": [
+    "프레임 6: 원본 시트 왼쪽 가장자리에서 이미 잘려 있다"
+  ]
+}

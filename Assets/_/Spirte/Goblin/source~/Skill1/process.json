@@ -1,0 +1,30 @@
+{
+  "note": "Goblin Skill1_v1 (사용자 적용 2026-10-23). 단검은 12장 모두 앞쪽 손(그린 그림 LEFT = 게임 오른손).",
+  "splice": {
+    "tool": "splice_frames.py --pin-foot left",
+    "items": [
+      "f01.png:1x1:1",
+      "w02.png:1x1:1",
+      "w03.png:1x1:1",
+      "w04.png:1x1:1",
+      "w05.png:1x1:1",
+      "near_tail_try9.png:2x2:1,2,3,4",
+      "f10.png:1x1:1",
+      "f11.png:1x1:1",
+      "f12.png:1x1:1"
+    ],
+    "scales": [
+      0.5,
+      0.6564,
+      0.6564,
+      0.6564,
+      0.6564,
+      1.0,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "sources": "f01·f11·f12 = 세트 A(setA/) 칸, f10 = A 10장을 앞쪽 손으로 편집(pose/Skill1_handfix.json), w02~w05 = Idle 몸 편집(pose/Skill1_windup.json), near_tail_try9 = 앞쪽 손 재생성(specs/Skill1_near_high.json) 뒤 4장"
+  },
+  "process": "--input splice.png --cols 12 --rows 1 --frames 12 --gap_counts 1 1 1 0 0 1 2 2 2 2 2 --align_x anchor --scale 0.7334"
+}

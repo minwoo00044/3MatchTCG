@@ -1,0 +1,84 @@
+{
+  "name": "Knight_Skill3_v1",
+  "character": "Knight",
+  "action": "Skill3",
+  "version": 1,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Skill3/try2/result.png",
+  "cols": 5,
+  "rows": 5,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      0.004,
+      0.5
+    ],
+    [
+      0.015,
+      0.5
+    ],
+    [
+      0.026,
+      0.5
+    ],
+    [
+      0.002,
+      1.0
+    ],
+    [
+      0.001,
+      0.25
+    ],
+    [
+      -0.001,
+      0.25
+    ],
+    [
+      -0.006,
+      0.25
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 516,
+  "cellHeight": 535,
+  "pivotX": 0.5,
+  "pivotY": 0.007476635514018692,
+  "fps": 30,
+  "loop": false,
+  "scale": 1.0333,
+  "anchorHeight": 500.8,
+  "stance": {
+    "method": "standing",
+    "vertical": 483,
+    "spread": 124.0,
+    "leg": 99,
+    "crotch": 383
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 20.1,
+    "right": 21.7
+  },
+  "warnings": [
+    "프레임 3: 원본 시트 오른쪽 가장자리에서 이미 잘려 있다",
+    "프레임 2: 발을 +56/-56px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다",
+    "프레임 3: 발을 +48/-48px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다"
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "name": "Priest_Skill2_v1",
+  "character": "Priest",
+  "action": "Skill2",
+  "version": 1,
+  "source": "C:/Users/minwo/orca/workspaces/3MatchTCG/3MatchTCG/SpriteRegen/Priest_Skill2/splice1.png",
+  "sources": null,
+  "cols": 5,
+  "rows": 5,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 18,
+    "rows": 1,
+    "frames": 18
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    2,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      0.009,
+      1.0
+    ],
+    [
+      -0.005,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.01,
+      1.0
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 692,
+  "cellHeight": 668,
+  "pivotX": 0.5,
+  "pivotY": 0.005988023952095809,
+  "fps": 90,
+  "durations": null,
+  "loop": false,
+  "scale": 1.2866,
+  "sizeFit": {
+    "reference": "Priest_Idle_v2",
+    "factor": 0.91,
+    "iou": 0.562,
+    "skipped": "기준 프레임 자세가 기준 시트와 너무 달라 보정하지 않았다"
+  },
+  "partScale": null,
+  "anchorHeight": 426.0,
+  "stance": {
+    "method": "vertical",
+    "reason": "발이 하나로 보인다"
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 47.0,
+    "right": 89.7
+  },
+  "warnings": [
+    "크기 보정 건너뜀 — 기준 프레임 0번이 Priest_Idle_v2 0번과 IoU 0.562 (기준 0.6)",
+    "프레임 15: 발을 +45/-45px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다",
+    "프레임 16: 발을 +70/-70px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다",
+    "프레임 17: 발을 +50/-50px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다"
+  ]
+}

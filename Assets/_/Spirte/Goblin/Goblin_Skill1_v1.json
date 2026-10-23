@@ -1,0 +1,102 @@
+{
+  "name": "Goblin_Skill1_v1",
+  "character": "Goblin",
+  "action": "Skill1",
+  "version": 1,
+  "source": "Assets/_/Spirte/Goblin/source~/Skill1/splice.png",
+  "sources": null,
+  "cols": 4,
+  "rows": 7,
+  "frames": 26,
+  "sourceGrid": {
+    "cols": 12,
+    "rows": 1,
+    "frames": 12
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    2,
+    4,
+    6,
+    7,
+    8,
+    10,
+    13,
+    16,
+    19,
+    22,
+    25
+  ],
+  "haze": [
+    [
+      0.04,
+      0.5
+    ],
+    [
+      0.015,
+      0.5
+    ],
+    [
+      0.011,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.003,
+      1.0
+    ],
+    [
+      0.002,
+      0.25
+    ],
+    [
+      0.001,
+      0.25
+    ],
+    [
+      0.001,
+      0.25
+    ],
+    [
+      -0.0,
+      0.5
+    ],
+    [
+      -0.002,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 808,
+  "cellHeight": 440,
+  "pivotX": 0.5,
+  "pivotY": 0.00909090909090909,
+  "fps": 30,
+  "durations": null,
+  "loop": false,
+  "scale": 0.7334,
+  "sizeFit": null,
+  "partScale": null,
+  "anchorHeight": 460.0,
+  "stance": {
+    "method": "vertical",
+    "reason": "가랑이를 못 찾았다"
+  },
+  "alignX": "anchor",
+  "alignY": "ground",
+  "mirrored": true,
+  "footSlide": {
+    "left": 324.2,
+    "right": 433.4
+  },
+  "warnings": []
+}

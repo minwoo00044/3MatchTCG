@@ -1,0 +1,25 @@
+{
+ "title": "a calm healing CAST: with her eyes closed she raises the staff high above her head",
+ "physics": "Spell-casting means gathering power: a small anticipation dip, a smooth rise that accelerates, a held peak (eyes closed, staff vertical above the head), then a gentle lowering back to the ready stance. Not a uniform speed.",
+ "figure_scale": 0.72,
+ "poses": [
+  "Ready: standing like #1, staff planted beside her in the left hand, book in the right hand, eyes open, calm.",
+  "Anticipation: knees bend slightly, the staff dips a little lower and closer to the body, she takes a breath, eyes begin to close.",
+  "Raising 1: the left arm lifts the staff off the ground to chest height, staff still vertical; eyes closed; the right hand brings the book to her chest.",
+  "Raising 2: the left arm is raised with the hand at the height of her face, the staff lifted off the ground and vertical; body straightens, chin slightly up, eyes closed.",
+  "Peak: the LEFT ARM IS FULLY STRAIGHT and points straight UP, the left hand is clearly ABOVE the top of her nurse cap, the staff held VERTICALLY so its lower end is only at about shoulder height and the orb is far above her head, glowing; eyes closed, serene; book held against the chest with the right hand.",
+  "Peak hold: exactly the same raised pose as the peak (arm straight up, hand above the cap), only the coat and hair drift down slightly; eyes closed.",
+  "Lowering: the staff comes down to head height, arm bending; eyes opening.",
+  "Settle: back to the ready stance, staff planted beside her, book in the right hand at her side, eyes open."
+ ],
+ "rules": [
+  "3/4 view facing RIGHT exactly like #1 in every frame. Body and face never turn toward the camera.",
+  "The caduceus staff with the blue cross orb is held in her LEFT hand (the far side, on the right of the image), exactly like #1. It moves only a little from one frame to the next. It never teleports and never changes hands unless written.",
+  "The white medical book stays in her RIGHT hand (near side) unless the frame says otherwise.",
+  "Keep every design element of #1 in every frame: white nurse cap with blue cross, very long wavy blonde hair with braids and blue ribbons, long white coat with blue lining and gold trim, brown belts with the medical bag and blue potion vials.",
+  "Both feet keep EXACTLY the same stance as in #1 in every frame: the same distance between the feet, the same spot, no stepping, no sliding, no narrower or wider stance.",
+  "Eyes are CLOSED in the raising and peak poses.",
+  "When the staff is raised the whole staff including the top ornament stays inside the cell.",
+  "Only the arms, head and staff move. The body stays at the same place inside its cell in every frame, the same as in #2."
+ ]
+}

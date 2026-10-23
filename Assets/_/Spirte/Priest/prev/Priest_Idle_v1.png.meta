@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: d2c68a23212c7ab40a6f04cf3723f373
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 199238765306957697
+    second: Priest_Idle_v1_0
+  - first:
+      213: 4527620685833676144
+    second: Priest_Idle_v1_1
+  - first:
+      213: -5491827607775147209
+    second: Priest_Idle_v1_2
+  - first:
+      213: 4369043516740039662
+    second: Priest_Idle_v1_3
+  - first:
+      213: -604890235743223979
+    second: Priest_Idle_v1_4
+  - first:
+      213: 1106127470093371693
+    second: Priest_Idle_v1_5
+  - first:
+      213: 3073256776215283008
+    second: Priest_Idle_v1_6
+  - first:
+      213: -2192448633105100890
+    second: Priest_Idle_v1_7
+  - first:
+      213: 1297155457440537737
+    second: Priest_Idle_v1_8
+  - first:
+      213: 7417364159881337521
+    second: Priest_Idle_v1_9
+  - first:
+      213: 5020779921812382877
+    second: Priest_Idle_v1_10
+  - first:
+      213: -7133616990829100287
+    second: Priest_Idle_v1_11
+  - first:
+      213: -4164476262877900730
+    second: Priest_Idle_v1_12
+  - first:
+      213: 3656481173671009467
+    second: Priest_Idle_v1_13
+  - first:
+      213: -3964409232417676315
+    second: Priest_Idle_v1_14
+  - first:
+      213: 3252907938564119838
+    second: Priest_Idle_v1_15
+  - first:
+      213: -8607787048111128393
+    second: Priest_Idle_v1_16
+  - first:
+      213: -278393839872086839
+    second: Priest_Idle_v1_17
+  - first:
+      213: 3942756829863913316
+    second: Priest_Idle_v1_18
+  - first:
+      213: 3990152215158674659
+    second: Priest_Idle_v1_19
+  - first:
+      213: 6897381066728274494
+    second: Priest_Idle_v1_20
+  - first:
+      213: -2141263246434005184
+    second: Priest_Idle_v1_21
+  - first:
+      213: 9108246023939774052
+    second: Priest_Idle_v1_22
+  - first:
+      213: 9167522199691177382
+    second: Priest_Idle_v1_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Priest_Idle_v1_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1713
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18fcb97f996d3c200800000000000000
+      internalID: 199238765306957697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_1
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 1713
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 075a3d0860755de30800000000000000
+      internalID: 4527620685833676144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_2
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 1713
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73b01ee33eb19c3b0800000000000000
+      internalID: -5491827607775147209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_3
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 1713
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee373872ee5f1ac30800000000000000
+      internalID: 4369043516740039662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_4
+      rect:
+        serializedVersion: 2
+        x: 1384
+        y: 1713
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55f3c62198ffa97f0800000000000000
+      internalID: -604890235743223979
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_5
+      rect:
+        serializedVersion: 2
+        x: 1730
+        y: 1713
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d298733d211c95f00800000000000000
+      internalID: 1106127470093371693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1142
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 045cfd151c666aa20800000000000000
+      internalID: 3073256776215283008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_7
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 1142
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6afca73959bd291e0800000000000000
+      internalID: -2192448633105100890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_8
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 1142
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98cd333140c600210800000000000000
+      internalID: 1297155457440537737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_9
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 1142
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bad07f8765cfe660800000000000000
+      internalID: 7417364159881337521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_10
+      rect:
+        serializedVersion: 2
+        x: 1384
+        y: 1142
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d946a07dcb46da540800000000000000
+      internalID: 5020779921812382877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_11
+      rect:
+        serializedVersion: 2
+        x: 1730
+        y: 1142
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 103c0f1742d400d90800000000000000
+      internalID: -7133616990829100287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 571
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 640dd9b37eec436c0800000000000000
+      internalID: -4164476262877900730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_13
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 571
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bbc509c214e6eb230800000000000000
+      internalID: 3656481173671009467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_14
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 571
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e32775bec69bf8c0800000000000000
+      internalID: -3964409232417676315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_15
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 571
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1d99251986a42d20800000000000000
+      internalID: 3252907938564119838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_16
+      rect:
+        serializedVersion: 2
+        x: 1384
+        y: 571
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b0c027294ffa8880800000000000000
+      internalID: -8607787048111128393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_17
+      rect:
+        serializedVersion: 2
+        x: 1730
+        y: 571
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9cc64c21742f22cf0800000000000000
+      internalID: -278393839872086839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_18
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 467a8c7727c77b630800000000000000
+      internalID: 3942756829863913316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_19
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 0
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e455488c4edf5730800000000000000
+      internalID: 3990152215158674659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_20
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 0
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3af7da498b68bf50800000000000000
+      internalID: 6897381066728274494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_21
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 0
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04f83b91c64b842e0800000000000000
+      internalID: -2141263246434005184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_22
+      rect:
+        serializedVersion: 2
+        x: 1384
+        y: 0
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4665bcf408df66e70800000000000000
+      internalID: 9108246023939774052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Priest_Idle_v1_23
+      rect:
+        serializedVersion: 2
+        x: 1730
+        y: 0
+        width: 346
+        height: 571
+      alignment: 9
+      pivot: {x: 0.5, y: 0.007005254}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ada9177ed4993f70800000000000000
+      internalID: 9167522199691177382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: a70745b303449d646ad91a3a6564d990
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Priest_Idle_v1_0: 199238765306957697
+      Priest_Idle_v1_1: 4527620685833676144
+      Priest_Idle_v1_10: 5020779921812382877
+      Priest_Idle_v1_11: -7133616990829100287
+      Priest_Idle_v1_12: -4164476262877900730
+      Priest_Idle_v1_13: 3656481173671009467
+      Priest_Idle_v1_14: -3964409232417676315
+      Priest_Idle_v1_15: 3252907938564119838
+      Priest_Idle_v1_16: -8607787048111128393
+      Priest_Idle_v1_17: -278393839872086839
+      Priest_Idle_v1_18: 3942756829863913316
+      Priest_Idle_v1_19: 3990152215158674659
+      Priest_Idle_v1_2: -5491827607775147209
+      Priest_Idle_v1_20: 6897381066728274494
+      Priest_Idle_v1_21: -2141263246434005184
+      Priest_Idle_v1_22: 9108246023939774052
+      Priest_Idle_v1_23: 9167522199691177382
+      Priest_Idle_v1_3: 4369043516740039662
+      Priest_Idle_v1_4: -604890235743223979
+      Priest_Idle_v1_5: 1106127470093371693
+      Priest_Idle_v1_6: 3073256776215283008
+      Priest_Idle_v1_7: -2192448633105100890
+      Priest_Idle_v1_8: 1297155457440537737
+      Priest_Idle_v1_9: 7417364159881337521
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,94 @@
+{
+  "name": "Priest_Skill3_v3",
+  "character": "Priest",
+  "action": "Skill3",
+  "version": 3,
+  "source": "C:/MYNewProject/3MatchTCG/SpriteRegen/Priest_Skill3/splice1.png",
+  "sources": null,
+  "cols": 2,
+  "rows": 4,
+  "frames": 8,
+  "sourceGrid": {
+    "cols": 7,
+    "rows": 1,
+    "frames": 7
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    1,
+    2,
+    3,
+    5,
+    6,
+    7
+  ],
+  "haze": [
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      -0.005,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.0,
+      null
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 1004,
+  "cellHeight": 591,
+  "pivotX": 0.5,
+  "pivotY": 0.00676818950930626,
+  "fps": 24,
+  "durations": [
+    0.1,
+    0.1,
+    0.08,
+    0.12,
+    0.05,
+    0.24,
+    0.1,
+    0.12
+  ],
+  "loop": false,
+  "scale": 1.1336,
+  "sizeFit": {
+    "reference": "Priest_Idle_v2",
+    "factor": 0.94,
+    "iou": 0.867
+  },
+  "partScale": null,
+  "anchorHeight": 502.2,
+  "stance": {
+    "method": "standing",
+    "vertical": 485,
+    "spread": 106.5,
+    "leg": 74,
+    "crotch": 410
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 59.2,
+    "right": 59.2
+  },
+  "warnings": [
+    "프레임 1: 발을 -52/+52px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다"
+  ]
+}

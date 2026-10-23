@@ -1,0 +1,32 @@
+{
+  "name": "Archer_Skill3_v4",
+  "character": "Archer",
+  "action": "Skill3",
+  "version": 4,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Archer_Skill3/try4/result.png",
+  "cols": 4,
+  "rows": 2,
+  "frames": 8,
+  "cellWidth": 392,
+  "cellHeight": 524,
+  "pivotX": 0.5,
+  "pivotY": 0.007633587786259542,
+  "fps": 10,
+  "loop": false,
+  "scale": 1.0788,
+  "anchorHeight": 502.0,
+  "stance": {
+    "method": "standing",
+    "vertical": 469,
+    "spread": 189.0,
+    "leg": 119,
+    "crotch": 349
+  },
+  "alignX": "mid",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 110.0,
+    "right": 110.0
+  },
+  "warnings": []
+}

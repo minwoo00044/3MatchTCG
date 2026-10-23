@@ -1,0 +1,37 @@
+{
+ "applied": "Priest_Dead_v3",
+ "splice": [
+  "part1.png:2x2:1,2",
+  "part2.png:2x2:1,2,3,4",
+  "part3.png:2x2:1,2,3,4"
+ ],
+ "process": [
+  "--cols",
+  "10",
+  "--rows",
+  "1",
+  "--frames",
+  "10",
+  "--align_x",
+  "anchor",
+  "--gap_counts",
+  "0",
+  "1",
+  "1",
+  "1",
+  "1",
+  "1",
+  "1",
+  "1",
+  "2",
+  "--hold",
+  "9:0.4",
+  "--fps",
+  "8",
+  "--loop",
+  "false",
+  "--scale",
+  "1.12",
+  "--no_size_fit"
+ ]
+}

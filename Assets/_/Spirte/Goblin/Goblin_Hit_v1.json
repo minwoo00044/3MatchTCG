@@ -1,0 +1,104 @@
+{
+  "name": "Goblin_Hit_v1",
+  "character": "Goblin",
+  "action": "Hit",
+  "version": 1,
+  "source": "Assets/_/Spirte/Goblin/source~/Hit/splice.png",
+  "sources": null,
+  "cols": 4,
+  "rows": 7,
+  "frames": 27,
+  "sourceGrid": {
+    "cols": 11,
+    "rows": 1,
+    "frames": 11
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    2,
+    4,
+    6,
+    8,
+    11,
+    14,
+    17,
+    20,
+    23,
+    26
+  ],
+  "haze": [
+    [
+      0.045,
+      1.0
+    ],
+    [
+      0.013,
+      0.5
+    ],
+    [
+      0.03,
+      0.25
+    ],
+    [
+      0.042,
+      1.0
+    ],
+    [
+      0.086,
+      0.25
+    ],
+    [
+      0.022,
+      0.25
+    ],
+    [
+      0.006,
+      0.5
+    ],
+    [
+      0.008,
+      0.25
+    ],
+    [
+      0.004,
+      0.5
+    ],
+    [
+      0.005,
+      0.5
+    ]
+  ],
+  "hazeCut": [
+    4
+  ],
+  "stabilize": null,
+  "cellWidth": 610,
+  "cellHeight": 404,
+  "pivotX": 0.5,
+  "pivotY": 0.009900990099009901,
+  "fps": 30,
+  "durations": null,
+  "loop": false,
+  "scale": 0.4814,
+  "sizeFit": null,
+  "partScale": null,
+  "anchorHeight": 769.5,
+  "stance": {
+    "method": "standing",
+    "vertical": 700,
+    "spread": 343.0,
+    "leg": 177,
+    "crotch": 522
+  },
+  "alignX": "anchor",
+  "alignY": "ground",
+  "mirrored": true,
+  "footSlide": {
+    "left": 1.4,
+    "right": 196.7
+  },
+  "warnings": [
+    "보간 4→5 번짐 0.086 (기준 0.06) — 보간하지 않고 원본처럼 끊었다. 버린 보간본은 미리보기 아래 칸에 있다 (쓰려면 --keep_haze)"
+  ]
+}

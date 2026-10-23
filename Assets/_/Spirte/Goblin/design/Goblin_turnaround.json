@@ -1,0 +1,7 @@
+{
+  "character": "Goblin",
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/Assets/_/Spirte/Goblin/Goblin_HD.png",
+  "hint": "young",
+  "design_note": "must keep: a short rusty notched dagger held in the LEFT hand (the near hand when facing right) in every frame — not in the HD art, must always be added; torn beige cloth scarf wrapped around the neck and shoulders; two brown leather straps crossing in an X over the bare chest, with a metal buckle; brown leather belt with an iron buckle plus a braided rope belt; small animal skull hanging on the hip of the belt; brown leather pouches on the belt; torn brown loincloth over a tattered beige cloth skirt; bandaged forearms with brown leather wraps and dark fingerless gloves; bandaged ankles with criss-cross brown leather straps, bare clawed feet; long pointed ears with small notches, yellow-orange eyes, long hooked nose, green skin",
+  "accepted_from": "SpriteRegen/Goblin_Deform/try1/result.png"
+}

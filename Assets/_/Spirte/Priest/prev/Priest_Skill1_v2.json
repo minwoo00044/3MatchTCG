@@ -1,0 +1,121 @@
+{
+  "name": "Priest_Skill1_v2",
+  "character": "Priest",
+  "action": "Skill1",
+  "version": 2,
+  "source": "C:/MYNewProject/3MatchTCG/SpriteRegen/Priest_Skill1/try3/result.png",
+  "sources": [
+    "C:/MYNewProject/3MatchTCG/SpriteRegen/Priest_Skill1/try3/result.png",
+    "C:/MYNewProject/3MatchTCG/SpriteRegen/Priest_Skill1/try4/result.png"
+  ],
+  "cols": 6,
+  "rows": 4,
+  "frames": 21,
+  "sourceGrid": {
+    "cols": 2,
+    "rows": 4,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    2,
+    6,
+    9,
+    13,
+    14,
+    17,
+    20
+  ],
+  "haze": [
+    [
+      -0.003,
+      0.5
+    ],
+    [
+      0.008,
+      0.5
+    ],
+    [
+      -0.004,
+      0.25
+    ],
+    [
+      0.037,
+      0.5
+    ],
+    [
+      0.0,
+      null
+    ],
+    [
+      0.02,
+      0.25
+    ],
+    [
+      -0.003,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 502,
+  "cellHeight": 733,
+  "pivotX": 0.5,
+  "pivotY": 0.005457025920873124,
+  "fps": 24,
+  "durations": [
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.3,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417,
+    0.0417
+  ],
+  "loop": false,
+  "scale": 1.134,
+  "sizeFit": {
+    "reference": "Priest_Idle_v2",
+    "factor": 0.96,
+    "iou": 0.813
+  },
+  "partScale": [
+    1.0,
+    1.133
+  ],
+  "anchorHeight": 497.9,
+  "stance": {
+    "method": "standing",
+    "vertical": 479,
+    "spread": 111.5,
+    "leg": 73,
+    "crotch": 405
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 119.9,
+    "right": 63.1
+  },
+  "warnings": [
+    "프레임 4: 발을 -55/+55px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다",
+    "프레임 5: 발을 -55/+55px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다",
+    "프레임 6: 발을 -55/+55px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다",
+    "프레임 7: 발을 -55/+55px 옮긴다(키의 6% 초과) — 그려진 보폭 변화를 지우는 것일 수 있다. 미리보기로 확인한다"
+  ]
+}

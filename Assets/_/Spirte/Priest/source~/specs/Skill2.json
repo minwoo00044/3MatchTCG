@@ -1,0 +1,28 @@
+{
+ "title": "she lifts the staff with BOTH hands, twirls it horizontally above her head, then slams its foot down onto the ground",
+ "physics": "Lifting is long, the slam is short (about 7:3). During the twirl BOTH hands and forearms travel around the head together with the staff (gripped in the middle, horizontal, rotating in a horizontal plane seen as an ellipse in 3/4 view). The hands never stay fixed while only the staff spins. The slam is the fastest move; at impact the knees bend and the torso folds slightly, no bounce afterwards.",
+ "figure_scale": 0.72,
+ "poses": [
+  "Lift 1: the book is gone; both hands grip the staff in the middle at chest height, staff tilting toward horizontal.",
+  "Lift 2: both hands raise the staff above the head, staff horizontal, pointing left-right across the image.",
+  "Twirl A (3/4 view facing right, NOT facing the camera): staff horizontal above her head, running left-right across the image with the orb on the RIGHT; both hands hold its middle above her FOREHEAD, elbows bent.",
+  "Twirl B: the staff has turned a quarter in the horizontal plane: it now points diagonally toward the viewer and away (foreshortened, looking SHORT), the orb end comes toward the viewer at the lower right of the head, the foot end behind her head; her hands and forearms have moved to the RIGHT side of her head, following the staff.",
+  "Twirl C: half turn: the staff again runs left-right across the image but the orb is now on the LEFT; both hands have moved BEHIND the top of her head, elbows pointing forward.",
+  "Twirl D: three-quarter turn: the staff foreshortened again (short), the orb end now going away behind her head and the foot end toward the viewer; her hands and forearms are on the LEFT side of her head (the hair side).",
+  "Twirl A again: same as Twirl A (orb on the RIGHT, hands above the forehead).",
+  "Twirl B again: same as Twirl B (foreshortened, hands on the right side of the head).",
+  "Raise high: the staff swings up to vertical with the orb on top, held high with both hands, body stretching up, ready to strike down.",
+  "Slam: the staff drives straight down fast, its foot just about to hit the ground in front of her; the motion is sharp.",
+  "Impact: the foot of the staff hits the ground just in front of her feet, knees bent IN PLACE (feet stay exactly where they were, the stance does NOT widen), torso folded forward a little, both hands on the staff, determined face; a small light burst at the staff foot.",
+  "Settle: she straightens up a bit, staff planted vertically in front, both hands still on it, calm."
+ ],
+ "rules": [
+  "3/4 view facing RIGHT exactly like #1 in every frame. Body and face never turn toward the camera.",
+  "In every pose including the twirl her body and face stay in the 3/4 view facing right like #1 — chest and face never turn toward the camera.",
+  "Keep every design element of #1 in every frame: white nurse cap with blue cross, very long wavy blonde hair with braids and blue ribbons, long white coat with blue lining and gold trim, brown belts with the medical bag and blue potion vials.",
+  "Both feet keep EXACTLY the same stance as in #1 in every pose, including the impact: the same distance between the feet, no stepping, no widening.",
+  "In this animation she holds the staff with BOTH hands and the book is gone completely (never half visible) from the first pose on.",
+  "In the twirl poses the hands and forearms travel around the head together with the staff (front of the head, right side, behind, left side). Never both hands fixed in the same place while only the staff flips.",
+  "The whole staff stays inside the cell in every pose, including when it is above her head."
+ ]
+}

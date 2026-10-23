@@ -1,0 +1,19 @@
+{
+  "note": "Priest Idle 몸(ai_sheet 0번)에서 지팡이를 떼어 낸 좌표 (2026-10-16, 격자 확대 그림·손 색 표본에서 읽음). prop_split.py",
+  "sheet": "Assets/_/Spirte/Priest/source~/idle/ai_sheet.png",
+  "grid": [4, 2, 8],
+  "frame": 0,
+  "prop": [
+    {"y": [null, 183], "x": [214, null]},
+    {"y": [30, 85], "x": [200, null]},
+    {"y": [null, 230], "x": [256, null]},
+    {"y": [184, null], "x": [231, 246]}
+  ],
+  "hand": {"y": [184, 213], "x": [222, 250]},
+  "pole_x": [231, 246],
+  "out": {
+    "body": "Assets/_/Spirte/Priest/source~/idle/staff_body.png",
+    "prop": "Assets/_/Spirte/Priest/source~/idle/staff.png",
+    "hand": "Assets/_/Spirte/Priest/source~/idle/staff_hand.png"
+  }
+}

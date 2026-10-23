@@ -1,0 +1,75 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "figure_h": 700,
+  "foot_margin": 70,
+  "common": "The goblin is hit from the RIGHT side (from the front). The dagger keeps exactly the same size and shape as in base.png. No blush, no smile.",
+  "poses": {
+    "h1": {
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "pose": "IMPACT: the head snaps back, eyes squeezed shut in pain, teeth clenched, the upper body jerked backward (away from the right side); the ears are still in place. Both feet unchanged. The dagger arm jerks up and outward from the shock, elbow bent, the dagger lifted to chest height and tilted. IMPORTANT: the dagger ARM must move with the body's stagger — the dagger is at a clearly DIFFERENT place than in base.png (not held still at the hip).",
+      "legs_keep": "both feet at the same pixels"
+    },
+    "h2": {
+      "body": "Assets/_/Spirte/Goblin/source~/Hit/h1.png",
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "legs_keep": "the back foot (the foot on the LEFT side of the image) at exactly the same pixels",
+      "pose": "STAGGER (next moment after base.png): the upper body is thrown far back, the FRONT foot (right side of the image) lifts off the ground and moves backward, the empty arm flung out behind for balance, ears bending forward, pain on the face. The dagger arm keeps going UP and BACK from where it is in base.png: the dagger hand ends ABOVE the top of the head, behind it, the blade pointing back — the arm lags the body like a whip. The dagger is never lowered to the hip in this frame."
+    },
+    "h3": {
+      "body": "Assets/_/Spirte/Goblin/source~/Hit/h2.png",
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "legs_keep": "the back foot (the foot on the LEFT side of the image) at exactly the same pixels",
+      "pose": "STAGGER (next moment after base.png): the lifted FRONT foot lands half a step further back (closer to the back foot), the body drops to its lowest, knees deeply bent, still leaning back, eyes half shut in pain. The dagger arm swings DOWN from above the head and OUT to the side for balance: the dagger hand at shoulder-to-waist height, far out from the body, the blade pointing outward. The empty arm also out for balance."
+    },
+    "h4": {
+      "body": "Assets/_/Spirte/Goblin/source~/Hit/h3.png",
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "legs_keep": "both feet at the same pixels",
+      "pose": "CATCHING BALANCE (next moment after base.png): the body rises a little and leans less back, grimacing; the empty hand presses to the chest where it was hit. The dagger arm comes back IN toward the body: the dagger hand at hip height close to the body, the wrist limp so the blade tilts down."
+    },
+    "h5": {
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "pose": "BRACE: crouched low with bent knees, glaring forward with a vicious snarl, the dagger held up protectively in front of the body. The front foot stays half a step back. The dagger arm lifts the dagger up in front of the chest protectively, blade pointing forward-up. IMPORTANT: the dagger ARM must move with the body's stagger — the dagger is at a clearly DIFFERENT place than in base.png (not held still at the hip).",
+      "legs_keep": "the back foot (the foot on the LEFT side of the image) at exactly the same pixels"
+    },
+    "h6": {
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "pose": "BRACE: rising slightly from the crouch, still glaring and snarling, dagger in front. The front foot stays half a step back.",
+      "legs_keep": "the back foot (the foot on the LEFT side of the image) at exactly the same pixels"
+    },
+    "h7": {
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "pose": "RECOVER: the FRONT foot steps forward again toward its spot in base.png, the body back to the aggressive ready crouch, snarling.",
+      "legs_keep": "the back foot (the foot on the LEFT side of the image) at exactly the same pixels"
+    },
+    "h8": {
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "pose": "RECOVER: almost exactly the ready pose of base.png, the front foot back at its spot, ears settling.",
+      "legs_keep": "both feet at almost the same pixels as base.png"
+    },
+    "h0": {
+      "pose": "(ready pose = base, kept as drawn)"
+    },
+    "h1b": {
+      "body": "Assets/_/Spirte/Goblin/source~/Hit/h1.png",
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "legs_keep": "the back foot (the foot on the LEFT side of the image) at exactly the same pixels; the front foot only starts to lift at the heel",
+      "pose": "IN-BETWEEN (halfway from base.png to a fully thrown-back stagger): the upper body tilts about HALF as far back as a full stagger, the head tilting back, eyes squeezed, teeth clenched; the dagger arm rises from chest height to about head height, elbow bending, the dagger tilting back; the empty arm starts to swing out behind. Only halfway — not the full stagger yet."
+    },
+    "h1w": {
+      "body": "Assets/_/Spirte/Goblin/source~/Hit/h1.png",
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "legs_keep": "both feet at the same pixels",
+      "pose": "CHANGE ONLY THE DAGGER'S ANGLE (the wrist): the body is being knocked BACKWARD, so the wrist is dragged along and bends back — the blade must point BACKWARD (toward the LEFT side of the image, up-and-back), trailing behind the hand, NOT pointing forward toward the right. Keep the hand position, the arm, the body, the face and the legs exactly as in base.png."
+    },
+    "h1bw": {
+      "body": "Assets/_/Spirte/Goblin/source~/Hit/h1b.png",
+      "hands": "The dagger stays in EXACTLY the same hand that holds it in base.png — the NEAR hand, whose arm is on the RIGHT side of the figure in the image. It is never dropped and never moves to the other hand. The other hand (arm on the LEFT side of the image) stays EMPTY.",
+      "legs_keep": "both feet at the same pixels",
+      "pose": "CHANGE ONLY THE DAGGER'S ANGLE (the wrist): the body is being knocked BACKWARD, so the wrist is dragged along and bends back — the blade must point BACKWARD (toward the LEFT side of the image, up-and-back), trailing behind the hand, NOT pointing forward toward the right. Keep the hand position, the arm, the body, the face and the legs exactly as in base.png."
+    }
+  }
+}

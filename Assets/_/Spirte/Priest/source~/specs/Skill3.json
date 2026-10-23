@@ -1,0 +1,23 @@
+{
+ "title": "she points the staff firmly forward (to the right) with one hand",
+ "physics": "A quick decisive gesture: small pull-back anticipation, a fast extension (fast out), a short hold with the staff nearly horizontal pointing to the right, then a slow return (slow in). Only the left arm and the torso move; the body does not slide forward.",
+ "poses": [
+  "Ready: standing like #1, staff planted beside her in the left hand, book in the right hand.",
+  "Anticipation: she pulls the staff slightly toward her body, staff tilted back, weight on the back foot.",
+  "Extend 1: the left arm swings the staff forward, staff at about 45 degrees, torso leaning slightly forward.",
+  "Extend 2: the left arm almost straight, staff nearly horizontal pointing RIGHT, weight on the front foot.",
+  "Point: left arm fully extended to the right, the staff HORIZONTAL pointing right with the orb ornament at the front, determined resolute expression; the book stays still in the right hand at her side.",
+  "Point hold: same as Point, a tiny settle of the coat and hair.",
+  "Return 1: the staff comes back to about 45 degrees, arm bending.",
+  "Return 2: back to the ready stance."
+ ],
+ "rules": [
+  "3/4 view facing RIGHT exactly like #1 in every frame. Body and face never turn toward the camera.",
+  "The caduceus staff with the blue cross orb is held in her LEFT hand (the far side, on the right of the image), exactly like #1. It moves only a little from one frame to the next. It never teleports and never changes hands unless written.",
+  "The white medical book stays in her RIGHT hand (near side) unless the frame says otherwise.",
+  "Keep every design element of #1 in every frame: white nurse cap with blue cross, very long wavy blonde hair with braids and blue ribbons, long white coat with blue lining and gold trim, brown belts with the medical bag and blue potion vials.",
+  "Both feet stay planted at exactly the same spot in every frame (no stepping, no sliding).",
+  "The right hand with the book does not follow the pointing motion; it stays at her side.",
+  "The whole staff including the orb stays inside the cell when pointing."
+ ]
+}

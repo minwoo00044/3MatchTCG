@@ -1,0 +1,29 @@
+{
+ "applied": "Priest_Hit_v2",
+ "inputs": [
+  "part1.png",
+  "part2.png"
+ ],
+ "process": [
+  "--cols",
+  "2",
+  "--rows",
+  "4",
+  "--frames",
+  "8",
+  "--align_x",
+  "both_feet",
+  "--gap_counts",
+  "0",
+  "1",
+  "1",
+  "2",
+  "2",
+  "2",
+  "2",
+  "--fps",
+  "10",
+  "--loop",
+  "false"
+ ]
+}

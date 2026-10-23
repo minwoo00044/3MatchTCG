@@ -1,0 +1,80 @@
+{
+  "name": "Knight_Dead_v1",
+  "character": "Knight",
+  "action": "Dead",
+  "version": 1,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Dead/try1/result.png",
+  "cols": 5,
+  "rows": 5,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      -0.001,
+      0.25
+    ],
+    [
+      0.013,
+      0.25
+    ],
+    [
+      0.014,
+      0.25
+    ],
+    [
+      0.002,
+      0.25
+    ],
+    [
+      0.008,
+      0.5
+    ],
+    [
+      -0.004,
+      0.5
+    ],
+    [
+      -0.004,
+      0.5
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 586,
+  "cellHeight": 522,
+  "pivotX": 0.5,
+  "pivotY": 0.007662835249042145,
+  "fps": 24,
+  "loop": false,
+  "scale": 1.1573,
+  "anchorHeight": 447.2,
+  "stance": {
+    "method": "standing",
+    "vertical": 436,
+    "spread": 90.0,
+    "leg": 85,
+    "crotch": 350
+  },
+  "alignX": "anchor",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 158.5,
+    "right": 223.9
+  },
+  "warnings": []
+}

@@ -1,0 +1,81 @@
+{
+  "name": "Knight_Hit_v2",
+  "character": "Knight",
+  "action": "Hit",
+  "version": 2,
+  "source": "C:/Users/SSAFY/Desktop/prj/3MatchTCG/SpriteRegen/Knight_Hit/try2/result.png",
+  "cols": 6,
+  "rows": 4,
+  "frames": 22,
+  "sourceGrid": {
+    "cols": 4,
+    "rows": 2,
+    "frames": 8
+  },
+  "inbetween": 2,
+  "keyFrames": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21
+  ],
+  "haze": [
+    [
+      -0.004,
+      0.25
+    ],
+    [
+      -0.003,
+      0.25
+    ],
+    [
+      -0.006,
+      0.25
+    ],
+    [
+      -0.005,
+      0.25
+    ],
+    [
+      -0.003,
+      0.25
+    ],
+    [
+      -0.004,
+      0.25
+    ],
+    [
+      -0.004,
+      0.25
+    ]
+  ],
+  "hazeCut": [],
+  "stabilize": null,
+  "cellWidth": 372,
+  "cellHeight": 525,
+  "pivotX": 0.5,
+  "pivotY": 0.007619047619047619,
+  "fps": 30,
+  "durations": null,
+  "loop": false,
+  "scale": 1.0489,
+  "anchorHeight": 494.2,
+  "stance": {
+    "method": "standing",
+    "vertical": 483,
+    "spread": 94.0,
+    "leg": 93,
+    "crotch": 389
+  },
+  "alignX": "both_feet",
+  "alignY": "ground",
+  "footSlide": {
+    "left": 3.7,
+    "right": 4.5
+  },
+  "warnings": []
+}
