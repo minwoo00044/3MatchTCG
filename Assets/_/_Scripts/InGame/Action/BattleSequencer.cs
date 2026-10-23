@@ -115,7 +115,7 @@ public class BattleSequencer : MonoBehaviour
 
         // 시전 모션 먼저. 시전자 뷰가 없으면(적 뷰 미배치 등) 건너뛰되 박자는 유지합니다.
         ActorView casterView = FindView(head.Caster);
-        if (casterView != null) seq.Append(casterView.PlayCast());
+        if (casterView != null) seq.Append(casterView.PlayCast(SkillNumber(head)));
         else seq.AppendInterval(castToHit);
 
         seq.AppendInterval(castToHit);
@@ -155,6 +155,18 @@ public class BattleSequencer : MonoBehaviour
         // 이 타격으로 죽었으면 그 자리에서 쓰러집니다.
         // 이미 죽어 있던 대상은 step.Died가 false라 두 번 쓰러지지 않습니다.
         if (step.Died) seq.Join(view.PlayDeath());
+    }
+
+    // 이 스킬이 시전자의 몇 번째 스킬인지(1부터) = 스프라이트 캐릭터가 틀 Skill 클립 번호.
+    // 플레이어는 CharacterSO.skills의 순서(버블 X1·X2·X3), 적은 스킬이 하나라 1입니다.
+    private static int SkillNumber(BattleStep step)
+    {
+        if (step.Caster is PlayerActor player && player.Origin != null && player.Origin.skills != null)
+        {
+            int index = Array.IndexOf(player.Origin.skills, step.Spec as BubbleSO);
+            if (index >= 0) return index + 1;
+        }
+        return 1;
     }
 
     private ActorView FindView(Actor actor)

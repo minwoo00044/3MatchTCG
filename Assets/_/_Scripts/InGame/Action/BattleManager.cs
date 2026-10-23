@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -55,6 +56,24 @@ public class BattleManager : BaseManager
     [Tooltip("적 뷰 색. 목업입니다")]
     [SerializeField]
     private Color enemyColor = Color.white;
+
+    // 캐릭터의 겉모습(스프라이트 애니메이션)은 CharacterSO에 넣지 않고 여기 따로 둡니다.
+    // CharacterSO는 GDD §2.3이 필드를 정해 둔 데이터이고(파싱 시스템 산출물 예정), 겉모습은 코스메틱이라
+    // 섞으면 스킨을 붙일 때 다시 갈라야 합니다(AGENTS.md §10). 표에 없는 캐릭터는 예전 사각형으로 나옵니다.
+    [Serializable]
+    private class CharacterLook
+    {
+        public CharacterSO character;
+        [Tooltip("파이프라인이 만든 컨트롤러 (Assets/_/_AnimCon/{캐릭터}.controller)")]
+        public RuntimeAnimatorController animator;
+    }
+
+    [Header("LOOK")]
+    [SerializeField]
+    private CharacterLook[] characterLooks;
+    [Tooltip("적의 스프라이트 애니메이션. 비우면 사각형")]
+    [SerializeField]
+    private RuntimeAnimatorController enemyLook;
 
     [Header("DEBUG")]
     [Tooltip("전투 시계와 적 공격을 로그로 확인합니다. 화면이 생기면 제거할 임시 수단입니다")]
@@ -138,13 +157,13 @@ public class BattleManager : BaseManager
 
                 // 만든 자리에서 바로 묶습니다. Actor는 자기 뷰를 모르고, 짝은 시퀀서가 듭니다.
                 AttachView(actor, allyViewPrefab, allyRoot, playerActors.Count - 1,
-                           character.characterName, character.mainColor, true);
+                           character.characterName, character.mainColor, true, FindLook(character));
             }
         }
 
         enemyActor = new EnemyActor(battlefield, enemyName, enemyMaxHP, enemyMaxShield, enemyBaseThreat, enemySkill);
         enemyActor.OnDeath += HandleActorDeath;
-        AttachView(enemyActor, enemyViewPrefab, enemyRoot, 0, enemyName, enemyColor, false);
+        AttachView(enemyActor, enemyViewPrefab, enemyRoot, 0, enemyName, enemyColor, false, enemyLook);
 
         enemyController = new EnemyController(enemyAttackInterval);
 
@@ -171,8 +190,19 @@ public class BattleManager : BaseManager
     //
     // 뷰가 없어도 전투는 그대로 돕니다. 수치와 영수증은 뷰를 모르기 때문입니다.
     // 다만 조용히 넘어가면 "왜 화면이 안 움직이지"를 코드에서 찾게 되므로 한 번 알립니다. (AGENTS.md §9)
+    private RuntimeAnimatorController FindLook(CharacterSO character)
+    {
+        if (characterLooks == null) return null;
+        foreach (CharacterLook look in characterLooks)
+        {
+            if (look != null && look.character == character) return look.animator;
+        }
+        return null;
+    }
+
     private void AttachView(Actor actor, ActorView prefab, Transform root, int seat,
-                            string displayName, Color color, bool facingRight)
+                            string displayName, Color color, bool facingRight,
+                            RuntimeAnimatorController look)
     {
         if (sequencer == null || actor == null) return;
 
@@ -190,7 +220,7 @@ public class BattleManager : BaseManager
 
         // 위치를 확정한 **뒤에** Init을 부릅니다. Init이 시전 모션의 복귀 지점(homePos)을
         // 캡처하므로, 순서가 뒤집히면 캐릭터가 프리팹 원점으로 돌아갑니다. (AGENTS.md §3, §7)
-        view.Init(displayName, color, facingRight);
+        view.Init(displayName, color, facingRight, look);
 
         spawnedViews.Add(view);
         sequencer.Bind(actor, view);
