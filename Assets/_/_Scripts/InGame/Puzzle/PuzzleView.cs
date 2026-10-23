@@ -21,12 +21,12 @@ public class PuzzleView : MonoBehaviour,
     private SpriteRenderer inBubble;
 
     [Header("Dead")]
-    // 죽은 캐릭터의 버블 표시. 예전엔 회색조(쉘·아이콘의 색을 뺌)였는데 색이 빠지면 누구 버블인지 알 수 없어서
-    // 원래 색은 두고 둘레만 회색 테두리로 바꿨다 - 사용자(기획) 테스트 결정 2026-10-23.
-    // GDD §3.2.1 "시각적 구별"은 아직 회색조로 적혀 있다(문서 갱신은 기획자 몫).
-    [Tooltip("죽은 캐릭터의 버블에 보일 테두리. 쉘 뒤에 조금 크게 깐 원이라 둘레만 보입니다")]
+    // 죽은 캐릭터의 버블 표시 (GDD §3.2.1). 원래 색은 그대로 두고 원 안에 X를 칩니다.
+    // 거쳐 온 것(2026-10-23): 회색조 → 색이 빠져 누구 버블인지 모름 / 회색 테두리 → 눈에 잘 안 띔.
+    // X는 쉘과 아이콘 사이 층이라 아이콘을 가리지 않고, 아이콘 둘레와 빈 곳으로 보입니다.
+    [Tooltip("죽은 캐릭터의 버블에 보일 X 표시. 쉘(아래)과 아이콘(위) 사이 정렬 순서에 둡니다")]
     [SerializeField]
-    private SpriteRenderer deadRim;
+    private SpriteRenderer deadMark;
 
     [Header("Highlight")]
     [Tooltip("선택/호버/힌트 표시용 링. 비워두면 쉘 색을 밝게 하는 방식으로 대체됩니다.")]
@@ -65,7 +65,7 @@ public class PuzzleView : MonoBehaviour,
     private int baseShellOrder;
     private int baseInBubbleOrder;
     private int baseRingOrder;
-    private int baseDeadRimOrder;
+    private int baseDeadMarkOrder;
     private bool sortingCaptured;
     private EBubbleHighlight highlight = EBubbleHighlight.None;
 
@@ -87,7 +87,7 @@ public class PuzzleView : MonoBehaviour,
         if (bubbleShell != null) baseShellOrder = bubbleShell.sortingOrder;
         if (inBubble != null) baseInBubbleOrder = inBubble.sortingOrder;
         if (highlightRing != null) baseRingOrder = highlightRing.sortingOrder;
-        if (deadRim != null) baseDeadRimOrder = deadRim.sortingOrder;
+        if (deadMark != null) baseDeadMarkOrder = deadMark.sortingOrder;
     }
     // shellColor는 뷰가 스스로 판단하지 않습니다. 버블 색의 원천은 CharacterSO.mainColor이고
     // 그 매핑은 PuzzleManager가 소유하므로 여기서는 받은 색을 칠하기만 합니다. (GDD §2.2, AGENTS.md §1)
@@ -115,7 +115,7 @@ public class PuzzleView : MonoBehaviour,
 
     public void SetDead(bool dead)
     {
-        if (deadRim != null) deadRim.gameObject.SetActive(dead);
+        if (deadMark != null) deadMark.gameObject.SetActive(dead);
     }
 
     // ===================== 하이라이트 =====================
@@ -209,7 +209,7 @@ public class PuzzleView : MonoBehaviour,
         if (bubbleShell != null) bubbleShell.sortingOrder = baseShellOrder + bump;
         if (inBubble != null) inBubble.sortingOrder = baseInBubbleOrder + bump;
         if (highlightRing != null) highlightRing.sortingOrder = baseRingOrder + bump;
-        if (deadRim != null) deadRim.sortingOrder = baseDeadRimOrder + bump;
+        if (deadMark != null) deadMark.sortingOrder = baseDeadMarkOrder + bump;
     }
 
     // scale: 버블 전체 크기 배율 / glow: 강조 세기(0~1)
