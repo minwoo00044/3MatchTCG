@@ -548,7 +548,7 @@ Transform:
   m_GameObject: {fileID: 1902928780}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.41, y: -0.97, z: 0}
+  m_LocalPosition: {x: 9.2, y: -1.42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -597,6 +597,14 @@ MonoBehaviour:
   enemyRoot: {fileID: 1902928781}
   allySpacing: 2
   enemyColor: {r: 1, g: 1, b: 1, a: 1}
+  characterLooks:
+  - character: {fileID: 11400000, guid: da27d674d894ddd4dace7832b9b11f0c, type: 2}
+    animator: {fileID: 9100000, guid: af74f5c544f811e45bc05851317cfdcc, type: 2}
+  - character: {fileID: 11400000, guid: cc6517eb714ae1143ad912cff3c6e945, type: 2}
+    animator: {fileID: 9100000, guid: 1199f62d77d74bc43a65ce693d3f2956, type: 2}
+  - character: {fileID: 11400000, guid: 86762f020c3409446a1aa86e3bdbb390, type: 2}
+    animator: {fileID: 9100000, guid: ca33c0d43e0df464395e45d1613dd75e, type: 2}
+  enemyLook: {fileID: 9100000, guid: 4d8a9996e732fd6488ba42fd9cc03764, type: 2}
   logBattleTick: 1
 --- !u!4 &1974427798
 Transform:

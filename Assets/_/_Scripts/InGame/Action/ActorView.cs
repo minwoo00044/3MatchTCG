@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -53,6 +55,23 @@ public class ActorView : MonoBehaviour
     [SerializeField]
     private float deathDuration = 0.3f;
 
+    [Header("SPRITE ANIMATION")]
+    // 프레임 애니메이션은 Animator로 재생합니다 - AGENTS.md §7(연출은 DOTween)의 예외입니다.
+    // 사유: 스프라이트 파이프라인(SpriteAnimationPipeline)이 캐릭터마다 클립과 AnimatorController를
+    // 만들어 두었고(상태 = Idle/Hit/Skill1~3/Dead), 프레임별 표시 시간(완급)까지 클립에 들어 있습니다.
+    // DOTween으로 같은 재생기를 다시 만들면 클립 해석이 두 벌이 됩니다(§5).
+    // 역할은 나눕니다 - Animator는 "어떤 그림을 몇 프레임째 보여 줄지"만, "언제 틀지"는 지금처럼
+    // BattleSequencer의 DOTween 타임라인이 정합니다(아래 PlayState는 시퀀스 콜백에서만 불립니다).
+    [Tooltip("프레임 애니메이션을 재생할 Animator. 비우면 body에 붙여 씁니다")]
+    [SerializeField]
+    private Animator animator;
+    [Tooltip("스프라이트 캐릭터의 배율. 캐릭터 간 키 차이는 시트에 이미 들어 있어 모두 같은 값을 씁니다")]
+    [SerializeField]
+    private float spriteScale = 0.4f;
+    [Tooltip("스프라이트 캐릭터: 시전 시작부터 대상이 맞기까지의 시간")]
+    [SerializeField]
+    private float castImpactTime = 0.35f;
+
     [Header("COLOR")]
     [SerializeField]
     private Color damageColor = new Color(1f, 0.35f, 0.35f);
@@ -72,13 +91,67 @@ public class ActorView : MonoBehaviour
     // 시전 방향. 아군은 오른쪽(적 쪽), 적은 왼쪽을 향합니다.
     private int facing = 1;
 
-    public void Init(string displayName, Color mainColor, bool facingRight)
+    // 스프라이트 캐릭터면 true. 아니면 예전 사각형 + DOTween 모션 그대로입니다.
+    private bool animated;
+    // 상태 이름 -> 클립 길이(초). 끝나고 Idle로 돌아갈 시점을 계산하는 데만 씁니다.
+    private readonly Dictionary<string, float> clipLengths = new Dictionary<string, float>();
+    private Tween idleReturn;
+
+    // 파이프라인 클립 이름: {캐릭터}_{액션}_v{N}. 상태 이름 = 액션 (SpriteAnimationPipeline.LinkController)
+    private static readonly Regex ClipAction = new Regex(@"_(Idle|Hit|Skill[1-9]|Dead)_v[0-9]+$");
+
+    public void Init(string displayName, Color mainColor, bool facingRight, RuntimeAnimatorController look = null)
     {
         homePos = transform.position;
         facing = facingRight ? 1 : -1;
 
-        if (body != null) body.color = mainColor;
         if (nameText != null) nameText.text = displayName;
+
+        if (look != null && body != null)
+        {
+            // 스프라이트 캐릭터는 그림 자체가 색이라 칠하지 않습니다. 보는 방향도 시트에 구워져 있습니다
+            // (적은 파이프라인이 좌우 반전해 저장) - 여기서 뒤집지 않습니다.
+            animated = true;
+            body.color = Color.white;
+            body.transform.localScale = Vector3.one * spriteScale;
+            if (animator == null) animator = body.GetComponent<Animator>();
+            if (animator == null) animator = body.gameObject.AddComponent<Animator>();
+            animator.runtimeAnimatorController = look;
+
+            clipLengths.Clear();
+            foreach (AnimationClip clip in look.animationClips)
+            {
+                Match m = ClipAction.Match(clip.name);
+                if (m.Success) clipLengths[m.Groups[1].Value] = clip.length;
+            }
+            return;
+        }
+
+        if (body != null) body.color = mainColor;
+    }
+
+    // 한 동작을 처음부터 틀고, 끝나면 Idle로 돌아갑니다(Dead는 마지막 장면에 머뭅니다).
+    // 없는 상태(예: 적의 Skill2)는 Skill1로 대신합니다.
+    private void PlayState(string state, bool returnToIdle = true)
+    {
+        if (animator == null) return;
+
+        if (!animator.HasState(0, Animator.StringToHash(state)))
+        {
+            if (!state.StartsWith("Skill") || !animator.HasState(0, Animator.StringToHash("Skill1"))) return;
+            state = "Skill1";
+        }
+
+        idleReturn?.Kill();
+        animator.Play(state, 0, 0f);
+
+        if (returnToIdle && clipLengths.TryGetValue(state, out float length))
+        {
+            idleReturn = DOVirtual.DelayedCall(length, () =>
+            {
+                if (animator != null) animator.Play("Idle", 0, 0f);
+            });
+        }
     }
 
     // 게이지는 즉시 값이 아니라 "이 값까지 흐르게" 합니다.
@@ -111,9 +184,21 @@ public class ActorView : MonoBehaviour
     }
 
     // 스킬을 쓰는 쪽 모션. 앞으로 내밀었다 돌아옵니다.
-    public Tween PlayCast()
+    // skillNumber: 이 스킬이 캐릭터의 몇 번째 스킬인지(1부터) - 스프라이트 캐릭터가 틀 Skill 클립.
+    public Tween PlayCast(int skillNumber = 1)
     {
         bodyTween?.Kill();
+
+        if (animated)
+        {
+            // 돌진·휘두르기는 클립에 그려져 있어 위치를 움직이지 않습니다.
+            // 반환하는 트윈 길이 = 타격 시점까지. 클립의 나머지(복귀 자세)는 다음 박자와 겹쳐 흘러갑니다.
+            Sequence cast = DOTween.Sequence();
+            cast.AppendCallback(() => PlayState($"Skill{skillNumber}"));
+            cast.AppendInterval(castImpactTime);
+            bodyTween = cast;
+            return cast;
+        }
 
         // 시작값은 트윈 "생성 전"에 확정합니다. OnStart 안에서 잡으면 이미 늦습니다. (AGENTS.md §7)
         transform.position = homePos;
@@ -135,7 +220,15 @@ public class ActorView : MonoBehaviour
         // 화면이 "맞았다"고 말하면 거짓말이 됩니다. 숫자는 여전히 띄웁니다(0으로).
         if (effect == EBattleEffect.Damage && applied > 0)
         {
-            seq.Join(transform.DOShakePosition(hitDuration, hitShake, 20, 90f, false, true));
+            if (animated)
+            {
+                seq.AppendCallback(() => PlayState("Hit"));
+                seq.AppendInterval(hitDuration);
+            }
+            else
+            {
+                seq.Join(transform.DOShakePosition(hitDuration, hitShake, 20, 90f, false, true));
+            }
         }
 
         ShowPopup(seq, effect, applied);
@@ -147,6 +240,16 @@ public class ActorView : MonoBehaviour
         bodyTween?.Kill();
 
         Sequence seq = DOTween.Sequence();
+
+        if (animated)
+        {
+            // 쓰러지는 모습은 Dead 클립에 있고, 마지막 장면(누운 자세)에 머뭅니다. 흐리게·눕히기는 하지 않습니다.
+            seq.AppendCallback(() => PlayState("Dead", returnToIdle: false));
+            seq.AppendInterval(deathDuration);
+            bodyTween = seq;
+            return seq;
+        }
+
         if (body != null) seq.Join(body.DOFade(0.25f, deathDuration));
         seq.Join(transform.DORotate(new Vector3(0f, 0f, 90f * facing), deathDuration));
 
@@ -193,5 +296,6 @@ public class ActorView : MonoBehaviour
         bodyTween?.Kill();
         hpTween?.Kill();
         shieldTween?.Kill();
+        idleReturn?.Kill();
     }
 }
