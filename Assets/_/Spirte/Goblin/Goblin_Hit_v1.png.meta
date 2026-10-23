@@ -1,0 +1,832 @@
+fileFormatVersion: 2
+guid: 0ad01b358bc800a43b49e892293ee506
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3067580752212876185
+    second: Goblin_Hit_v1_0
+  - first:
+      213: 3163928718880742155
+    second: Goblin_Hit_v1_1
+  - first:
+      213: -3811251522389681397
+    second: Goblin_Hit_v1_2
+  - first:
+      213: 6865740851365847601
+    second: Goblin_Hit_v1_3
+  - first:
+      213: 919753872010149236
+    second: Goblin_Hit_v1_4
+  - first:
+      213: -4397630021707227922
+    second: Goblin_Hit_v1_5
+  - first:
+      213: 2763213885774998009
+    second: Goblin_Hit_v1_6
+  - first:
+      213: -4883798351466776545
+    second: Goblin_Hit_v1_7
+  - first:
+      213: -4194248530838890513
+    second: Goblin_Hit_v1_8
+  - first:
+      213: 5429102461641518575
+    second: Goblin_Hit_v1_9
+  - first:
+      213: 271921424062075083
+    second: Goblin_Hit_v1_10
+  - first:
+      213: -7076689693418267032
+    second: Goblin_Hit_v1_11
+  - first:
+      213: 4741597623006307315
+    second: Goblin_Hit_v1_12
+  - first:
+      213: -1325386813332995903
+    second: Goblin_Hit_v1_13
+  - first:
+      213: -6376001258736281167
+    second: Goblin_Hit_v1_14
+  - first:
+      213: -8557303538395618346
+    second: Goblin_Hit_v1_15
+  - first:
+      213: -2135546617540192136
+    second: Goblin_Hit_v1_16
+  - first:
+      213: 2973564027761205289
+    second: Goblin_Hit_v1_17
+  - first:
+      213: -5765164061685301327
+    second: Goblin_Hit_v1_18
+  - first:
+      213: 7741620544240404122
+    second: Goblin_Hit_v1_19
+  - first:
+      213: -6640265343933031839
+    second: Goblin_Hit_v1_20
+  - first:
+      213: -5279026812093669476
+    second: Goblin_Hit_v1_21
+  - first:
+      213: -8535447855228790176
+    second: Goblin_Hit_v1_22
+  - first:
+      213: 8862269472264772200
+    second: Goblin_Hit_v1_23
+  - first:
+      213: 1792505725923354010
+    second: Goblin_Hit_v1_24
+  - first:
+      213: 6196641060096842129
+    second: Goblin_Hit_v1_25
+  - first:
+      213: -5029196056109882805
+    second: Goblin_Hit_v1_26
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2424
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99b597ff07c329a20800000000000000
+      internalID: 3067580752212876185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_1
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 2424
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0b1b87186888eb20800000000000000
+      internalID: 3163928718880742155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_2
+      rect:
+        serializedVersion: 2
+        x: 1220
+        y: 2424
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0bdb4aeee6bb1bc0800000000000000
+      internalID: -3811251522389681397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_3
+      rect:
+        serializedVersion: 2
+        x: 1830
+        y: 2424
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 132ac859de2084f50800000000000000
+      internalID: 6865740851365847601
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2020
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47d74f5064f93cc00800000000000000
+      internalID: 919753872010149236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_5
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 2020
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eec1c8e7bca78f2c0800000000000000
+      internalID: -4397630021707227922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_6
+      rect:
+        serializedVersion: 2
+        x: 1220
+        y: 2020
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f9ab049368e85620800000000000000
+      internalID: 2763213885774998009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_7
+      rect:
+        serializedVersion: 2
+        x: 1830
+        y: 2020
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f183f2a5643493cb0800000000000000
+      internalID: -4883798351466776545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1616
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe7d4abee290bc5c0800000000000000
+      internalID: -4194248530838890513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_9
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 1616
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fed675b9ceb085b40800000000000000
+      internalID: 5429102461641518575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_10
+      rect:
+        serializedVersion: 2
+        x: 1220
+        y: 1616
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc0d900381f06c300800000000000000
+      internalID: 271921424062075083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_11
+      rect:
+        serializedVersion: 2
+        x: 1830
+        y: 1616
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86ed22eb73c8acd90800000000000000
+      internalID: -7076689693418267032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1212
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f3a0238ae98dc140800000000000000
+      internalID: 4741597623006307315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_13
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 1212
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c0cc4927b74b9de0800000000000000
+      internalID: -1325386813332995903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_14
+      rect:
+        serializedVersion: 2
+        x: 1220
+        y: 1212
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b9949df2a4e387a0800000000000000
+      internalID: -6376001258736281167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_15
+      rect:
+        serializedVersion: 2
+        x: 1830
+        y: 1212
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d36cb635c95e3980800000000000000
+      internalID: -8557303538395618346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 808
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 878da3c7aa30d52e0800000000000000
+      internalID: -2135546617540192136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_17
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 808
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92026978ab8344920800000000000000
+      internalID: 2973564027761205289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_18
+      rect:
+        serializedVersion: 2
+        x: 1220
+        y: 808
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bf366fb4d50effa0800000000000000
+      internalID: -5765164061685301327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_19
+      rect:
+        serializedVersion: 2
+        x: 1830
+        y: 808
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a96c05d3ed2cf6b60800000000000000
+      internalID: 7741620544240404122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 404
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16ad880f9d909d3a0800000000000000
+      internalID: -6640265343933031839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_21
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 404
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9fd46975112db6b0800000000000000
+      internalID: -5279026812093669476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_22
+      rect:
+        serializedVersion: 2
+        x: 1220
+        y: 404
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06ad73ef56ffb8980800000000000000
+      internalID: -8535447855228790176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_23
+      rect:
+        serializedVersion: 2
+        x: 1830
+        y: 404
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86a5126712b1dfa70800000000000000
+      internalID: 8862269472264772200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_24
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a95e38be57240e810800000000000000
+      internalID: 1792505725923354010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_25
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 0
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1991ca38634eef550800000000000000
+      internalID: 6196641060096842129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Hit_v1_26
+      rect:
+        serializedVersion: 2
+        x: 1220
+        y: 0
+        width: 610
+        height: 404
+      alignment: 9
+      pivot: {x: 0.5, y: 0.00990099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4266c135d4b43ab0800000000000000
+      internalID: -5029196056109882805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: fc3ddfd8f5c0da24685b04df59429117
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Goblin_Hit_v1_0: 3067580752212876185
+      Goblin_Hit_v1_1: 3163928718880742155
+      Goblin_Hit_v1_10: 271921424062075083
+      Goblin_Hit_v1_11: -7076689693418267032
+      Goblin_Hit_v1_12: 4741597623006307315
+      Goblin_Hit_v1_13: -1325386813332995903
+      Goblin_Hit_v1_14: -6376001258736281167
+      Goblin_Hit_v1_15: -8557303538395618346
+      Goblin_Hit_v1_16: -2135546617540192136
+      Goblin_Hit_v1_17: 2973564027761205289
+      Goblin_Hit_v1_18: -5765164061685301327
+      Goblin_Hit_v1_19: 7741620544240404122
+      Goblin_Hit_v1_2: -3811251522389681397
+      Goblin_Hit_v1_20: -6640265343933031839
+      Goblin_Hit_v1_21: -5279026812093669476
+      Goblin_Hit_v1_22: -8535447855228790176
+      Goblin_Hit_v1_23: 8862269472264772200
+      Goblin_Hit_v1_24: 1792505725923354010
+      Goblin_Hit_v1_25: 6196641060096842129
+      Goblin_Hit_v1_26: -5029196056109882805
+      Goblin_Hit_v1_3: 6865740851365847601
+      Goblin_Hit_v1_4: 919753872010149236
+      Goblin_Hit_v1_5: -4397630021707227922
+      Goblin_Hit_v1_6: 2763213885774998009
+      Goblin_Hit_v1_7: -4883798351466776545
+      Goblin_Hit_v1_8: -4194248530838890513
+      Goblin_Hit_v1_9: 5429102461641518575
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

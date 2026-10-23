@@ -86,6 +86,24 @@ def check_team_action(character, action):
         sys.exit(str(e))
 
 
+def match_color(img, ref):
+    """
+    인물(불투명 픽셀)의 채널별 색 분포를 기준 그림의 분포에 맞춘다(히스토그램 매칭). 알파는 그대로.
+    Codex 편집을 앞 장 결과에서 이어 하면 장마다 색이 조금씩 붉어져 쌓였다(Goblin Hit h3·h4, 2026-10-23).
+    자세가 달라도 같은 인물이면 색 분포는 거의 같다는 가정 — 소품·이펙트 면적이 크게 다르면 쓰지 않는다.
+    """
+    a = np.asarray(img.convert("RGBA")).copy()
+    r = np.asarray(ref.convert("RGBA"))
+    m, rm = a[..., 3] > 128, r[..., 3] > 128
+    for c in range(3):
+        src, tgt = a[..., c][m].astype(float), np.sort(r[..., c][rm].astype(float))
+        order = np.argsort(src, kind="stable")
+        q = np.empty_like(src)
+        q[order] = np.linspace(0, 1, len(src))
+        a[..., c][m] = np.interp(q, np.linspace(0, 1, len(tgt)), tgt).round().astype(np.uint8)
+    return Image.fromarray(a, "RGBA")
+
+
 def latest_sheet(character, action):
     """Spirte/{캐릭터}/ 에서 해당 액션의 최신 버전 시트 (prev/ 제외)."""
     pat = re.compile(rf"^{character}_{action}_v(\d+)\.png$")

@@ -131,20 +131,9 @@
     **내려찍기가 보간 없이 뚝 떨어진다**(raise → slam_smear → impact가 각 1장).
   - Skill3: **보간을 더**, **왼다리를 앞으로 뻗는 동작** 추가, **표정 변화(작은 함성)** 추가.
 
-## Goblin — 첫 적 캐릭터 (2026-10-21~22), 다음: Skill1 마무리 → Hit → Dead
-- 적 파이프라인: `character.json "team": "enemy"` → Idle·Hit·Skill1·Dead만, 처리 단계에서 좌우 반전(규칙 `process_sprite_sheet.py TEAMS`, SKILL.md "적 캐릭터").
-- 완료: ★1(140cm, young, 필수 10개 — 원화에 없는 녹슨 단검 = 그린 그림 LEFT/앞쪽 손 = 게임 오른손) → 턴어라운드 1차 확정 → Idle AI 시트(웅크린 공격 자세, 몸 0번·눈 4번)
-  → set-height + 웅크림 보정(편 키 = 140cm, ref_height 376.9) → **Idle_v2 적용·기준 시트**(kneebody 무릎 3%·호흡 0.8%, 30fps 0.8초).
-- 이번에 고친 도구 빈칸: 턱 찾기가 사람 피부색 고정이라 고블린(올리브색)은 목천·붕대를 턱으로 잡았다 → `character.json palette.skin` + `deform.use_skin`.
-  그 여파로 Idle_v1은 깜빡임이 입·코 자리에 붙어 눈을 안 감았다(→ v2). 녹화 도구가 `_Compare/` 없는 PC에서 실패 → 폴더 생성.
-- **Skill1(돌진 베기) 진행 중** — 사용자: 세트 A가 좋지만 "단검이 왼손에서 오른손으로 옮겨가는 찐빠".
-  A 원본 = `source~/Skill1/setA/try1·3·6.png`(칸별 `cells/f01~f12.png`). A의 2~7장은 단검이 뒤쪽 손이었다.
-  - 실패한 것: 장별 Codex 편집으로 손 바꾸기(2~7장 안 바뀜, 8~10장만 바뀜 = `f08~f10.png`) / 앞쪽 손 재생성 high·low(예비 동작을 또 뒤쪽 팔로 그림 — 생성은 이 편향이 강하다).
-  - 통한 것: **Idle 몸(이미 앞쪽 손)을 pose_edit로 편집** — `pose/Skill1_windup.json` → `w02·w04·w05.png`(앞쪽 손 확인). `w03`은 시간 초과로 재시도 중이었다(SSAFY PC, 결과 없으면 다시 돌린다).
-  - 남은 일: `pose_edit generate --pose w03` → accept → 12장 잇기:
-    `f01 | w02 w03 w04 w05 | near_tail_try9.png 2x2의 1~4(임팩트~복귀, 앞쪽 손) | f10 f11 f12`.
-    배율(A 원본 px 기준): f 캔버스 ×0.5, w 캔버스 ×0.6564, try9 칸 ×1.0 → `splice_frames.py --scales …` 후
-    `process_sprite_sheet.py --cols 12 --rows 1 --frames 12 --gap_counts 1 1 1 0 0 1 2 2 2 2 2 --align_x left_foot --scale 0.7334`.
-    Idle·이전 A와 비교 녹화 → 사용자 확인 → `Goblin_Skill1_v1` 적용, `source~/Skill1/process.json` 기록.
-  - 크기: Skill1 생성분은 턱 기준 배율로 Idle보다 13~16% 크게 나와 0번 키를 Idle에 맞춘 `--scale`을 썼다(A 0.7334).
-- Hit(크게 휘청)·Dead(뒤로 나자빠짐): 디렉팅·정의 확정(`character.json actions`). 단검 손 편향 때문에 **Idle 몸 pose_edit로 시작**하는 것을 권한다(Dead는 다리를 크게 써서 generate_action이 필요할 수 있음).
+## Goblin — 첫 적 캐릭터 (2026-10-21~23) — 4개 동작 완료
+- 적용: Idle_v2(기준 시트) · Skill1_v1 · Hit_v1 · Dead_v1. 컨트롤러 기본 상태 Idle. 각 동작 재현은 `Goblin/source~/{액션}/process.json`.
+- 설정: 140cm, young, 웅크림 보정 ref_height 376.9, palette.skin(올리브색), 단검 = 그린 그림 앞쪽(LEFT) 손 = 게임 오른손.
+- Skill1: 세트 A의 몸·궤적 + 단검 손 교정(2~5장 Idle 몸 편집, 6~9장 앞쪽 손 재생성분, 10장 편집). Hit: 이어서 편집 11장(지적 3회 반영 — process.json feedback).
+  Dead: 이어서 편집 10장, 누운 장면 0.91배. Hit h3→h4 보간은 번져서 끊김(플레이에서 거슬리면 사이 장면 추가).
+- 배운 것은 SKILL.md "사람이 아닌 캐릭터·한 손 무기".

@@ -51,6 +51,17 @@ Knight(2026-10-14~15)가 이 순서로 원화에서 6개 동작까지 갔다. **
   - **처리된(반전된) 시트를 다시 파이프라인 `--input`으로 넣지 않는다** — 두 번 뒤집혀 오른쪽을 보게 된다. 다시 만들 땐 원본(`source~`, `source_build.py`)에서.
 - 설정: `deform.py init ... --team enemy` → `character.json` `"team": "enemy"`(없으면 ally). 키 비교(`lineup`·`set-height --relative-to`)는 아군과 같이 한다.
 
+### 사람이 아닌 캐릭터·한 손 무기 (Goblin, 2026-10-22~23)
+- **피부색**: 턱 찾기(`deform.face_chin`)는 사람 피부색 기준이다. 피부가 다른 캐릭터는 `character.json palette.skin`을 먼저 넣고 `sheet_check.py masks`로 확인한다 —
+  없으면 천·붕대를 턱으로 잡아 키·배율·Idle 깜빡임 자리가 전부 틀렸다(Goblin Idle_v1은 눈을 한 번도 안 감았다). `skull_over_L` 추정도 비교샷 파랑 선으로 다시 잰다.
+- **무기 손**: `generate_action`(처음부터 그림)은 휘두르기 전 동작을 **뒤쪽 팔**로 그리려는 편향이 강했다 — 손 지정 문구·편집으로도 안 고쳐짐(Skill1 4회).
+  무기가 앞쪽 손이면 **Idle 몸을 `pose_edit`로 편집**해 시작한다(이미 그 손에 쥔 그림이라 바뀌지 않는다).
+- **이어서 편집**: Idle 몸에서 매번 출발하면 팔다리를 최소로만 움직인다(Hit "단검 손이 휘청임에 맞지 않게 고정"). 앞 장 결과를 다음 장 `body`로 —
+  `pose_chain.py`(생성 → `accept --match-color source~/body.png` → 다음 장). 장마다 색이 붉어지고 크기가 커지는 게 쌓이니
+  색은 `--match-color`, 크기는 실루엣 면적으로 재서 `splice_frames.py --keep-canvas --scales`(발밑 고정)로 고친다.
+- 사용자 지적으로 굳힌 동작 규칙: 무기 팔은 몸을 한 박자 늦게 따라가고, 몸이 뒤로 넘어가면 손목이 끌려 칼날이 뒤로 처진다. 큰 자세 변화(서 있음 → 젖혀짐, 기울어짐 → 누움) 사이에는 장면을 하나 더 그린다.
+- 런지처럼 뒷발이 바닥에 납작하면 발 검출이 놓친다 → `splice_frames.py --pin-foot left` + `--align_x anchor`. 쓰러지며 이동하는 동작은 `--keep-canvas`.
+
 ### 관문 1 — 설정 입력 (생성 전에)
 원화를 보고 후보를 제안하고, AskUserQuestion으로 받는다. 짐작으로 채우지 않는다.
 - **이름**(영문, 대문자 시작), **키(cm)** — 기존 캐릭터를 함께 보여 준다(Archer 160, Knight 170). 키 차이는 게임 안에서 실제 크기 차이로 보인다.

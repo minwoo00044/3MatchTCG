@@ -21,7 +21,10 @@
     "props_reference": "Goblin_Idle_v2",
     "note": "deform.py init — 사용자 입력"
   },
-  "align_x": {},
+  "align_x": {
+    "Skill1": "anchor",
+    "Hit": "anchor"
+  },
   "actions": {
     "Skill1": {
       "direction": "돌진 베기",

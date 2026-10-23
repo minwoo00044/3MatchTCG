@@ -1,0 +1,806 @@
+fileFormatVersion: 2
+guid: d289cb337f8d9034d8edefc69d577805
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -318209220423265816
+    second: Goblin_Skill1_v1_0
+  - first:
+      213: 5082858065708755794
+    second: Goblin_Skill1_v1_1
+  - first:
+      213: 3041414888585668983
+    second: Goblin_Skill1_v1_2
+  - first:
+      213: -3406819862582123810
+    second: Goblin_Skill1_v1_3
+  - first:
+      213: -3475319677340593978
+    second: Goblin_Skill1_v1_4
+  - first:
+      213: -143630469032837650
+    second: Goblin_Skill1_v1_5
+  - first:
+      213: -4435794976811972443
+    second: Goblin_Skill1_v1_6
+  - first:
+      213: 3814035347863897348
+    second: Goblin_Skill1_v1_7
+  - first:
+      213: -8782554140935729363
+    second: Goblin_Skill1_v1_8
+  - first:
+      213: 4803240053716001621
+    second: Goblin_Skill1_v1_9
+  - first:
+      213: -3269801396947961440
+    second: Goblin_Skill1_v1_10
+  - first:
+      213: 1087480185778039654
+    second: Goblin_Skill1_v1_11
+  - first:
+      213: 1152299934085333134
+    second: Goblin_Skill1_v1_12
+  - first:
+      213: 4571318348908031734
+    second: Goblin_Skill1_v1_13
+  - first:
+      213: 1509808679518397101
+    second: Goblin_Skill1_v1_14
+  - first:
+      213: 4881817684902129314
+    second: Goblin_Skill1_v1_15
+  - first:
+      213: 445170360827121264
+    second: Goblin_Skill1_v1_16
+  - first:
+      213: 2491040179601151037
+    second: Goblin_Skill1_v1_17
+  - first:
+      213: -6419624181926042483
+    second: Goblin_Skill1_v1_18
+  - first:
+      213: 187113803061639111
+    second: Goblin_Skill1_v1_19
+  - first:
+      213: -8365086108510158874
+    second: Goblin_Skill1_v1_20
+  - first:
+      213: -8805165569641391234
+    second: Goblin_Skill1_v1_21
+  - first:
+      213: -4497537645564131400
+    second: Goblin_Skill1_v1_22
+  - first:
+      213: -1371505391034237504
+    second: Goblin_Skill1_v1_23
+  - first:
+      213: 7115242628440043372
+    second: Goblin_Skill1_v1_24
+  - first:
+      213: 619957428497652465
+    second: Goblin_Skill1_v1_25
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2640
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e1da64666e759bf0800000000000000
+      internalID: -318209220423265816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_1
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 2640
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25bac4a0b70f98640800000000000000
+      internalID: 5082858065708755794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_2
+      rect:
+        serializedVersion: 2
+        x: 1616
+        y: 2640
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 779abb02ab6453a20800000000000000
+      internalID: 3041414888585668983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_3
+      rect:
+        serializedVersion: 2
+        x: 2424
+        y: 2640
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed22c05926b88b0d0800000000000000
+      internalID: -3406819862582123810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2200
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c0503f9a2f25cfc0800000000000000
+      internalID: -3475319677340593978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_5
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 2200
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eedff5279d8b10ef0800000000000000
+      internalID: -143630469032837650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_6
+      rect:
+        serializedVersion: 2
+        x: 1616
+        y: 2200
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a809ae68f3e072c0800000000000000
+      internalID: -4435794976811972443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_7
+      rect:
+        serializedVersion: 2
+        x: 2424
+        y: 2200
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4050636f0fc2ee430800000000000000
+      internalID: 3814035347863897348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1760
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2fc3e07a891e1680800000000000000
+      internalID: -8782554140935729363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_9
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 1760
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 553aba4516988a240800000000000000
+      internalID: 4803240053716001621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_10
+      rect:
+        serializedVersion: 2
+        x: 1616
+        y: 1760
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a937d024f45f92d0800000000000000
+      internalID: -3269801396947961440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_11
+      rect:
+        serializedVersion: 2
+        x: 2424
+        y: 1760
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66b639d9771871f00800000000000000
+      internalID: 1087480185778039654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1320
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e80ccd55faacdff00800000000000000
+      internalID: 1152299934085333134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_13
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 1320
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fe63e581d5907f30800000000000000
+      internalID: 4571318348908031734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_14
+      rect:
+        serializedVersion: 2
+        x: 1616
+        y: 1320
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da2ee75aefae3f410800000000000000
+      internalID: 1509808679518397101
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_15
+      rect:
+        serializedVersion: 2
+        x: 2424
+        y: 1320
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2aeafc6c153bfb340800000000000000
+      internalID: 4881817684902129314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 880
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07e02a5a5109d2600800000000000000
+      internalID: 445170360827121264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_17
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 880
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d341a5268d3f19220800000000000000
+      internalID: 2491040179601151037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_18
+      rect:
+        serializedVersion: 2
+        x: 1616
+        y: 880
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d846ac4b1d9e8e6a0800000000000000
+      internalID: -6419624181926042483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_19
+      rect:
+        serializedVersion: 2
+        x: 2424
+        y: 880
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c7bf043303c89200800000000000000
+      internalID: 187113803061639111
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 440
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ef72b2218e39eb80800000000000000
+      internalID: -8365086108510158874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_21
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 440
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7b5601f094cdc580800000000000000
+      internalID: -8805165569641391234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_22
+      rect:
+        serializedVersion: 2
+        x: 1616
+        y: 440
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b7043027598591c0800000000000000
+      internalID: -4497537645564131400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_23
+      rect:
+        serializedVersion: 2
+        x: 2424
+        y: 440
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0cdfed70d1f67fce0800000000000000
+      internalID: -1371505391034237504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_24
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6fa2eee87b6eb260800000000000000
+      internalID: 7115242628440043372
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Skill1_v1_25
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 0
+        width: 808
+        height: 440
+      alignment: 9
+      pivot: {x: 0.5, y: 0.009090909}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1fa977d1ff78a9800800000000000000
+      internalID: 619957428497652465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 0b76ff2c0013dea4abae94d65a9932ee
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Goblin_Skill1_v1_0: -318209220423265816
+      Goblin_Skill1_v1_1: 5082858065708755794
+      Goblin_Skill1_v1_10: -3269801396947961440
+      Goblin_Skill1_v1_11: 1087480185778039654
+      Goblin_Skill1_v1_12: 1152299934085333134
+      Goblin_Skill1_v1_13: 4571318348908031734
+      Goblin_Skill1_v1_14: 1509808679518397101
+      Goblin_Skill1_v1_15: 4881817684902129314
+      Goblin_Skill1_v1_16: 445170360827121264
+      Goblin_Skill1_v1_17: 2491040179601151037
+      Goblin_Skill1_v1_18: -6419624181926042483
+      Goblin_Skill1_v1_19: 187113803061639111
+      Goblin_Skill1_v1_2: 3041414888585668983
+      Goblin_Skill1_v1_20: -8365086108510158874
+      Goblin_Skill1_v1_21: -8805165569641391234
+      Goblin_Skill1_v1_22: -4497537645564131400
+      Goblin_Skill1_v1_23: -1371505391034237504
+      Goblin_Skill1_v1_24: 7115242628440043372
+      Goblin_Skill1_v1_25: 619957428497652465
+      Goblin_Skill1_v1_3: -3406819862582123810
+      Goblin_Skill1_v1_4: -3475319677340593978
+      Goblin_Skill1_v1_5: -143630469032837650
+      Goblin_Skill1_v1_6: -4435794976811972443
+      Goblin_Skill1_v1_7: 3814035347863897348
+      Goblin_Skill1_v1_8: -8782554140935729363
+      Goblin_Skill1_v1_9: 4803240053716001621
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

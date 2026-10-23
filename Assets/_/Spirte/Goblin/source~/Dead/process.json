@@ -1,0 +1,32 @@
+{
+  "note": "Goblin Dead_v1 (사용자 적용 2026-10-23). d1~d8·d4b = pose_chain.py(앞 장에서 이어서 편집 + --match-color source~/body.png), d0 = 몸 기준.",
+  "splice": {
+    "tool": "splice_frames.py --keep-canvas",
+    "items": [
+      "d0.png:1x1:1",
+      "d1.png:1x1:1",
+      "d2.png:1x1:1",
+      "d3.png:1x1:1",
+      "d4.png:1x1:1",
+      "d4b.png:1x1:1",
+      "d5.png:1x1:1",
+      "d6.png:1x1:1",
+      "d7.png:1x1:1",
+      "d8.png:1x1:1"
+    ],
+    "scales": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0.91,
+      0.91,
+      0.91,
+      0.91
+    ],
+    "why_scales": "이어서 편집하며 누운 장면이 ~10% 커짐(실루엣 면적)"
+  },
+  "process": "--input splice.png --cols 10 --rows 1 --frames 10 --gap_counts 0 1 1 1 1 0 0 1 2 --hold 9:0.4 --align_x anchor --scale 0.4814"
+}

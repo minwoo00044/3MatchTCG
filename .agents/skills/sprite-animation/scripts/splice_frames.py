@@ -98,6 +98,8 @@ def main():
     ap.add_argument("--fit", choices=["silhouette", "face", "none"], default="silhouette")
     ap.add_argument("--scales", type=float, nargs="+", default=None, help="항목별 배율을 직접 준다(--fit보다 우선)")
     ap.add_argument("--keep-canvas", action="store_true", help="자르지 않고 캔버스째 잇는다(모든 장의 몸이 같은 자리일 때, 처리는 --align_x anchor)")
+    ap.add_argument("--pin-foot", choices=["left", "right"],
+                    help="장마다 바닥 띠(키의 6%%)의 가장 왼쪽/오른쪽 픽셀(디딘 뒷발 끝)을 같은 x에 놓는다. 처리는 --align_x anchor")
     ap.add_argument("items", nargs="+")
     args = ap.parse_args()
     if args.keep_canvas:
@@ -112,6 +114,24 @@ def main():
             ims.append(C.load_rgba(path))
         if len({im.size for im in ims}) != 1:
             sys.exit(f"--keep-canvas: 캔버스 크기가 다르다 {sorted({im.size for im in ims})}")
+        if args.scales:
+            # 캔버스째 이으면서 장별 크기만 고친다 — 발밑(실루엣 바닥 가운데)을 고정점으로 줄이고 키워 캔버스 위치(쓰러지며 이동한 거리)를 지킨다.
+            # 앞 장에서 이어서 편집하면 누운 장면이 서 있는 장보다 ~10% 커졌다(Goblin Dead 2026-10-23)
+            if len(args.scales) != len(ims):
+                sys.exit(f"--scales {len(args.scales)}개, 항목 {len(ims)}개")
+            fixed = []
+            for im, s in zip(ims, args.scales):
+                if abs(s - 1) < 0.005:
+                    fixed.append(im)
+                    continue
+                a = np.asarray(im)[:, :, 3] > 128
+                ys, xs = np.where(a)
+                px, py = (xs.min() + xs.max()) / 2, ys.max()
+                sm = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
+                c = Image.new("RGBA", im.size)
+                c.alpha_composite(sm, (round(px - px * s), round(py - py * s)))
+                fixed.append(c)
+            ims = fixed
         cw, ch = ims[0].width + GAP, ims[0].height
         out = Image.new("RGBA", (cw * len(ims), ch))
         for k, im in enumerate(ims):
@@ -151,6 +171,27 @@ def main():
         if abs(s - 1) > 0.005:
             g[:] = [im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS) for im in g]
     ims = [im for g in groups for im in g]
+    if args.pin_foot:
+        # 런지처럼 뒷발이 바닥에 납작하게 깔리면 파이프라인의 발 검출(세로로 두툼한 열만)이 그 발을 놓쳐
+        # 궤적·앞발에 맞춰 몸이 반 칸씩 밀렸다(Goblin Skill1 2026-10-23: 베기·임팩트 장). 디딘 발 끝을 직접 맞춘다
+        def foot_x(im):
+            a = np.asarray(im)[:, :, 3] > 128
+            ys = np.where(a.any(1))[0]
+            band = a[ys.max() - max(3, int((ys.max() - ys.min()) * 0.06)):ys.max() + 1]
+            xs = np.where(band.any(0))[0]
+            return xs.min() if args.pin_foot == "left" else xs.max()
+        fx = [foot_x(im) for im in ims]
+        left = max(fx) if args.pin_foot == "left" else max(f for f in fx)
+        right = max(im.width - f for im, f in zip(ims, fx))
+        cw = left + right + GAP
+        ch = max(im.height for im in ims) + GAP
+        out = Image.new("RGBA", (cw * len(ims), ch))
+        for k, (im, f) in enumerate(zip(ims, fx)):
+            out.alpha_composite(im, (k * cw + GAP // 2 + left - f, ch - GAP // 2 - im.height))
+        os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+        out.save(args.out)
+        print(f"RESULT {json.dumps({'ok': True, 'out': args.out, 'frames': len(ims), 'scales': factors, 'pin_foot': args.pin_foot}, ensure_ascii=False)}")
+        return
     cw = max(im.width for im in ims) + GAP
     ch = max(im.height for im in ims) + GAP
     out = Image.new("RGBA", (cw * len(ims), ch))

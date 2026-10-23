@@ -77,6 +77,13 @@ def body_image(character, override=None):
 
 def base_canvas(body, spec, path, key):
     w, h = spec.get("canvas", [1024, 1536])
+    if body.size == (w, h):
+        # 앞 장의 편집 결과(이미 같은 캔버스)를 바탕으로 이어서 편집할 때 — 다시 맞추지 않는다.
+        # Idle 몸에서 매번 출발하면 Codex가 팔을 최소로만 움직여 휘청이는 몸에 단검 팔이 붙어 있었다(Goblin Hit 2026-10-23)
+        c = Image.new("RGBA", (w, h), C.KEY_COLORS[key] + (255,))
+        c.alpha_composite(body)
+        c.convert("RGB").save(path)
+        return
     fig_h = spec.get("figure_h", 900)
     s = fig_h / body.height
     body = body.resize((round(body.width * s), fig_h), Image.LANCZOS)
@@ -144,7 +151,10 @@ def cmd_accept(args):
     dst = source_dir(args.character, args.action, f"{args.pose}.png")
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     # 키 색(또는 예전 흰 배경)을 지운 투명 PNG로 둔다 — 뒤 단계(smear·splice)는 투명 그대로 쓴다
-    C.load_rgba(args.result).save(dst)
+    img = C.load_rgba(args.result)
+    if args.match_color:
+        img = C.match_color(img, Image.open(os.path.join(C.ROOT, args.match_color)))
+    img.save(dst)
     print(f"RESULT {json.dumps({'ok': True, 'saved': os.path.relpath(dst, C.ROOT).replace(os.sep, '/')}, ensure_ascii=False)}")
 
 
@@ -183,6 +193,7 @@ def main():
     a.add_argument("--action", required=True)
     a.add_argument("--pose", required=True)
     a.add_argument("result")
+    a.add_argument("--match-color", help="색 분포를 이 그림(보통 몸 기준 source~/body.png)에 맞춘다 — 이어서 편집해 색이 틀어졌을 때")
     b = sub.add_parser("base", help="준비 장면(몸 기준 그대로)을 source~/{액션}/{포즈}.png로")
     b.add_argument("--character", required=True)
     b.add_argument("--action", required=True)

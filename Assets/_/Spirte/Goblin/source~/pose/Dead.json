@@ -1,0 +1,67 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "figure_h": 700,
+  "foot_margin": 70,
+  "common": "The goblin is killed — no blush, no smile. The dagger keeps exactly the same size and shape. Everything stays inside the canvas.",
+  "poses": {
+    "d1": {
+      "hands": "The dagger stays in the SAME hand as in base.png — the NEAR hand (arm on the RIGHT side of the figure) — until the frame where it is written that it slips out. The other hand stays empty. The dagger arm follows the body's motion with a slight lag, and the wrist is dragged so the blade trails behind the hand (never stiffly pointing forward).",
+      "legs_keep": "both feet at the same pixels",
+      "pose": "RECOIL from a killing blow from the RIGHT side: the head and upper body snap back, eyes wide then squeezing, mouth open in a choked cry; the dagger arm jerks up and out, the blade trailing back."
+    },
+    "d2": {
+      "hands": "The dagger stays in the SAME hand as in base.png — the NEAR hand (arm on the RIGHT side of the figure) — until the frame where it is written that it slips out. The other hand stays empty. The dagger arm follows the body's motion with a slight lag, and the wrist is dragged so the blade trails behind the hand (never stiffly pointing forward).",
+      "legs_keep": "the back foot (LEFT side of the image) at the same pixels",
+      "pose": "STAGGER BACK: the front foot (RIGHT side of the image) steps back past the other foot, the upper body still leaning back, the empty hand clutching the chest; the dagger arm swings out wide, loose. (This is the next moment after base.png.)",
+      "body": "Assets/_/Spirte/Goblin/source~/Dead/d1.png"
+    },
+    "d3": {
+      "hands": "The dagger stays in the SAME hand as in base.png — the NEAR hand (arm on the RIGHT side of the figure) — until the frame where it is written that it slips out. The other hand stays empty. The dagger arm follows the body's motion with a slight lag, and the wrist is dragged so the blade trails behind the hand (never stiffly pointing forward).",
+      "legs_keep": "the foot that just stepped back stays where it is",
+      "pose": "STAGGER BACK again: the other foot steps further back, knees buckling, the body sagging; the dagger hangs loosely from limp fingers, the blade pointing down. (This is the next moment after base.png.)",
+      "body": "Assets/_/Spirte/Goblin/source~/Dead/d2.png"
+    },
+    "d4": {
+      "hands": "The dagger stays in the SAME hand as in base.png — the NEAR hand (arm on the RIGHT side of the figure) — until the frame where it is written that it slips out. The other hand stays empty. The dagger arm follows the body's motion with a slight lag, and the wrist is dragged so the blade trails behind the hand (never stiffly pointing forward).",
+      "legs_keep": "nothing fixed — the feet may slide",
+      "pose": "LOSING BALANCE: the feet slide forward (toward the RIGHT), the body tips over backward (toward the LEFT) about 30 degrees, arms rising; the dagger starts to slip out of the loose fingers. (This is the next moment after base.png.)",
+      "body": "Assets/_/Spirte/Goblin/source~/Dead/d3.png"
+    },
+    "d5": {
+      "hands": "The dagger stays in the SAME hand as in base.png — the NEAR hand (arm on the RIGHT side of the figure) — until the frame where it is written that it slips out. The other hand stays empty. The dagger arm follows the body's motion with a slight lag, and the wrist is dragged so the blade trails behind the hand (never stiffly pointing forward).",
+      "legs_keep": "nothing fixed",
+      "pose": "FALLING: the body is about 60 degrees back, almost horizontal, both feet lifting off the ground in front (RIGHT), arms flung up; the dagger has left the hand and is spinning in the air above the body. (This is the next moment after base.png.)",
+      "body": "Assets/_/Spirte/Goblin/source~/Dead/d4.png"
+    },
+    "d6": {
+      "hands": "The dagger stays in the SAME hand as in base.png — the NEAR hand (arm on the RIGHT side of the figure) — until the frame where it is written that it slips out. The other hand stays empty. The dagger arm follows the body's motion with a slight lag, and the wrist is dragged so the blade trails behind the hand (never stiffly pointing forward).",
+      "legs_keep": "nothing fixed",
+      "pose": "IMPACT ON THE GROUND: the goblin lands flat on its BACK, head toward the LEFT, feet toward the RIGHT, limbs bouncing up; the dagger lands on the ground a little beyond the hand. Everything rests on one ground line at the bottom. (This is the next moment after base.png.)",
+      "body": "Assets/_/Spirte/Goblin/source~/Dead/d5.png"
+    },
+    "d7": {
+      "hands": "The dagger stays in the SAME hand as in base.png — the NEAR hand (arm on the RIGHT side of the figure) — until the frame where it is written that it slips out. The other hand stays empty. The dagger arm follows the body's motion with a slight lag, and the wrist is dragged so the blade trails behind the hand (never stiffly pointing forward).",
+      "legs_keep": "nothing fixed",
+      "pose": "SMALL BOUNCE: still lying on the back, the limbs flop down, the head rolls slightly to the side; the dagger lies still on the ground. (This is the next moment after base.png.)",
+      "body": "Assets/_/Spirte/Goblin/source~/Dead/d6.png"
+    },
+    "d8": {
+      "hands": "The dagger stays in the SAME hand as in base.png — the NEAR hand (arm on the RIGHT side of the figure) — until the frame where it is written that it slips out. The other hand stays empty. The dagger arm follows the body's motion with a slight lag, and the wrist is dragged so the blade trails behind the hand (never stiffly pointing forward).",
+      "legs_keep": "the lying body at the same pixels",
+      "pose": "SETTLED: lying completely limp on the back, eyes closed, mouth slack, arms and legs relaxed on the ground, the dagger on the ground next to the open hand. (This is the next moment after base.png.)",
+      "body": "Assets/_/Spirte/Goblin/source~/Dead/d7.png"
+    },
+    "d0": {
+      "pose": "(ready pose = base, kept as drawn)"
+    },
+    "d4b": {
+      "body": "Assets/_/Spirte/Goblin/source~/Dead/d4.png",
+      "hands": "The dagger stays in the SAME hand as in base.png — the NEAR hand (arm on the RIGHT side of the figure) — until the frame where it is written that it slips out. The other hand stays empty. The dagger arm follows the body's motion with a slight lag, and the wrist is dragged so the blade trails behind the hand (never stiffly pointing forward).",
+      "legs_keep": "nothing fixed",
+      "pose": "IN-BETWEEN (halfway from base.png to falling flat): the body tips further backward to about 45 degrees (toward the LEFT), the feet sliding forward (toward the RIGHT) with the heels still touching the ground, arms rising up and out; the dagger is slipping out of the fingers, hanging from the fingertips, the blade trailing. Keep the goblin EXACTLY the same size as in base.png. (This is the next moment after base.png.)"
+    }
+  }
+}
