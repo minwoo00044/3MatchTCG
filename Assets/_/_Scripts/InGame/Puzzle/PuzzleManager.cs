@@ -206,7 +206,7 @@ public class PuzzleManager : BaseManager, IReceivableMachineManager
             if (pair.Value == character) deadSpecs.Add(pair.Key);
         }
 
-        // 보드에 이미 남은 버블은 파괴 가능 상태로 유지하고 표현만 즉시 사망 표시(원 안의 X)로 바꿉니다.
+        // 보드에 이미 남은 버블은 파괴 가능 상태로 유지하고 표현만 즉시 사망 표시(원 안의 금지 표시)로 바꿉니다.
         puzzleMatrixView.SetDead(deadSpecs);
 
         // 현재 스왑의 리필은 MoveReceipt에 이미 확정돼 있습니다. 전투 실행 중 들어온 이 갱신은
